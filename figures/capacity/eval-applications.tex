@@ -1,0 +1,23 @@
+\begin{table}
+\footnotesize
+ \begin{tabularx}{\columnwidth}{@{}lXcl@{}}
+ \toprule
+ \thead{Applications} & \thead{Isolated Objects \{Ref. Types\}}& \thead{No. of\\domains}& \thead{Modified\\SLOC} \\
+ \midrule
+ \makecell[l]{NGINX (v1.23.0)\\+LibreSSL (vx,x,x)} & \makecell[l]{Private key\{\cpath, \fd,\ptr\}\\TLS Session key\{\ptr\}\\Sokets \{\fd\}} & 3 \\
+ \midrule
+ OpenSSH (v1.1.1) & Private key \{\cpath, \fd,\ptr\} & 1 \\
+ \midrule
+ minizip &Password \{\ptr\}& 1\\
+ \midrule
+ wget (v1.1.1) & Password \{\ptr\}& 1\\
+
+ 
+ \bottomrule
+ \end{tabularx}
+
+\caption{Programs used to evaluate \thename's resource isolation. }
+
+\label{tbl:porting-app}
+\label{tbl:app}
+\end{table}

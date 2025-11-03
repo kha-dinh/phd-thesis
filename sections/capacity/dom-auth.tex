@@ -1,0 +1,231 @@
+% !TeX root = ../main.tex
+\section{Domain Switching and Authentication}
+\label{sec:design:impers}
+\keypoint{
+\thename's API design allows the introduction of flexible compartmentalization  boundaries to existing software through in-place annotations.
+}
+However, such a design must be robust against  \emph{domain impersonation} (\srimpers).
+% \keypoint{
+% In this section, we show how \thename prevents \emph{domain impersonation} (\srimper) with its design.
+% }
+In \thename's threat model, domain impersonation happens when a compromised domain diverts the control flow into \thename APIs, \eg, calling the domain entry gates with arbitrary arguments, or corrupts \thename's critical values, \eg, \gls{mte} tag ID stored in memory to gain illegal access to domain-private resources.
+\thename prevents such domain impersonation using two techniques.
+First, \thename \emph{authenticates} the domain entry sites by requiring them to construct \emph{entry tokens}, which the reference monitor can verify before granting the domain switch.
+Second, it introduces an in-userspace \emph{authentication} protocol that securely fetches the currently executing domain's \gls{mte} tag.
+In both cases, after successful authentication, \thename securely places its critical values (the domain's memory tag and the per-instance modifier) in compiler-reserved registers and fetches them when needed to prevent illegal modifications.
+% By forbidding the compiler from using the reserved register and enforcing a coarse-grained CFI, \thename ensures that these registers are used only for their designated purposes.
+
+% Second, \thename uses two reserved registers to store the \gls{mte} tag and the per-instance modifier, preventing the attacker from tampering with its tag and modifier management.
+
+% \hdr{Domain authentication}
+% \added{
+% Domain authentication enables trustworthy runtime domain ID fetching, which allows us to avoid hardcoding \gls{mte} tag values into functions.
+% \thename authenticates the currently executing domain with a data structure called the \gls{dst}.
+% Additionally, a global variable that stores the domain ID of the currently active domain (\texttt{curr\_dom}) is also maintained.
+% During initialization, \thename's runtime library populates the table with the  \emph{domain signatures} of each declared domain ({\tt DST[i] = }\pac{DBi}{0}{0}).
+% \thename then makes the \gls{dst} read-only throughout program execution to prevent tampering.
+% }
+
+
+% \hdr{Authenticated domain ID retrieval}
+% \thename enables trustworthy runtime domain ID fetching, which allows us to avoid hardcoding \gls{mte} tag values into functions.
+% Hence, \thename-protected functions that employ \gls{mte} tagging can be invoked from \emph{multiple} domains.
+% % This authenticated runtime retrieval of domain \gls{mte} tag allows a \thename-protected functions to be called from \emph{multiple} domains.
+% % % that have domain-private object authentication (i.e., \texttt{pacdb})
+% Domain ID retrieval is performed with the \gls{dst} that is filled with 
+% The variable, called \texttt{int curr\_dom}, is updated on each \texttt{capac\_enter(domID)} and \texttt{capac\_exit()} invocation.  
+
+% The following code snippet shown above illustrates how \thename fetches the signature of the current domain and authenticates it. 
+% \begin{lstlisting}[style=sslab-capacity-c]
+%     domain_signature_t dom_sig = DST[curr_dom];
+%     AUTDB(dom_sig); %     // dom_sig now contains /*!\textcolor{clr-comment}{\tagnum{Dom}}!*/ if authentication succeed
+%     assert(dom_sig == curr_dom);
+%     // /*!\textcolor{clr-comment}{\tagnum{Dom}}!*/ is known from this point onward
+% \end{lstlisting}
+
+
+% The above procedure can be inlined to verify the current domain ID, such that it can be used as a \gls{mte} tag for the pending operation. 
+% Notably, \texttt{capac\_malloc()} uses the procedure to authenticate the callee's domain ID and tag the allocated memory accordingly. 
+% The procedure is also imperative in runtime domain stack and pointer tagging in \thename's instrumentation, as we will explain in \cref{sec:design:instrumentation}. 
+
+
+
+\textbf{Secure domain switching.}
+\label{sec:design:libcapac}
+\label{sec:design:switch-auth} % \hdr{Bootstraping}
+The program enters a domain through the API \texttt{capac\_enter} (\autoref{tab:apis}) that internally invokes an \texttt{ioctl} syscall to the reference monitor.
+The reference monitor then switches the currently activating \key{DB} to that of the target domain by writing into the dedicated \gls{pa} key registers with its kernel privilege. Hence, an attacker who can invoke \texttt{ioctl} calls with arbitrary values could achieve \emph{impersonation} and access domain-private references.
+\keypoint{
+	\thename protects the domain switches from impersonation by authenticating domain entry points with \key{G}.
+}
+Before a domain switching request, the call gate signs the domain ID argument in \texttt{capac\_enter(domID, mod)} with a \texttt{pacga} instruction, then passes the signed argument to \thename reference monitor.
+Since there is no dedicated authentication instruction that uses \key{G}, the reference monitor uses \texttt{pacga} to generate the valid argument with the domain ID and compare it with the argument from the call gate. Domain entry is granted if the two values match.  
+After the entry is granted, the call gate loads the per-instance modifier into a reserved floating-point register (\texttt{ModReg}), which is to be used by our instrumentation for pointer authentication demonstrated in \cref{sec:instrumentation}.
+Finally, the call gate clears the token-containing register to prevent the leaking of the entry token.
+\texttt{capac\_enter} is implemented as the following call gate, which is to be inlined to the domain switching sites:
+
+% \begin{listing}[h]
+\begin{minted}{c}
+    PACGA(token, target_id, 0)
+    if(!ioctl(capac_fd, CAPAC_ENTER, token, modifier)) 
+        exit();
+    // Load per-instance modifier into ModReg register
+    asm volatile("fmov ModReg, %[mod]" ::[mod] "r"(modifier) :);  
+    // Clear entry token from register
+\end{minted}
+% \caption{\thename domain entry gate}
+    
+% \end{listing}
+
+\keypoint{
+	\thename endows authenticity to the entry points by preventing attackers from diverting the control flow into arbitrary instructions with \gls{cfi} and ensuring that the instruction \texttt{pacga} is absent within the process but the domain entry sites.
+}
+\key{G} is currently unused in both deployed and proposed \gls{pa}-based defenses.
+Therefore, it is unlikely that it would naturally appear under normal circumstances.
+Also, since ARM is a RISC architecture, we can generally rule out the issue of unaligned, unintended occurrences of the instruction, an issue that makes preventing illegal instruction occurrences challenging on x86 architectures \cite{erim}.
+
+% After, the \texttt{capac\_exit} call simply instructs the reference monitor to revert the domain key to that of the ambient domain.
+
+% \added{
+% The reference monitor also receives and activates an instance-specific modifier, which it uses as the modifier to sign domain-private file descriptors (\cref{sec:design:ref-mon})  
+% }
+
+
+% \begin{figure}[t]
+% 	\centering
+
+% \caption{\thename domain entry call gate}
+% \label{fig:dom_callgate}
+% \end{figure}
+\textbf{Authenticated domain ID retrieval.}
+\thename enables a trustworthy runtime domain ID fetching procedure.
+This avoids hardcoding \gls{mte} tags into functions that require memory tagging since these functions might be used in confused deputy attacks to tag arbitrary memory regions. 
+Moreover, fetching the domain ID at runtime allows a \thename-protected function to be called from multiple domains.
+The procedure is also imperative in runtime domain memory and pointer tagging in \thename's instrumentation, as we will explain in \cref{sec:design:instrumentation}.
+\thename's private heap memory allocator, \texttt{capac\_malloc()}, also uses the procedure to authenticate the callee's domain ID and tag the allocated memory.
+% that have domain-private object authentication (i.e., \texttt{pacdb})
+
+To prepare for runtime domain ID retrieval, \thename first constructs a \gls{dst} that is filled with \emph{domain signatures} of each declared domain ({\tt DST[i] = }\pac{DBi}{0}{0}).
+After initialization, the table remains read-only throughout program execution to prevent tampering.
+Additionally, a global variable that stores the domain ID of the currently active domain, \texttt{int curr\_dom}, is updated on each \texttt{capac\_enter(domID)} and \texttt{capac\_exit()} invocation.
+
+The following snippet is inlined to verify the current domain ID, such that it can be used as a \gls{mte} tag for the pending operation:
+% The variable, 
+% \begin{listing}[h!]
+\begin{minted}[escapeinside=||]{c}
+    domain_signature_t dom_sig = DST[curr_dom];
+    AUTDB(dom_sig);
+    assert(dom_sig == curr_dom);
+    // Form a tag mask shifting left by 56 bits
+    asm volatile("lsl %[tag], %[tag], 56" : [tag] "=r"(target_id)::); 
+    // Load tag mask into TagReg register
+    asm volatile("fmov TagReg, %[tag]" ::[tag] "r"(target_id) :);  
+    // |\tagnum{Dom}| is known from this point onward
+\end{minted}
+% \caption{\thename domain ID authentication}
+% \end{listing}
+The above procedure first fetches the current domain's signature from the \gls{dst}, then authenticates it with the domain key.
+If authentication succeeds, a \emph{tag mask} is constructed, \eg \texttt{0x00ff00..00}, which can be applied to an untagged pointer with a bitwise \texttt{OR}.
+The tag mask is stored in a reserved floating-point register (\texttt{TagReg}), so the memory tagging operations can efficiently retrieve it.
+% \begin{lstlisting}[style=sslab-capacity-c,language={C},keepspaces,numbers=none,frame=none]
+% int dom_id = dom_auth(DST[curr_dom]);
+% if (dom_id == FAILED) exit();
+% // dom_id 
+% \end{lstlisting}
+% The code snippet shown above illustrates how \thename fetches the signature of the current domain and authenticates it.
+
+% \hdr{Optimization with unused registers}
+% After the domain switch is granted, the call gate builds the tag mask \eg, \texttt{0x00ff00..00} which can later be applied on an untagged pointer with a bitwise \texttt{OR}.
+
+% Similarly, the per-instance modifier is stored in another floating-point register.
+% Domain private pointer authentication operations later retrieve the modifier from the register to use as the signing/authentication context.
+
+
+
+
+% \added{
+% \thename domain switch performs the following actions. 
+% Internally, it invokes a \texttt{ioctl} call to the reference monitor to request changing the current domain key to the domain key of \texttt{domID} and allow access to \thename references of that domain.
+% Hence, an attacker who can invoke \texttt{ioctl} calls with arbitrary values could achieve \emph{impersonation} and access domain-private references. 
+% }
+
+% It signs the target domain ID with \texttt{pacga} as a token of proof that the call originates from a legitimate site, as explained in \cref{sec:design:domains}, and passes the token as an argument to the \texttt{ioctl} call.
+
+
+
+% \begin{lstlisting}[style=sslab-capacity-c]
+%     PACGA(token, target_id, 0)
+%     if(!ioctl(capac_fd, CAPAC_ENTER, token)) 
+%         exit();
+%     curr_dom = target_id;
+% \end{lstlisting}
+
+
+% \begin{lstlisting}
+%    pacga x8, x0, x8      
+% \end{lstlisting}
+
+
+
+
+% Enabling trustworthy runtime domain ID fetching allows us to avoid hardcoding \gls{mte} tag values into functions.
+
+% Given our key switching mechanism, \thename must prevents attackers from
+
+% Each domain is authenticated with a per-domain \gls{pa} key called \emph{domain authentication key}, or domain key for short.
+
+
+
+
+
+
+
+ 
+
+% \chcomment{why we need cryptographic}
+
+% \hdr{Domain-private and ambient objects}
+
+
+
+
+
+
+
+
+% \hdr{Life-cycle protection of program objects}
+% The novelty of \thename's design compared to the previous capability systems~\cite{capsicum,cheri-risc,cheri} is that it coherently applies the access control principles throughout the life-cycle of in-process resources.
+
+
+
+
+% A summary of \thename's encapsulated reference types, and their authentication scheme is displayed in \autoref{tbl:objects}\hj{Move}.
+
+
+% \hdr{Domain memory isolation}
+% For domain memory isolation, \thename requires that both the \ptr references and their pointed-to memory region are protected, for that \gls{pa} alone cannot guarantee memory safety. 
+% Hence, \thename employs \gls{mte} memory tagging to establish \emph{domain-private} memory. \thename facilities (explained in \cref{sec:implementation}) strictly control the creation and usage of \ptr that could access the tagged memory.
+% The ambient domain is given an ID of 0, which means that untagged memory and {\ptr}s are implicitly ambient objects. 
+% As shown in \autoref{fig:overview}, the authentication of {\ptr}s utilizes hardware-assisted checks from both \gls{pa} and \gls{mte}.
+
+% \ptr in \thename's security model requires special considerations against pointer forging attacks that reuse \gls{pa} signing instructions~\cite{pac-it-up,kernel-pac}.
+% \thename's design incorporates existing \gls{pa}-based \gls{cfi} forward-edge/backward-edge schemes, which is also a common requirement for \gls{pa}-based security~\cite{pac-it-up}.
+% Hence, the adversary cannot jump into arbitrary instruction sequences to forge a pointer, and the attack surface is vastly diminished.
+% We further discuss the security of \gls{cfi} and the remaining issues (\eg, \emph{signing oracles}) in \cref{sec:discussion:oracle}.
+
+
+% \hdr{Reference delegation} \thename also supports references \emph{delegation}, \ie, the transferrtherring of resources access right from one domain into another.
+% This is an essential feature to support multi-domain interaction in complex programs.
+% Our webserver example discussed in \cref{sec:evaluation:porting-app} illustrates the necessity of such domain-to-domain reference delegation; a domain that interacts with the private server key for TLS handshake produces a session key, which s then delegated to the session handling domain.
+
+
+
+
+
+% We will further explain the design and implementation of the components that enforce complete mediation in the next section.
+
+% \hdr{Security requirements}
+
+
+
+

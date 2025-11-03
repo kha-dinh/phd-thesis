@@ -1,0 +1,264 @@
+\documentclass[a4paper,11pt]{SKKU-PhD-Thesis}
+\usepackage{IEEEtrantools}
+\usepackage{pdfpages}
+\usepackage[a4paper]{geometry}
+\usepackage{multirow}
+\usepackage{rotating}
+\usepackage[breaklinks = true]{hyperref} % to use \phantomsection
+
+
+% \usepackage[english]{babel}
+\usepackage{booktabs}
+\usepackage{threeparttable}
+\usepackage{subcaption}
+% \expandafter\def\csname ver@subfig.sty\endcsname{}
+
+% Highlight and stuffs
+\usepackage{soul}
+% \makeatletter 
+% \setbox\z@\hbox{\ttfamily\global\let\SOUL@tt\ttfamily}
+% \setbox\z@\hbox{\SOUL@tt-}
+% \SOUL@ttwidth\wd\z@
+% \makeatother
+
+% \usepackage[
+% style=ieee
+% ]{biblatex}
+\usepackage[nocompress]{cite}
+%%-----------------------------------------
+%% required packages for writing
+\usepackage{listings}
+\usepackage{minted}
+\setminted[c]{frame=single,framesep=2mm,bgcolor=gray!10}
+\usepackage{balance}
+\usepackage{setspace}
+\usepackage{graphicx}
+%\usepackage[tight]{subfigure}
+\usepackage{caption}
+% \usepackage[caption=false]{subfig}
+\usepackage{graphics,picins}
+%\usepackage{epstopdf}
+
+% *** MATH PACKAGES ***
+\usepackage[cmex10]{amsmath}
+\usepackage{amsfonts}
+\usepackage{amsthm,amssymb}
+\usepackage{amsmath}
+\usepackage{circledsteps} % ***NOT ACM***
+\usepackage{float}
+\usepackage[ruled,vlined,linesnumbered,lined,boxed,commentsnumbered]{algorithm2e}
+\usepackage{setspace}
+
+\usepackage{tabularx}
+\usepackage{color}
+\usepackage{multirow}
+\usepackage{etoolbox}
+\usepackage{mathtools}
+\usepackage{textcomp}
+\usepackage{lipsum,graphicx,multicol}
+\usepackage{caption}
+% \usepackage[caption=false]{subfig}
+%\usepackage{subfigure}
+%\usepackage{subcaption} % for subfigures
+%\usepackage[aboveskip=0pt]{subcaption}
+\usepackage{makecell}
+\usepackage{adjustbox}
+\usepackage[toc,page]{appendix}
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+
+
+
+%from ACL
+\usepackage{amssymb,amsmath,array,bm}
+
+% \usepackage{cleveref}
+\newcommand{\cref}{\autoref}
+% \renewcommand{\ref}{\autoref}
+\providecommand*{\listingautorefname}{Listing}
+\renewcommand*{\sectionautorefname}{Section}
+\renewcommand*{\subsectionautorefname}{Subsection}
+\renewcommand*{\subsubsectionautorefname}{Subsubsection}
+
+% \usepackage{svg}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric,matrix,fit, arrows}
+% Also, note that the amsmath package sets \interdisplaylinepenalty to 10000
+% thus preventing page breaks from occurring within multiline equations. Use:
+\interdisplaylinepenalty=2500
+% after loading amsmath to restore such page breaks as IEEEtran.cls normally
+% does. amsmath.sty is already installed on most LaTeX systems. The latest
+% version and documentation can be obtained at:
+% http://www.ctan.org/tex-archive/macros/latex/required/amslatex/math/
+
+%\usepackage[ruled,vlined,linesnumbered,longend,resetcount,algochapter]{algorithm2e}
+
+% *** TRACKING CHANGED PACKAGES ***
+%\usepackage[final]{changes}
+%\usepackage[addedmarkup=uwave]{changes}
+%\setdeletedmarkup{\textcolor{red}{\sout{#1}}}
+
+% \include{ldt_MBL_newcommand}
+
+
+\input{terminologies}
+% \addbibresource{references.bib}
+% \addbibresource{capacity.bib}
+% \addbibresource{sepim.bib}
+\begin{document}
+% \catcode`\-=\active
+% \newcommand-{hallo}
+% \hyphenchar\font=\textendash
+% \textendash\font=\hypenchar
+% \newcommand{\newhyphen}{\rotatebox[origin=c]{-7}{-}}
+% \hyphenchar\font=\newhyphen
+
+% \newcommand{\theauthor}{Kha Dinh Duy}
+% \newcommand{\thedepartment}{Computer Science and Engineering}
+% \newcommand{\theadvisor}{Hojoon Lee}
+% \newcommand{\theyear}{2023}
+
+
+\author{Kha Dinh Duy}
+\department{Computer Science and Engineering}
+\title{Retrofitting Modern Operating System Security with Hardware Supports}
+\year{2023}
+\month{October}
+\advisor{Hojoon Lee}
+\committeechair{Hyungjoon Koo}
+\firstmember{Hyungshick Kim}
+\secondmember{}
+\thirdmember{}
+
+\newpage
+%%---------------------------------
+\makecover
+%%---------------------------------
+\makeinsidecover
+%%---------------------------------
+\makesubmissionform
+%%---------------------------------
+\makecertification
+
+
+
+%\includegraphics[page=1,scale=1.0]{131226-ThesisAproval.pdf}
+%\includepdf[pages=1]{131226-ThesisAproval.pdf}
+
+%%---------------------------------
+%\phantomsection \label{chap:Acknowledgement}
+%\addcontentsline{toc}{chapter}{Acknowledgements}
+%\include{ldt-MBL-acknowledgement}
+
+\newpage
+
+%\begin{CJK}{UTF8}{}
+%\begin{Korean}
+% \renewcommand{\contentsname}{}
+\setcounter{tocdepth}{2}
+\pagenumbering{roman}% start numbering from Content
+\tableofcontents
+
+
+\newpage
+\phantomsection \label{listoftab}
+% \addcontentsline{toc}{chapter}{List of Tables}
+\listoftables
+
+\newpage
+\phantomsection \label{listoffig}
+% \addcontentsline{toc}{chapter}{List of Figures}
+\listoffigures
+
+\newpage
+
+%\phantomsection \label{chap:Publications}
+%\addcontentsline{toc}{chapter}{Publications}
+%\include{ldt-MBL-publication}
+
+%\section*{Patent}
+%\begin{itemize}
+%\item[-] patents
+%\end{itemize}
+
+\newpage
+%%--------------------------------------
+% Abstract
+%\include{ldt-MBL-Pre-0-abstract}
+\makeabstracttitle
+
+Traditional \emph{operating systems (OSes)} often only provide coarse-grained security mechanisms for rudimentary protection, such as process isolation and system calls white-listing. Unfortunately, these mechanisms are insufficient in the modern world. Security threats are getting increasingly advanced, while application security requirements are also increasing. For instance, modern confidential computing systems must consider the threat of side-channel leakages and sophisticated physical attacks. Moreover, traditional security mechanisms such as process-based isolation entail performance and usability trade-offs. 
+
+At the same time, hardware vendors constantly roll out modern hardware security features with the hope of tackling those problems. For example, Intel released Protection Keys for Userspace (PKU) to enable efficient page-granularity in-process memory isolation. Trusted Execution Environment (TEE) technologies create an environment shielded against potentially compromised system software. This trend creates two research questions. First, how to adapt operating system designs to the security constraints of new hardware features such as TEEs. Second, how modern hardware features can be retrofitted to implement OS security mechanisms.
+
+
+% Thus, a key question that modern operating systems must answer is how to effectively take advantage of modern hardware features to (1) provide a safe execution environment for applications robust against advanced threats and (2) introduce low-overhead primitives for implementing robust applications.
+
+This dissertation provides steps toward answering those questions. I first took a look at the emerging hardware of \gls{pim} and the newly introduced features \gls{pa} and \gls{mte} on modern ARM processors and see how they can be retrofitted into \gls{os} security primitives. Based on our observation, I devised two systems, \textsc{SE-PIM} and \textsc{Capacity}.
+I next study the security issues of modern hardware-supported confidential \gls{vm}.
+I am in the process of designing and evaluating a novel design for OS-supported side-channel defense mechanisms that take advantage of direct privileged hardware access provided by the unikernel. 
+
+
+
+
+
+ 
+\textbf{Keywords:} Security, Operating System
+
+\include{sections/introduction}
+\include{sections/background}
+\include{sections/sepim}
+\include{sections/capacity}
+\include{sections/oblivm}
+
+%%--------------------------------------
+% Chapters.....
+\phantomsection %\label{chap:Intro}
+%\addcontentsline{toc}{chapter}{Introduction}
+%\include{ldt-MBL-Pre-1-intro}
+%================================================
+
+%================================================
+\phantomsection
+%\addcontentsline{toc}{chapter}{Literature Review}
+%\include{ldt-MBL-Pre-2-background}
+
+%================================================
+% References 
+\newpage
+%\include{ldt-MBL-Pre-reference}
+% \titleformat*{\section}{\center\large\bfseries}
+\phantomsection \label{chap:Reference}
+\addcontentsline{toc}{chapter}{References}
+\bibliographystyle{IEEEtran}
+
+% Dirty hack lol
+\renewcommand{\bibname}{\hfil \hfil References}
+{
+\small
+% \printbibliography
+\bibliography{all}
+}
+
+\newpage
+\phantomsection \label{chap:Appendix}
+\addcontentsline{toc}{chapter}{Appendix}
+\include{ldt-MBL-0-appendix}
+
+\newpage
+\phantomsection \label{chap:KrAbstract}
+\addcontentsline{toc}{chapter}{초록}%Korean Abstract
+\include{ldt-MBL-0-abstract-ko}
+\newpage
+
+\makesidecover
+
+
+
+
+%\pagenumbering{arabic}
+
+
+
+
+\end{document}

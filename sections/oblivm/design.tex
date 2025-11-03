@@ -1,0 +1,43 @@
+\section{Design}
+\label{wtg}
+We are interested in two key features of the OS, (1) being able to control the virtual address mapping through page table manipulation, and (2) being able to intercept access to memory through page faults.
+Through page table manipulation, we observe that we can control application \emph{access pattern} to physical memory without changing the \emph{virtual address space} of the application.
+
+On the other hand, page fault-based interception enables a primitive similar to that of compiler instrumentation that inserts inline reference monitor before/after memory accesses~\cite{asan,wichelmann_cipherfix_nodate,dynpta} to enforce security policies. 
+With access to the page table, we can clear the present bit in the page of interest such that all access to those pages would transfer to the kernel reference monitor.
+However, two issues prevent the page fault handler from being a reliable defense tool.
+First, page-level interception is too coarse-grained. After one instruction is intercepted, the control must be passed back to the faulting instruction. After this, there is no way to intercept other memory accesses to the same page. 
+Second, traditional page fault handlers do not need to be aware of the semantics of the fault-inducting instruction, e.g., whether it is a load or store instruction and how many bytes are accessed. 
+However, understanding instruction semantics is necessary to implement many fine-grained defense policies, like changing the \emph{location} and \emph{content} of data being accessed.
+For the above reasons, we incorporate an \emph{emulation engine} that the faulting instruction and allows the fault handler to emulate the instruction. The emulation engine exposes hooks through callbacks that enable fine-grained security instrumentation on load and store instructions.
+
+\textbf{Virtual Memory Areas}
+Operating systems manage the address space through an abstraction called the \gls{vma}. A \gls{vma} contains the start and end address of a contiguous virtual address range. 
+Especially in Unikraft, the infrastructure \gls{vma} is implemented as a library that allows the user to define \gls{vma} with user-defined behaviors.
+We extend the \gls{vma} abstraction to fit our purposes and use it to implement our security mechanisms as \glspl{vma} within the address spaces. For instance, memory accesses virtual addresses that are within the oblivious paging \gls{vma} (\autoref{sec:ovma}) will have their paging pattern protected.
+
+
+
+
+
+\subsection{Oblivious Paging}
+\label{sec:ovma}
+Our first defense tries to obfuscate application memory accesses to \emph{guest physical memory} to make them seem random and observing hypervisor. At a high level, we employ a single 2MB page as a trusted physical space (an ORAM stash) and enforce that accessible virtual addresses are only mapped to this page. We place the kernel and application memory into an ORAM tree, We use the Path ORAM algorithm to swap pages in and out of the stash. This way, an observing hypervisor that monitors page accesses would only see accesses to a single page, that is, the ORAM stash, along with seemingly random ORAM accesses.
+
+
+\subsection{Automatic Salting of Sensitive Writes}
+The recently discussed cipherleak attack~\cite{li_cipherleaks_nodate,li_systematic_2022} exploits the ciphertext side-channel to extract sensitive memory access patterns from cryptographic libraries. 
+Such an attack can be prevented if the data is \emph{salted} with a nonce before being written to memory.
+This approach is employed by a proposed defense that utilizes compiler analysis and binary instrumentation~\cite{wichelmann_cipherfix_nodate}.
+With our emulation primitive, we can implement an automatic salting scheme without relying on a compiler pass.
+
+% We implement an automatic salting scheme.
+
+\subsection{In-register Data Protection}
+The CacheWarp attack~\cite{cachewarp} selectively drops a sensitive memory write instruction from a \gls{cvm}, to enable control flow hijacking and bypassing of access control checks. 
+Conceptually, this attack is similar to the \emph{data-only} attacks that corrupt sensitive in-memory data structures through memory vulnerabilities. 
+To prevent data-only attacks, an approach is to protect sensitive data within a trusted memory region. Since all memory can be used for the attack, we use the vector registers. This approach can be seen in previous work that employs compiler instrumentation~\cite{dynpta}. 
+We can implement such a defense without the compiler.
+
+
+% test

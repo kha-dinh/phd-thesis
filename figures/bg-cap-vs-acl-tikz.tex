@@ -1,0 +1,118 @@
+\tikzstyle{arrow} = [thick,->,>=stealth]
+\tikzstyle{subject} = [ circle, minimum size=2cm, draw=black ]
+\tikzstyle{resource} = [rectangle, minimum height=2cm,  minimum width=2.5cm, draw=black, anchor=east, font=\ttfamily,]
+\tikzstyle{clist} = [draw, rectangle, rounded corners=20pt, minimum height=2.5cm]
+\tikzstyle{capability} = [draw, inner sep=1mm, anchor=west, minimum width=1cm, font=\ttfamily,]
+\tikzstyle{mymatrix} = [matrix of nodes, nodes=capability, row sep=1mm]
+
+\begin{figure}
+    \centering
+    \begin{tikzpicture}[node distance=2.6cm, 
+    ]
+\node (a) [subject] {Alice};
+\node (b) [subject, below of=a] {Bob};
+\node (c) [subject, below of=b] {Carol};
+
+
+
+\matrix[mymatrix, right of=a, xshift=4cm] (mx1) {
+    R\\
+    R\\
+    R\\
+};
+
+
+\matrix[mymatrix, right of=b, xshift=4cm] (mx2) {
+    W\\
+    R\\
+};
+
+\matrix[mymatrix, right of=c, xshift=4cm] (mx3) {
+    W\\
+    W\\
+};
+
+\node (cap1) [above of=a, yshift=-0.8cm] {Subjects};
+\node (cap2) [right of=cap1, xshift=4cm, align=center] {Access Control Lists};
+\node [right of=cap2, xshift=1cm] {Resource};
+
+\node(clist1) [clist, fit=(mx1)] {};
+\node(clist2) [clist, fit=(mx2)] {};
+\node(clist3) [clist, fit=(mx3)] {};
+
+\node(res1) [resource,right of=clist1, xshift=1cm] {/etc/passwd};
+\node(res2) [resource,right of=clist2, xshift=1cm] {/home/bob};
+\node(res3) [resource,right of=clist3, xshift=1cm] {/tmp/log};
+
+\draw[arrow] (mx1-1-1) -- (a);
+\draw[arrow] (mx1-2-1) -- (b);
+\draw[arrow] (mx1-3-1) -- (c);
+
+
+\draw[arrow] (mx2-1-1) -- (a);
+\draw[arrow] (mx2-2-1) -- (b);
+
+\draw[arrow] (mx3-1-1) -- (b);
+\draw[arrow] (mx3-2-1) -- (c);
+
+\end{tikzpicture}
+    \caption{Access control using ACLs.}
+    \label{fig:bg:acl}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{tikzpicture}[node distance=2.6cm, 
+    ]
+\node (a) [subject] {Alice};
+\node (b) [subject, below of=a] {Bob};
+\node (c) [subject, below of=b] {Carol};
+
+
+
+\matrix[mymatrix, right of=a] (mx1) {
+    R\\
+    W\\
+};
+
+
+\matrix[mymatrix, right of=b] (mx2) {
+    R\\
+    R\\
+    W\\
+};
+
+\matrix[mymatrix, right of=c] (mx3) {
+    R\\
+    W\\
+};
+
+\node (cap1) [above of=a, yshift=-0.8cm] {Subjects};
+\node (cap2) [right of=cap1, align=center] {Capability Lists};
+\node [right of=cap2, xshift=1cm] {Resource};
+
+\node(clist1) [clist, fit=(mx1)] {};
+\node(clist2) [clist, fit=(mx2)] {};
+\node(clist3) [clist, fit=(mx3)] {};
+
+\node(res1) [resource,right of=clist1, xshift=4cm] {/etc/passwd};
+\node(res2) [resource,right of=clist2, xshift=4cm] {/home/bob};
+\node(res3) [resource,right of=clist3, xshift=4cm] {/tmp/log};
+
+\draw[arrow] (mx1-1-1) -- (res1);
+\draw[arrow] (mx1-2-1) -- (res2);
+
+% \draw[arrow] (mx1-3-1) -- (c);
+
+
+\draw[arrow] (mx2-1-1) -- (res1);
+\draw[arrow] (mx2-2-1) -- (res2);
+\draw[arrow] (mx2-3-1) -- (res3);
+
+\draw[arrow] (mx3-1-1) -- (res1);
+\draw[arrow] (mx3-2-1) -- (res3);
+
+\end{tikzpicture}
+    \caption{Access control using Capabilities.}
+    \label{fig:bg:capability}
+\end{figure}

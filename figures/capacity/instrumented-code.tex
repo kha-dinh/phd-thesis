@@ -1,0 +1,90 @@
+\begin{figure*}[t]
+	\centering
+	\noindent\begin{minipage}[t]{.45\textwidth}
+		\begin{lstlisting}[style=sslab-capacity-c,language={[ARM]Assembler},keepspaces,numbers=none]{Name}
+.prologue:
+ // Sign return addr
+ pacib  x30, sp 
+ ... 
+ // x9: DST[curr_dom]
+ // Auth current domain get /*!\textcolor{clr-comment}{\tagnum{Dom}}!*/
+ /*!\textbf{autdzb}!*/	x9    
+ cmp    x9, x8 
+ b.ne  .auth_failed
+ // Build tag mask and save to ModReg
+ lsl    x8, x8, #56 
+ fmov   TagReg, x8
+\end{lstlisting}
+	\end{minipage}\hfill
+	\noindent\begin{minipage}[t]{.45\textwidth}
+		\begin{lstlisting}[style=sslab-capacity-c,language={[ARM]Assembler},keepspaces,numbers=none]{Name}
+...
+// Tag pointer
+// x8: /*!\textcolor{clr-comment}{\tagnum{Dom}}!*/ tag mask 
+fmov x8, TagReg
+mov  x24, sp
+orr	 x25, x24, x8 
+// Tag stack frame
+stg	 x25, [x25]  
+...
+
+\end{lstlisting}
+	\end{minipage}\hfill
+
+\begin{minipage}[t]{.45\textwidth}
+		\subcaption{Prologue: Domain ID auth.}
+		\label{fig:asm-prologue}
+	\end{minipage}\hfill
+	\begin{minipage}[t]{.45\textwidth}
+		\subcaption{Private stack tagging}
+		\label{fig:asm-stack-tagging}
+	\end{minipage}\hfill
+ 
+	\noindent\begin{minipage}[t]{.45\textwidth}
+		\begin{lstlisting}[style=sslab-capacity-c,language={[ARM]Assembler},keepspaces,numbers=none]{Name}
+// x0: domain-priv. ptr
+fmov    x8, ModReg  
+/*!\textbf{pacd}\underline{\textbf{b}}!*/   x0, x8   /*!\hfill\action{PTR-Sign}!*/
+str	    x0, [mem] 
+...
+// x13: domain-priv. ptr
+ldr     x13, [mem]
+fmov    x8, ModReg
+/*!\textbf{autd}\underline{\textbf{b}}!*/   x13, x8 /*!\hfill\action{PTR-Auth}!*/
+... 
+// x12: ambient ptr
+/*!\textbf{autdz}\underline{\textbf{a}}!*/  x12   /*!\hfill\actionambient{PTR-Auth}!*/
+\end{lstlisting}
+	\end{minipage}\hfill
+	\noindent\begin{minipage}[t]{.45\textwidth}
+		\begin{lstlisting}[style=sslab-capacity-c,language={[ARM]Assembler},keepspaces,numbers=none]{Name}
+.epilogue:
+ mov	w0, #1
+ // Untag/zero out stack 
+ stzg	x24, [x24]
+ // Clear tag mask register
+ fmov TagReg, xzr
+ ...
+ // Auth return addr
+ retab
+\end{lstlisting}
+	\end{minipage}
+	%%%%%%%%%%%%%%%%%%%% CAPTIONS
+	
+	\begin{minipage}[t]{.45\textwidth}
+		\subcaption{Domain-aware pointer auth.}
+		\label{fig:asm-pa}
+	\end{minipage}\hfill
+	\begin{minipage}[t]{.45\textwidth}
+		\subcaption{Epilogue: stack clean up}
+		\label{fig:asm-epilogue}
+	\end{minipage}
+	% \vspace{-1em}
+	\caption{\thename's instrumentation of an annotated function.}
+	\label{fig:asm}
+	%\vspace{-0.5em}
+\end{figure*}
+
+
+% // Alloc tagged heap
+% bl      capac_malloc  

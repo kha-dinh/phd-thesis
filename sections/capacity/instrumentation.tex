@@ -1,0 +1,429 @@
+% !TeX root = ../main.tex
+
+\section{Domain memory isolation}
+\label{sec:design:instrumentation}
+\label{sec:instrumentation}
+\input{figures/capacity/instrumented-code}
+This section describes how \thename establishes its capability-inspired memory isolation model.
+\thename enforces domain memory isolation through \gls{mte}-assisted segregation of domain-private memory regions and a \emph{complete mediation} (\srcompmed) of memory access through pointers that are made \emph{non-reusable} (\srreuse) and \emph{non-forgeable} (\srforge) capability tokens.
+
+\thename first introduces facilities to allocate domain-private memory, including a tagged heap memory allocator and compiler-instrumented stack tagging.
+\thename also present an instrumentation that mediates pointer uses with \gls{pa}-based \emph{on-load} pointer authentication.
+It instruments the program to sign pointers before they are stored in memory and authenticate pointers as they are loaded from memory into registers.
+\keypoint{
+Different from PARTS~\cite{pac-it-up}, a previous work that also introduced an on-load pointer authentication scheme, \thename uses \key{DA} to sign/authenticate ambient pointers, and \emph{selectively} uses \key{DB} for domain-private pointers identified using a static taint analysis, making its instrumentation \emph{domain-aware}.
+\thename also uses a user-defined, instance-specific modifier for domain-private pointers to prevent their reuses across domain instances.
+}
+
+\keypoint{
+    \thename's instrumentation framework seeks to be compatible with complex user programs, as we will demonstrate through our evaluation (\cref{sec:evaluation}).
+}
+It must enforce \emph{complete mediation} of program pointer uses for whole-program pointers.
+We initially used the existing implementation of PARTS~\cite{pac-it-up} but quickly found that it is inapplicable to large programs since even one incorrect handling would result in a crash.
+Toward this end, our instrumentation scheme is developed from scratch to support large userspace programs reliably.
+Our instrumentation handles \emph{stack spill} with a new \emph{pointer liveness tracking}  algorithm.
+% We also discover compatibility issues sufficiently addressed in previous work that adapts whole-program pointer authentication~\cite{pac-it-up} and introduce solutions to overcome them. 
+We also introduce solutions to compatibility issues we observed with whole-program \gls{pa} instrumentation.
+The instrumentation framework is implemented on LLVM 14.0.0 \cite{llvm}, which includes built-in intrinsics for \gls{pa} and \gls{mte} features.
+As of the time of writing, no available hardware supports MTE.
+For this reason, we used a QEMU virtual machine (\texttt{-march=armv8.5-a+pauth+memtag}) that supports emulating MTE instructions as a testing target during implementation.
+
+% Different from the sandboxing model that only protects with a subset of the program, 
+% \keypoint{
+% 	Our instrumentation also protects compiler-induced pointer spill to the stack with a \emph{pointer liveness tracking} algorithm.
+% }
+% With the algorithm, our instrumentation can reliably authenticate  ambient/domain-private pointer accesses through spill instructions without intrusive modifications to the instruction selection pipeline.
+
+% \thename's protection surface and reveals 
+% to only benchmark programs
+
+% \keypoint{
+% 	Hence, we implement our instrumentation framework from the ground up, with userspace applications compatibility in mind.
+% }
+% We designed heuristics and transformation passes that can be optionally enabled to tackle intricate compatibility issues.
+% We also provide an instrumented musl~\cite{musl} C library for complete program protection and compatibility with the \gls{syscall} interface.
+% These enhancements allow \thename to adapt \gls{pa}-based whole-program instrumentation to fairly complex programs such as the NGIXN webserver and the OpenSSL library.
+%
+% We also introduce an algorithm to detect pointers spilled to the stack, which is critical to \gls{pa}-based security.
+
+% The detected pointers spills are then instrumented accordingly with \thename's access control scheme. 
+
+
+
+
+
+% These properties are is provided by two components: the private memory allocation and delegation APIs provided by \libcapac, and an instrumentation framework that enforces stack memory tagging and whole-program pointer authentication for pointer use complete mediation. 
+
+
+
+
+% through its runtime heap allocator and stack-stagging compiler instrumentation.
+
+% \wip{
+% Compared to the previous work that combines \gls{pac} and \gls{mte} to compartment kernel drivers~\cite{hakc}, \thename capability-based memory isolation is more well-adapted to the variety of userspace programs. 
+% }
+
+% \wip{
+% \thename provides a flexible interface consisting of \libcapac functions and source-level annotations for the programmer to mark sensitive resources and define data transfer between domains.
+% }
+
+% Finally, \thename extends its protection to the C library, an often overlooked component.
+
+% \wip{
+% Second, \thename dynamically identifies the currently executing domains. This allows for code reuse.
+% Third, \thename allows for asynchronous data transfer with in-memory delegation. This means the programmer does not have to precisely determine the boundary between domains, which is a known difficult problem.
+% % All of these features make \thename a more suitable choice for the usespace, compared to HAKC, a previous work that adapts \gls{pac} and \gls{mte} to compartment kernel modules~\cite{hakc}. 
+% }
+
+% \wip{
+% A key challenge that \thename had to overcome is the complexity of real-world programs. 
+% }
+
+% NOTE:
+% \deleted{
+% 	Finally, \thename inherits \gls{pa}-based \gls{cfi} schemes as we previously explained in \cref{sec:design:threat-model} to achieve forward/backward-edge \gls{cfi}.
+% 	More specifically, code pointers are signed with \key{IA} and \key{IB} and authenticated right before use (\emph{on-use}) with \gls{pa} instructions (e.g. \texttt{retab}) to provide forward and backward-edge \gls{cfi}.
+% 	\thename is compatible with those defenses since their uses \gls{pa} key are not conflicting with \thename.
+% }
+
+
+
+% \chadded{As shown in \autoref{fig:ref}, \thename tags} 
+% \autoref{fig:asm} shows snippets of a \thename-instrumented functions. 
+
+
+
+% \chcomment{5.4: Add section about heuristic that we developed for applications (not exist in PARTS); we are the first to make it compatible with large real applications}
+
+%   \begin{table}[t]
+%   \centering
+%   \footnotesize
+%   \begin{tabular}{cp{4.5cm}}
+%     \toprule
+%     \thead{Annotation}&\thead{Enabled Instrumentation}\\
+%     \midrule
+%     \multirow{2}{*}{\texttt{DOM\_PRIV\_FUNC}}& Tag function's stack frame with the currently executing domain's tag ($\textbf{T}_{Dom}$). \\
+%     \midrule
+%     \multirow{3}{*}{\texttt{DOM\_PRIV}} & Mark designated variable declaration to be domain-authenticated. All pointer load/store whose source/destination that are in the address range of the annotated variable are signed/authenticated with domain key (\key{DB}).\\
+%   \bottomrule
+% \end{tabular}
+% \caption{\thename-provided source code annotations.}
+% \label{tbl:annotations}
+% \end{table}
+% \hdr{Programming interfaces}
+% \added{
+% A programmer uses \thename to isolate domain-private memory through \libcapac memory-related APIs shown in \autoref{tab:apis}, e.g, \texttt{capac\_malloc} and \texttt{capac\_free}, and through a set of source-level annotations that marks domain-private resources.
+% }
+% The following code example shows an example of how \thename protection is applied to a simple function that initializes domain-private memory:
+% \begin{lstlisting}[style=sslab-capacity-c,linewidth=0.97\columnwidth]
+% /*!\textcolor{blue}{\underline{DOM\_PRIV\_FUNC}}!*/  void sensitive_func(ctx_t* ctx) {
+%     /*!\textcolor{blue}{\underline{DOM\_PRIV}}!*/ char* ptr = capac_alloc(SIZE);
+%     ctx->sensitive_ptr = ptr;
+% }
+% \end{lstlisting}
+
+% \added{
+% In the example, \texttt{capac\_alloc} allocates a memory region tagged with the currently executing domain's tag (\tagnum{Dom}).
+% The annotation \texttt{DOM\_PRIV\_FUNC} instructs the instrumentation framework to tag the function's stack frame also with $\textbf{T}_{Dom}$.
+% When enabled, the stack memory isolation instrumentation described later in this section is enabled for only selected functions, thus preventing the overhead from becoming too high.
+% The \texttt{DOM\_PRIV} annotation tags the marked \emph{pointer declaration} (stack variable or function argument) as \emph{domain-private}. 
+% All pointer load/store whose source/destination that are in the address range of the annotated variable are signed/authenticated with the domain key, as we will describe in \cref{sec:design:ptrauth}.
+% }
+
+% \added{
+% We implement the annotations using clang's \texttt{annotate} attribute (\texttt{\_\_attribute\_\_((annotate("...")))}.
+% Our LLVM passes extracts the annotations and attaches them to the corresponding structure in LLVM IR. 
+% \texttt{DOM\_PRIV\_FUNC} will attach a the annotation to the tagged IR function, while \texttt{DOM\_PRIV} attaches the annotation to the IR variable that correspond to marked declaration, which is commonly a stack allocation with the \texttt{alloca} instruction.
+% }
+
+
+
+
+
+% \hdr{Programming interfaces}
+% % \hdr{APIs}
+% \chcomment{mention capac\_malloc)}
+% \thename supports secure delegation of domain-private objects to support inter-domain interaction.
+% The \texttt{delegate\_ptr()} API takes the address of an \emph{in-memory} pointer (i.e., \texttt{\&ptr}), the size of memory to delegate, and the target domain's ID as its parameters.
+% The delegation API first authenticates the delegated pointer with the domain key to verify its ownership.
+% It then performs domain ID authentication (\cref{sec:design:libcapac} to extract \tagnum{dom}, and compares \tagnum{dom} with the in-memory tag of the memory region, before retagging the memory with the target domain's tag.
+% \texttt{delegate\_ptr()} then requests a domain switch to the target domain, re-signs the pointer with the target domain's key such that the target domain can successfully authenticate the delegated pointer, and finally switches back to the previous domain. 
+
+
+\iffalse
+	\hdr{Achieving CFI and DPI}
+	\thename inherits \gls{pa}-based \gls{cfi} schemes as we previously explained in \cref{sec:design:threat-model} to achieve forward/backward-edge \gls{cfi}.
+	More specifically, code pointers are signed with \key{IA} and \key{IB} and authenticated right before use (\emph{on-use}) with \gls{pa}'s dedicated instructions (e.g. \texttt{retab}) to provide forward and backward-edge \gls{cfi}. For the \gls{pa} modifier, \thename uses LLVM's \texttt{ElementType}-based \texttt{type-id} for data pointers and forward-edge code pointers, and the stack pointer (\texttt{sp}) for backward-edge code pointers.
+
+	\kha{For data pointers, \thename instrumentation adapts \emph{on-load} pointer authentication scheme~\cite{pac-it-up}, which instruments the program to sign pointers as before they are stored in memory and authenticate pointers as they are loaded from memory into registers (displayed in \autoref{fig:asm-pa}).
+		This allows \thename to achieve a similar security guarantee to that of \gls{dpi}~\cite{pac-it-up}.
+		\thename instrumentation uses \key{DA} to sign/authenticate ambient pointers, and uses \key{DB} \emph{selectively} for domain-private pointers, as we will explain later. However, it would not compromises the \gls{dpi}'s integrity guarantee; all pointers would still be integrity-checked by \gls{pa}.
+	}
+
+\fi
+% As we will explain later, we 
+
+
+
+% In addition, \thename also utilizes \gls{mte} for its memory isolation scheme, because \gls{pa} alone is incapable of ensuring memory isolation; an adversary can the adversary may aptly authenticate a pointer and then perform out-of-bound memory access. 
+% Given \gls{pa}-based \gls{dpi} and \gls{cfi}, \thename instrumentation framework mediates the tagging and authentication of domain-private pointers such that the security requirements that we outlined in \cref{sec:design:threat-model} holds.
+
+% \todo{term "domain" is repeated, maybe remove the repeated term(kyuwon)}
+% \thename enforces its domain memory isolation model by completely mediating the use of memory references, i.e., pointers, through whole-program instrumentation. 
+
+% \autoref{tbl:objects} summaries the pointer tagging and authentication scheme of \thename. Our instrumentation, along with \libcapac's heap memory allocator, controls the tagging, and enforces signing/authentication of data pointers\todo{figure2's ptr-sign and ptr-auth is infact on-store, on-load this is never explained}. 
+% such as \gls{dpi} and code pointer signing~\cite{qualcomm-pac,pac-it-up
+
+
+% In \autoref{fig:code-example}, on-store data pointer signing is marked by \action{PTR-Sign} and on-load data pointer signing is marked by \action{PTR-Auth}.
+
+% Domain-private data pointers are tagged with \tagnum{Dom} and signed/authenticated with \key{DB}, while ambient pointers by default, have the tag of $0$, and are signed/authenticated with \key{DA}. Because untagged pointers have the tag of $0$ implicitly, \thename's protection effectively cover the ambient pointers without explicitly tagging them. 
+
+
+\subsection{Domain-private memory tagging}
+% \begin{figure}[b]
+% 	\centering
+% 	\includegraphics[width=.75\columnwidth]{images/capacity-stack-tagging}
+% 	\caption{Instrumentation for private stack memory tagging}
+% 	\label{fig:my_label}
+% \end{figure}
+%
+\thename establishes domain-private memory regions by tagging each domain's private memory with the domain's integer domain ID (\tagnum{Dom}) obtained with domain authentication (\cref{sec:design:switch-auth}).
+% and only allows pointers tagged with the same ID can be used to access tagged memory.
+% \keypoint{
+% 	The adaption of \gls{mte} is imperative as \gls{pa} alone is incapable of ensuring memory isolation; an adversary can authenticate a pointer and then perform an out-of-bounds memory access (e.g., \texttt{gets(autda(ptr))}).
+% }
+
+% \thename currently requires programmer discretion to store sensitive objects in domain-private memory (\texttt{capac\_malloc()}) and also use \texttt{DOM\_PRIV\_FUNC} to protect the function's stack that contains the intermediate values of the sensitive computation.
+% Our observation is that automated tainting of sensitive data often brings more complications than convenience.
+% Taint-tracking of cryptographic data with a secret key as a source is a quintessential example where the compiler has no semantic to declassify the computed ciphertext and will generally overtaint~\cite{cryptompk}.
+% We regard the task as out-of-scope as several works have been dedicated to achieving automated \emph{inter}-procedural taint-tracking and protection of sensitive data~\cite{cryptompk,dynpta}
+
+% \thename has two sources of tagged memory generation: domain-private heap memory from \libcapac's \texttt{capac\_malloc()} and private stack frame generation from \texttt{DOM\_PRIV\_FUNC}.
+
+
+
+
+% \hdr{Authenticated heap memory allocation}
+% \textcolor{red}{
+% \texttt{capac\_malloc(size)} (line 15) and \texttt{capac\_free(ptr)} facilitates runtime allocation and just-in-time tagging of heap memory.
+% \libcapac uses a customized \texttt{dlmalloc} that maintains a statically allocated, \gls{mte}-enabled memory pool.
+% Upon invocation, \texttt{capac\_malloc()} first performs \gls{dst}-based domain to determine \tagnum{Dom} of the currently executing domain.
+% It then allocates memory from its memory pool, tags the memory with the domain ID, then finally returns a pointer also tagged with the domain ID.
+% Note that the returned pointer is not signed as it is delivered in the return value register, adhering to \thename instrumentation's on-store sign and on-load authentication policy that we will explain later.
+% The \texttt{capac\_free()} API untags the memory, zeros out the contents, and frees the allocation.}
+
+\hdr{Private heap memory allocation}
+\libcapac manages a domain-private heap memory with its \texttt{dlmalloc}-based allocator that maintains a statically allocated, \gls{mte}-enabled memory pool.
+Upon invocation, \texttt{capac\_malloc(size)} first performs \gls{dst}-based domain authentication so that it can determine the tag number of the currently executing domain as we explained in \cref{sec:design:switch-auth}.
+Afterward, \texttt{capac\_malloc()} allocates memory from its memory pool, tags it with the domain ID, and returns a pointer tagged with the domain ID.
+The returned pointer is not signed as it is delivered in the return value register, adhering to \thename instrumentation's on-store sign and on-load authentication policy.
+
+\hdr{Private stack tagging}
+\thename provides private \emph{stack} memory to domains through in-place tagging and untagging of the stack objects with the current domain ID (i.e., no explicit stack switching).
+The \texttt{DOM\_PRIV\_STACK} annotation directive on a function notifies the instrumentation framework to instrument the function prologue and epilogue to prepare a domain-private stack before the function execution and to untag and zero out the tag before return.
+
+\autoref{fig:asm} (a), (b), and (d) show the stack tagging instrumentation on an annotated function.
+The instrumented prologue authenticates and obtains the currently executing domain's ID by consulting \gls{dst}, then loads the tagging mask into the reserved register.
+Then, it retrieves the tagging mask from the reserved register and tags the function's stack frame when a stack variable is allocated.
+The epilogue returns the stack frame to the ambient domain by zeroing out the stack contents and setting the tag on the memory region back to 0.
+The instrumentation uses \texttt{stzg} instruction introduced in \gls{mte} that performs such operation efficiently in the hardware.
+
+
+% The instrumentation utilizes source-level annotation to mark a \emph{source} domain-private pointer. For instance, on line $20$ of \autoref{fig:code-example}, the variable \texttt{char *secret\_key} is the source pointer from which the domain-private heap memory from \texttt{capac\_malloc()} is known to the function. The annotation \texttt{DOM\_PRIV\_PTR} marks \texttt{*secret\_key} instructs \thename instrumentation to perform intra-procedural points-to analysis to find all pointers that point to the same object as the source pointer. This subset of all pointers whose load and store are instrumented in \thename's DPI instrumentation, are to use domain authentication key \key{DB} instead of the ambient key\key{DA}. That is, the domain-private pointers are signed through \texttt{pacdb} before store, and authenticated with \texttt{autdb} on-load. \autoref{tbl:objects} can be revisited for a summary of the authentication code generation scheme.
+
+%The analysis recursively taints all data flow from and to the annotated value.
+
+\subsection{Domain-aware pointer authentication}
+\label{sec:design:ptrauth}
+
+% Completely mediating pointers with \gls{pa} authentication protects pointers from memory corruption, enabling \srforge.
+
+% That is, depending on the pointee memory's domain, ambient vs. \thename domain, \key{DB} will be used for domain-private(\action{PTR-Sign} \& \action{PTR-Auth} in \autoref{fig:asm-pa}), and \key{DA} (\actionambient{PTR-Auth}) for ambient.
+% By doing so, the domain-private pointers will be successfully authenticated within its owner-domain execution context.
+
+
+% \keypoint{
+% 	We faced two main challenges while implementing the instrumentation.
+% 	First, we need to guarantee the \emph{complete mediation} requirement even in the presence of compiler-inserted load and store instructions, \ie, stack spills.
+% }
+% If a raw pointer is spilled into memory, the attacker can quickly substitute it with another pointer and bypass pointer authentication~\cite{kernel-pac}.
+% Also, \thename must propagate domain awareness to the spill instructions to uphold its security model.
+% \keypoint{
+
+The instrumentation now inserts \texttt{pac} and \texttt{aut} instructions for pointer store and load sites and uses \key{DB} \emph{selectively} for domain-private pointers. 
+Compared to \emph{on-use} pointer authentication schemes, such as the one used in \gls{pa}-based \gls{cfi}~\cite{pac-it-up,kernel-pac}, on-load authentication provides better efficiency and compatibility when adapted to whole-program data pointers~\cite{pac-it-up}.
+% Instead of using the LLVM type ID as the \gls{pa} modifier, which we found is unreliable, 
+
+The previous \gls{pa} on-load pointer instrumentation scheme~\cite{pac-it-up} instruments the program in LLVM \gls{mir} to handle cases where pointers are \emph{spilled} into memory by the compiler.
+However, we found that it does not reliably detect and instrument such cases due to the use of ad-hoc heuristics.
+To handle this issue, we also implement our instrumentation in \gls{mir} after most optimizations are already performed but introduce a vastly improved instrumentation algorithm.
+Our instrumentation relies on embedded metadata from our IR-level taint analysis and built-in type metadata to inform the instrumentation decisions without modifying the instruction selection pipeline.
+Moreover, instead of using heuristics, we introduce a liveness analysis that keeps track of sensitive pointers on the stack frame and inside the registers.
+Those improvements allow us to reliably enforce the on-load authentication scheme while also avoiding intrusive changes to instruction selection and register allocation stages.
+% \keypoint{
+% 	Secondly, we found several subtle compatibility issues associated with on-load whole-program pointer authentication not mentioned in previous works.
+% }
+% To this end, we developed several supporting passes that solve \gls{pa}-based instrumentation compatibility issues that can be optionally enabled.
+% With those issues resolved, \thename could be adapted to complex applications like the NGINX webserver and the OpenSSL library.
+
+
+
+% First, we need to determine the load and store instructions that access domain-private pointers such that they can be authenticated with the domain key.  
+% This challenge fundamentally differs from related work on automatic resource isolation because it tracks the propagation of domain-private pointers but not the sensitive data themselves.
+% \added{
+% We tackle the first challenge by employing an \emph{intra-procedural static taint analysis} that tracks the data-flow of a domain-private pointer inside a function.
+% Finally, we 
+% }
+
+% \begin{figure}[t]
+% 	\centering
+% 	\includegraphics[width=.9\columnwidth,height=4cm]{images/capacity-instrumentation}
+% 	\caption{Instrumentation for domain-aware pointer authentication}
+% 	\label{fig:dom-ptauth}
+% \end{figure}
+
+
+\hdr{Identifying domain-private pointer load/store}
+% \keypoint{
+% 	\thename employs an intra-procedural data-flow analysis that tracks the data flow of an annotated pointer to find the memory locations into which the pointer might be stored.
+% }
+% We choose to go with an inta-procedural analysis because it provides better accuracy.
+\thename employs an intra-procedural data-flow analysis that aims to find all IR pointer-containing variables, where an annotated domain-private variable, or its members, may flow to.
+The analysis takes two sources: variables that are explicitly annotated with \texttt{DOM\_PRIV} and pointers returned from \texttt{capac\_malloc()}.
+We use a worklist algorithm starting from the taint source to visit all variables and instructions recursively.
+It follows the def-use chains of LLVM IR instructions and adds all users of the visited instruction to the worklist.
+When an instruction that addresses a pointer variable (\eg, \texttt{alloca}, \texttt{getelementptr}) is encountered along the def-use chain, the analysis attaches metadata to the LLVM \texttt{value} that the later instrumentation can retrieve.
+Additionally, the analysis performs backward tracking whenever it encounters a store instruction since def-use analysis cannot track such data-flow; it adds the instruction's \emph{destination} operand to the worklist in such cases.
+% After, The list of sensitive IR variables is consumed by \thename's instrumentation in \gls{mir} for domain-aware pointer authentication.
+
+% propagate the taint to the
+% We also provides \texttt{AMBIENT} annotation to \emph{declassify} pointers that might be over-tainted by our algorithm.
+% The annotation marks a pointer-containing variable as non-private, such that all memory accesses derived from it should be authenticated with \key{DA}.
+
+% The annotation is used 
+
+
+% marks the instructions as \emph{sensitive IR variable} that address the \emph{locations} of domain-private pointers.
+
+
+% 
+% \iffalse
+% \fi
+\hdr{MIR instrumentation} % due to the double dot
+% We developed from scratch a new \gls{mir} instrumentation based on the \emph{liveness analysis} in compiler designs~\cite{reg-alloc}.
+Our \gls{mir} instrumentation is based on \emph{liveness analysis} in compiler designs~\cite{reg-alloc}.
+The instrumentation keeps track of registers and stack frame locations that potentially contain pointers/sensitive pointers, called the \emph{live pointer set}.
+At compile time, the pass scans and visits \gls{mir} instructions.
+On load or store instructions, it tries to retrieve LLVM type and taint information to extract whether the instruction accesses a pointer/sensitive pointer.
+If such information is unavailable, the instrumentation consults the live pointer set.
+For a store instruction, the instrumentation checks whether the \emph{source} operand (e.g., ``\texttt{x1}'' in \verb|str x1, [sp, #8]|) is within the live pointer set, and whether the operand is sensitive.
+For a load instruction, the same check is performed on the instruction's \emph{destination} operand (e.g., ``\verb|[sp, #8]|'' in \verb|ldr x8, [sp, #8]|).
+
+Instrumentation is performed on the load and store instructions as shown in \autoref{fig:asm-pa}. 
+On non-sensitive pointer operands, it instruments with \key{DA} signing/authentication. 
+Before signing an ambient pointer, the instrumentation inserts a masking instruction that zeros out the tag to prevent pointer forging through ambient code signing (\srforge).
+% The instrumentation uses \key{DA} to sign/authenticate non-sensitive pointer operands and uses \key{DB} for sensitive (domain-private) pointers.
+When instrumenting sensitive pointer operands, \key{DB} is used. 
+An instruction that loads the modifier from \texttt{ModReg} into a spare register (\texttt{fmov}) is also inserted. 
+The modifier is then used for signing/authentication of the pointer.
+Finally, the instrumentation updates the live pointer set after visiting each instruction.
+For instance, if an instruction \emph{kills} a register or overwrites a stack frame location with non-pointer data, the register/stack frame index is removed from the live pointer set.
+
+
+
+
+
+% This helps it inserts the \gls{pa} instructions on line 3 and 8.
+% Whenever it encounters an instruction that accesses a pointer variable marked as sensitive, 
+% 
+
+
+\subsection{Handling compatibility issues}
+% While implementing \thename's instrumentation, we found several compatibility issues with real-world programs, many of which are not sufficiently resolved by the existing whole-program \gls{pa} instrumentation~\cite{pac-it-up}.
+% \keypoint{
+% 	Secondly, we found several subtle compatibility issues associated with on-load whole-program pointer authentication not mentioned in previous works.
+% }
+% To this end, 
+We developed supporting transformations that can be optionally enabled to solve \gls{pa}-based instrumentation compatibility issues.
+% With those issues resolved, \thename could be adapted to complex applications like the NGINX webserver and the LibreSSL library.
+
+
+%We describe those issues here and also explain \thename's heuristic to solve each issue.
+\hdr{Type-unsafe object initialization}
+% % \keypoint{
+% 	The first is the type-unsafe object initialization patterns (e.g., \texttt{memset()} or \texttt{calloc()}) that are seen in C applications, including NGINX and the OpenSSL library.
+% % }
+The following example demonstrates the type-unsafe object initialization pattern found in C applications, including NGINX and LibreSSL:
+% \begin{listing}[h]
+\begin{minted}{c}
+obj_t* obj =  calloc(1, sizeof(obj_t));
+//...
+if (obj->ptr == NULL){ /* Perform initialization */ }
+\end{minted}
+% \end{listing}
+In this example, when the program loads an uninitialized pointer from memory at line $3$, the on-load authentication would fail since the pointer is not signed, making the branch condition evaluate incorrectly.
+% More especially, we solve the case where a non-signed pointer is loaded from memory, then used as a branch condition (\eg, \texttt{if (ptr == NULL)}), causing the branch condition to evaluate incorrectly.
+% This would cause a logic bug since the failed authentication would not trigger a segmentation fault but only causes the if condition at line $4$ to evaluate incorrectly.
+To solve this, we introduce a pass that transforms the program's NULL checks to cover the AUT failed NULL value (e.g., \texttt{ptr != NULL \&\& ptr != 0x20000000}).
+We also explored inferring the type of the zero-initialized objects, then recursively signing all of its containing pointers, using type inference methods proposed in \cite{type-after-type}, but found that the approach is infeasible on complex programs without heavy source code processing.
+\begin{figure}[h]
+\small
+\begin{equation*}
+\text{visit($id,t$)} = 
+  \begin{cases}
+  % \text{pac$(p,\&p)$} & \text{if $t$ = $t_1*$ and $t_1$ is not struct | array}\\
+  \text{\{sign$(id)$\} $\cup$ visit$(*id, t_1)$} & \text{if $t = t_1*$}\\
+  % & \text{$f$ = build$(p,t_1)$ if $t_1$ = struct $|$ array}\\
+  % & \text{$f$ = \{\} otherwises}\\
+  $$\bigcup\limits_{i=1}^{n} \text{visit$(id_i, t_i)$}$$
+  % \text{visit$(id_i, t_i)$}  &\text{for $i \in [1..n]$ }\\
+  &\text{if t = struct $\{id_1:t_1, ..., id_n:t_n\}$}\\
+  $$\varnothing$$ &\text{if $t$ = int}
+  % &\text{or t = arrayofptr $\{id_1, .., id_n\}$ }\\
+  % \text{$f(p)$} & \text{if $t$ = ptrofstruct | ptrofarrayofptr} \\  
+  % &\text{$f$ = build$(asd)$}
+  % \text{build($id_i, \&id_i$)} &  \text{if $}\\
+  % & \text{and $t_i$ = ptr}\\
+  % \text{insertPac($c,id_i$)} & \text{struct $\{id_1:t_1, ..., id_n,t_n\}$}\\
+  % \text{insertCall($f_i, id_i$)} & \text{if t = struct $\{id_1:t_1, ..., id_n:t_n\}$}\\ 
+  % & \text{and $f_i$ = build($id_i,t_i$)}\\
+  % insertPac($c$,$p$) & \text{if t = array or struct }\\
+  % visit($c,p,t$) & \text{if t = arraytype or structtype}\\
+  % $f$ = constructor($t$), insertCall($c$,$f$(p,t) ) & \text{if t = arraytype}\\
+  % buildConstructor($c$,$p$) & \text{if $t$ = structtype}\\
+  % buildConstructor($c$,$p$) & \text{if $t$ = arraytype}\\
+  \end{cases}
+\end{equation*}
+\caption{Type-based global constructor generation. sign($id$) signs an in-memory pointer indexed by LLVM variable $id$.}
+\label{fig:glob}
+\end{figure}
+
+\hdr{Global pointers in complex structures}
+% \keypoint{
+% 	Another resolved issue is signing pointers in global variables stored in complex structs and array types.
+% }
+The prototype of PARTS~\cite{pac-it-up} only scans and signs pointers in the global structures at the top-most level, which misses many cases where pointers are stored in the nested structs.
+We tackle this problem more comprehensively with a type-assisted approach that recursively visits global variables, as shown in \autoref{fig:glob}.
+The algorithm uses the same type syntax and notations as PtrSplit~\cite{ptrsplit}, where int represents an integer type, $t_1*$ represents a pointer type, and struct type contains a list of types for each member. 
+\text{visit$(id,t)$} is invoked on every global variable $id$ with type $t$ to generate initialization functions. They are then inserted before the program logic to sign the global pointers.
+
+\hdr{Issues with MIR instrumentation}
+We also resolved numerous compatibility issues with the \gls{mir}-based instrumentation.
+First, we found that the \gls{mir}-based instrumentation must be aware of register liveness.
+When a pointer inside a register is signed and then stored in memory, the signed in-register pointer may still be \emph{live}.
+This side effect of pointer signing can cause following legitimate memory access with the in-register pointer to cause a fault.
+As a solution, our instrumentation inserts a \texttt{xpac} instruction to remove the \gls{pac} of the in-register value, immediately following the \texttt{pac} instruction if (1) the \texttt{pac}-ed register is used again in the function, or (2) the \texttt{pac}-ed register is passed to another function as an argument.
+% The \texttt{pac} instruction 
+% For instance, after a register is signed, its authentication code needs to be removed from the register with 
+Another issue that we found was the cases of \gls{pa} instrumentation failing on load and store instructions that have the same register in source and destination operands (\eg, \texttt{ldr, x8, [x8]}).
+To resolve this, we transform these instructions to use distinct operands (\eg, \texttt{ldr, x8, [x9]}) instead.
+% \hdr{Same source and destination operands}
+% \hdr{xpac undead pointers}
+
+
+% \subsection{Delegating pointers and memory}
+% \label{sec:design:instrumentation:delegation}
+
+
+

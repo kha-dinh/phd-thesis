@@ -1,0 +1,201 @@
+\section{Security analysis \& discussion}
+\label{sec:discussion}
+In this section, we use the security requirements outlined in \cref{sec:overview:secreq} to analyze the security of \thename. 
+We show that these security requirements are achieved throughout the life cycles of program resources.
+We also discuss the possible mitigation for brute-forcing attacks at the end of the section.
+
+% \subsection{Domain impersonation \& complete mediation}
+\textbf{Non-impersonable domains (\srimper).}
+The domain entry explained in \cref{sec:design:libcapac} renders invoking domain switches into arbitrary domains in unintended locations impossible. 
+Also, our trusted domain ID fetching and in-register tag protection prevent the attacker from impersonating a domain by corrupting the currently activating domain ID spilled onto the stack or accessible globally.
+
+\textbf{Complete mediation (\srcompmed).}
+\thename's reference monitor ensures the use of \fd and \cpath in \glspl{syscall} is always authenticated, and all userspace \fds are signed.
+Its whole-program instrumentation guarantees the signing and authentication of all ambient and domain-private pointers.
+% We also provide an instrumented musl C library.
+Bypassing \gls{pa} checks by jumping into non-entry locations of a function is infeasible with the presence of \gls{cfi}.
+Hence, assuming no uninstrumented code, \thename achieves complete mediation of all resource usage.
+
+% \subsection{Token reusing}
+\textbf{Non-reusable references (\srreuse).}
+% \hdr{Reusing of file objects} 
+% With \srimper satisfied for domains and the reference monitor enforcing \srcompmed on \glspl{syscall}, \srreuse is satisfied; 
+Under \thename's protection, a non-owner domain cannot access a protected file since the inode signature check will fail during file import.
+A domain-private \fd leaked to another domain remains unusable thanks to our \fd authentication scheme using the domain key.
+The reference monitor also prevents the OS from reusing \fd numbers after one is deallocated.
+In addition, a domain compromised by the adversary cannot reuse in-memory pointers pointing to other domains' private memory.
+Due to domain key mismatch, the authentication would fail at \texttt{pacdb} sites.
+A pointer signed with \key{DB} would also fail to authenticate at pointer 
+load sites where \key{DA} is used.
+
+
+% \subsection{Token forging}
+\textbf{Non-forgable references (\srforge).}
+% \hdr{Forging of path and file descriptors}
+It is impossible to forge an illegal path reference to a protected file object since path string references are resolved to their in-kernel data structures.
+Forging an \fd in the userspace is also prevented using a secret (to userspace) modifier, which allows the kernel to remain the sole issuer of unforgeable and protected file descriptors.
+% \hdr{Forging of pointers}
+% Pointers in \thename security model require special attention regarding signed pointer forging.
+
+
+With two methods, the adversary may forge a tagged and signed pointer to access domain-private memory.
+First, the adversary may overwrite an existing in-memory pointer through memory corruption.
+Such attacks are thwarted by the \gls{pa}-based pointer authentication, whose primary purpose is to detect corruptions of in-memory pointers.
+Second, through code reuse attacks, the adversary may sign arbitrarily manipulated data (e.g., 64-bit data with the victim’s domain tag and target sensitive memory address) using the available \texttt{pacda} and \texttt{pacdb} gadgets.
+For \texttt{pacdb} gadgets, \thename PA contexts created by key switching force the attacker to use them within the target domain. 
+We consider the isolated domains small enough so that it can be verified that the domain code is free of signing gadgets.
+However, this is a substantial and realistic threat when completely safe TCB is not guaranteed \cite{civ, kernel-pac}, and a scanner to remove such gadgets could be utilized~\cite{kernel-pac}.
+% \thename is a framework that introduces primitive for compartmentalization at multiple boundaries.
+% this type of attack is already discussed in a previous work that also introduced a scanner to remove such gadgets~\cite{kernel-pac}.
+% Hence, this is out of scope and important future work.
+Given that no such convenient gadgets exist in \thename domains, the adversary may still launch an extremely sophisticated attack by finding gadgets that (1) leak the sensitive memory address, (2) create a pointer and add the appropriate tag to it, (3) use \texttt{pacda} to create an ambient pointer that points to domain-private area, and (4) pass the signed pointer to an \texttt{autda} site.
+\thename's instrumentation currently zeros out the tag of ambient pointers before signing them, rendering such code reuse attacks infeasible.
+
+
+
+% A previous work that also introduced 
+
+
+
+% A recent work showed that introducing compartmentalization to existing programs introduces vulnerabilities that leak.
+% ~\cite{that-interface-paper} 
+% ours is a framework that introduces primitive for compartmentalization and also it can support sanboxing and higher privilege model. So this is out of scope and important orthogonal future work
+% The imperfections of the current forward-edge \gls{cfi} are well-known~\cite{multi-layer-type,unique-code-target,kernel-pac}.
+% As such, the adversary may launch an extremely advanced attack to reuse the \gls{pa} instructions to forge pointers.
+% We regard polishing \gls{cfi} as an orthogonal direction to our contribution.
+% Nevertheless, reliance on CFI and its imperfection will remain an inherent challenge of all PA-based defenses.
+
+
+\textbf{Brute-forcing atttacks.}
+An attacker can exploit certain ideal situations, such as infinite thread spawning~\cite{hackingblind}, to try different \gls{ac} values until authentication succeeds.
+This is an inherent weakness with \gls{pa}-based security.
+Such attacks can be overcome by placing thresholds on the number of crashed threads due to \gls{pa} traps and systems call authentication failures~\cite{kernel-pac}.
+%Such countermeasures need to be in place since the entropy of \gls{pa} in \thename is only 7 bits due to the combined use of \gls{pa} and \gls{mte}.
+
+% \hdr{Completeness of reference monitor policy} 
+% We do not seek completeness with the \gls{syscall} filtering policy in our reference monitor.
+% The syscall APIs were never developed with intra-process isolation in mind. 
+% This large attack surface entails various domain-to-domain \emph{confused deputy} problems that undermine the security of protected domains, many such attacks have been discussed in the previous works~\cite{pku-pitfall,jenny,cerberus}. 
+% We regard the issue as an open challenge and leave the completeness of the syscall filtering out of scope.
+
+% However, such attacks proved to break even 64-bit ASLR.
+% Heuristics can be applied (e.g., threshold on crashed threads).
+
+%  Entropy, it can be 7bits, --> thresholding must be in place.
+ 
+ % (Maybe mask? and r1 0x00fffff) (sign_ambient intrinsic )
+
+
+% Pointer forging through code reuse attacks, which requires the adversary to prepare a fake pointer and a signing gadget (e.g., \texttt{pacda}), is extremely challenging under \gls{cfi}'s protection.
+% \hdr{Bruteforcing}
+%  threshold on PA traps. However, certain ideal situations in attacker's favor such as infinite thread spawning ~\cite{hacking-blind}. However, such attacks proved to break even 64-bit ASLR. Heuristics can be applied (e.g., threshold on crashed threads).
+%  Entropy, it can be 7bits, --> thresholding must be in place.
+
+% \hdr{Inherient limitations}
+% \label{sec:discussion:oracle}
+% All \gls{pa}-based security architectures inevitably accompany the necessity of \gls{cfi} and \thename is no exception.
+% \thename does employ backward-edge and forward-edge \gls{cfi}.
+% However, the imperfections of the current forward-edge \gls{cfi} are well-known~\cite{multi-layer-type,unique-code-target,kernel-pac}.
+% As such, the adversary may launch an extremely advanced attack to reuse the \gls{pa} instructions to forge pointers. We regard polishing \gls{cfi} as an orthogonal direction to our contribution.
+% However, our use of \gls{pa} and \gls{mte} does not interfere with and thus can coexist with the proposals for \gls{pa}-based CFI~\cite{pac-it-up,kernel-pac,pactight,pacstack}.
+
+ % Capacity's PA context created by key switching forces the attacker to use the gadgets in the target domain.
+ % When completely safe TCB (i.e., capacity domain code) is not guaranteed. This is a substantial and realistic threat, however, already discussed in a previous work that also introduced a scanner to remove such gadgets
+ % Given that no such convenient gadgets exist in Cap domains, the adversary may still launch an extremely sophisticated attack by finding the necessary gadgets.
+ % In such case, the attack will be as the following: 1. leak memory address 2. add tag (randomized?) 3. PACDA to just create ambient pointer that points to domain-private area.
+ % (Maybe mask? and r1 0x00fffff) (sign_ambient intrinsic )
+
+%~\cite{pactight}
+
+
+%     Security Analysis
+
+%     Token Reusing 
+
+%  Entry Site authentication: Key switching is impossible and only done in entry site with authentication
+%  TCB: small isolated domain code is the TCB, we assume that it can be verified.
+%  Interface security: ~\cite{that-interface-paper} ours is a framework that introduces primitive for compartmentalization and can also support sandboxing and higher privilege model. So this is out of scope and important orthogonal future work
+%  Sandbox must not be able to access Enter
+% ** Randomize domain ID
+
+%     Token forging
+
+%  Inherent limitation of PA+MTE
+%  Capacity's PA context created by key switching forces the attacker to use the gadgets in the target domain.
+%  When completely safe TCB (i.e., capacity domain code) is not guaranteed. This is a substantial and realistic threat, however, already discussed in a previous work that also introduced a scanner to remove such gadgets
+%  Given that no such convenient gadgets exist in Cap domains, the adversary may still launch an extremely sophisticated attack by finding the necessary gadgets.
+%  In such case, the attack will be as the following: 1. leak memory address 2. add tag (randomized?) 3. PACDA to just create ambient pointer that points to domain-private area. (Maybe mask? and r1 0x00fffff) (sign_ambient intrinsic )
+
+%     Bruteforce
+%  threshold on PA traps. However, certain ideal situations in attacker's favor such as infinite thread spawning ~\cite{hacking-blind}. However, such attacks proved to break even 64-bit ASLR. Heuristics can be applied (e.g., threshold on crashed threads).
+%  Entropy, it can be 7bits, --> thresholding must be in place.
+% \section{Discussion}
+% In this section, we further discuss the matters that were set aside thus far for brevity. 
+
+
+% \subsection{Security Analysis}
+\label{sec:discussion:sec}
+%
+
+% \hdr{Domain memory isolation}
+% We now discuss the security of \thename's domain memory isolation. Thus far, we discussed how domain entry point authentication satisfies \srimper (\cref{sec:design:libcapac}) and \srcompmed through whole-program instrumentation.
+
+
+% We further discuss this matter in \cref{sec:discussion}.
+% We use the domain key to authenticate/sign pointer stack spills since those pointers are never accessed outside the function. 
+
+
+% However, the memory operand information is often missing for spill instruction
+% \todo{Hard to understand, abstract what you're trying to say}
+
+
+% \subsection{Limitations}
+%
+% \hdr{Control-flow integrity}
+% \label{sec:discussion:oracle}
+% All \gls{pa}-based security architectures inevitably accompany the necessity of \gls{cfi} and \thename is no exception.
+% \thename does employ backward-edge and forward-edge \gls{cfi}.
+% However, the imperfections of the current forward-edge \gls{cfi} is well-known~\cite{multi-layer-type,unique-code-target,kernel-pac}.
+% As such, the adversary may launch an extremely advanced attack to reuse the \gls{pa} instructions to forge pointers. We regard polishing \gls{cfi} as an orthogonal direction to our contribution. However, our use of \gls{pa} and \gls{mte} does not interfere with, and thus can coexist with the the proposals for \gls{pa}-based CFI~\cite{pac-it-up,kernel-pac,pactight,pacstack}.
+%~\cite{pactight}
+
+
+%For instance, research has shown that even with the fully-precise static \gls{cfi}, the adversary may achieve Turing-complete computation with \emph{control-flow bending} attacks~\cite{control-flow-bending}. However, this is still an open challenge to \gls{cfi} defenses, and we consider this issue out of scope.
+
+%On another note, in a type-matching-based forward-edge \gls{cfi}, certain functions with the matching type as the adversary-controlled indirect call site may inadvertently serve as a \emph{signing oracle} that signs an adversary-controlled argument to an adversary-controlled memory.
+%A static binary scanning tool for detecting such oracles has been discussed in PAL~\cite{kernel-pac}, a previous work that introduces \gls{pa}-based \gls{cfi} for kernel.
+%We plan to incorporate the tool into our work since we could not obtain PAL's implementation at the time of writing.
+
+
+
+
+
+% The authors of the work have released the implementation
+
+
+
+
+%https://github.com/SamsungLabs/PALinux
+
+
+
+
+% \thename currently employs a LLVM type type-based forward-edge \gls{cfi} scheme, which may allow a limited cases of false-negatives (e.g., illegitimate target function with matching type). In turn, the adversary may abuse a function that may serve as a signing oracle to forge \thename references. \todo{Gotta finish this.}
+
+
+% 
+
+
+% \hdr{Preventing signing oracle} 
+
+
+% One direction we observe to tackle is to improve
+
+
+
+% \hdr{Reference forgery}
+
+% \hdr{Reference forgability}
+
+% \hdr{Control-flow integrity}
+

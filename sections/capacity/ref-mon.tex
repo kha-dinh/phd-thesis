@@ -1,0 +1,260 @@
+\section{File System Object Isolation}\label{sec:ref-mon}\label{sec:design:ref-mon}\label{sec:design:file-path}
+
+% \begin{figure}[t]
+%     \centering
+%     \includegraphics[width=.98\columnwidth]{images/capacity-syscall-filter}
+%     \caption{\thename syscall filter vs. other syscall filter designs when filtering \texttt{sys\_read} and \texttt{sys\_write}.}
+%     \label{fig:ref-mon}
+% \end{figure}
+% \chcomment{Rule-based filtering vs. capability-based filtering}
+
+
+% Also, importing and using file resources must be mediated to prevent leaking % sensitive assets of a protected domain~\cite{jenny}. \thename's reference monitor enables the complete mediation of file path and file descriptor usages by authenticating the \gls{syscall} arguments. 
+% (e.g., \cpath into \fd)
+
+% Previous works on \gls{ipi} implemented reference monitors that mediate syscalls, along with their memory isolation scheme~\cite{erim,hodor,jenny,cerberus,pku-pitfall}. The necessity of such monitors arises because the kernel is unaware of the in-process domains, and adversaries in the untrusted domain may launch various forms of confused deputy attacks on the trusted domain. 
+
+% \thename references also serve as a non-forgeable token in a capability-based access control scheme.
+
+\keypoint{
+	\thename includes a reference monitor that verifies the \emph{arguments} of syscalls to enforce the complete mediation (\srcompmed) of system resource accesses.
+	This capability-inspired authentication mechanism drastically differs from previous works implementing \gls{acl}-based reference monitors for in-process syscall filtering and file access control~\cite{erim,hodor,jenny,cerberus,pku-pitfall}.
+}
+In those systems, enforcing access control on domain-private sensitive file objects requires a separate logic for the monitor detached from the program semantics.
+Moreover, \gls{acl}-based access control requires keeping track of the isolated objects and the domains that can access them at runtime~\cite{jenny}.
+In contrast, the \fds in \thename are cryptographically secured; the proof of ownership and object attributes are attached to the reference itself, regardless of the number of subjects sharing a resource.
+
+We implement the reference monitor in about $1000$ LoC. It provides domain key switching and \gls{syscall} interception through \gls{syscall} table hooking using a similar approach to a previous efficient reference monitor~\cite{jenny}.
+To avoid the system monitor affecting all processes within the system, we set an unused flag in \texttt{struct thread\_info->flags} to mark \thename-enabled processes during initialization and check for the flag before performing syscall authentication.
+
+
+% Note that we do not seek completeness with the syscall filtering policy in our reference monitor.
+% The syscall APIs were never developed with intra-process isolation in mind. This large attack surface entails various domain-to-domain \emph{confused deputy} problems that undermine the security of protected domains.
+% Many such attacks have been discussed in the previous works~\cite{pku-pitfall,jenny,cerberus}.
+% However, we regard the issue as an open challenge and  leave the completeness of the syscall filtering out of scope.
+
+% \keypoint{
+% 	\thename supports the authentication of file system paths (\cpath) and file descriptors (\fd).
+% }
+
+
+
+% As demonstrated later, we utilize the attributes to attach Capsicum-inspired policies that limit the capabilities of file descriptors to be used in syscalls.
+%
+% Also, with hardware acceleration, \thename's system object authentication only requires minimal kernel extensions and can be applied at the intra-process granularity.
+%
+
+% is performed automatically with \thename's facilities.  
+% \thename's cryptographically-protected references are intuitively built into the program as values, 
+
+
+% \noh{
+% Our capability-based resource filtering offers several advantages.
+% First, capabilities allow users to control authority per resource, providing a more granular access control level.
+% Although it may be possible to achieve the same level of granularity with a traditional access control system, capabilities reduce complexity by only requiring a corresponding authority token, regardless of the number of subjects sharing a particular resource.
+% In contrast to a syscall filtering, which limits the role or privilege of a specific domain, our approach uses resource filtering to constrain what can be accessed rather than what can be performed.
+% As a result, our capability-based resource filtering offers a more flexible and secure approach to access control.
+% }
+
+
+
+% By adopting capability-based access control, \thename enables drastically simplified authentication and management of sensitive file object references in syscalls.
+% We demonstrate the adv    antages of \thename's capability-based reference monitor design over \gls{acl}-based reference monitors. 
+
+
+% \hdr{In-program and coherent sensitive object access control} 
+% Another difference is the programming model between the two monitor designs.
+% Enforcing ACL on sensitive objects requires a separate code for the monitor, which is detached from the program semantics.
+% In contrast, cryptographically-secured object references in \thename are coherently built into the program through a \thename library, in-kernel monitor, and compiler instrumentation.
+% Managing the access control on sensitive objects in \thename is achieved through in-place annotations.
+
+
+
+% \added{
+% In \thename, file object isolation is provided by the complete mediation (\srcompmed) of resource usage provided by the reference monitor.
+% Isolation of \cpath references is provided by resolving the path to get its underlying file object (\ie, \texttt{struct inode}), then authenticate its attached the \gls{acl}-like data structure, as explained in (\cref{sec:design:path}).
+% File descriptors isolation is provided with Capsicum-inspired capability-enhanced file descriptors~\cite{capsicum} that are efficiently constructed and verified with \gls{pa} hardware acceleration (\cref{sec:design:fd}).
+% The reference monitor also propagates ownership of references when they change forms, which enables the life-cycle isolation of program resources.
+% }
+
+% The reference monitor of \thename performs several tasks: First, it enables the authenticated domain switching mechanism described in \cref{sec:design:impers} by serving the \texttt{capac\_enter} and \texttt{capac\_exit} requests from userspace.
+% Second, it also enforces the complete mediation (\srcompmed) of the file path and file descriptor uses by interposing \fd/\cpath-accepting syscalls and authenticating those references inside arguments with \gls{pa}.
+
+
+
+% \added{
+% \autoref{fig:ref-mon} presents a qualitative comparison between \thename and other technologies that filter syscalls.
+% Specifically, we compare \thename with two existing designs: the industry-standard seccomp-based filter and the user-delegate technique proposed recently~\cite{jenny}.
+% The seccomp-based filter relies on a set of predefined rules implemented in the kernel to restrict a program's access to syscalls. To use seccomp, a program must define a filter that specifies the filtering logic, typically using the BPF language.
+% The filter is then loaded into the kernel, which applies it to the program's syscalls to determine whether they are authorized.
+% However, seccomp-based mechanisms have high overheads and are inflexible, making them less ideal for intra-process isolation scenarios~\cite{jenny}.
+% To address these limitations, the user-delegate-based syscall filter was proposed~\cite{jenny}.
+% The design delegates the task of authorizing syscalls to an in-process reference monitor, allowing for more flexible filtering logic to be registered for nested domains while reducing syscall authorization overhead.
+% }
+
+% \added{
+% \thename's capability principle simplifies enforcement by authenticating references with the current domain authentication key.
+% Similar to the user-delegate-based filter, our approach requires minimal kernel extension, as the reference contains all the necessary information to authorize resource usage.
+% However, while each domain in user-delegate requires a dedicated filter, all \thename domains use a uniform authentication logic, requiring only a simple \gls{pa} instruction invocation on the authenticated reference.
+% Furthermore, \thename employs the same authentication logic to filter both read and write syscalls since they both accept a file descriptor as an argument.
+% This is not the case with seccomp-based or user-delegate-based filters. 
+% }
+
+
+
+% For instance,...
+
+% as a kernel module that hooks the \gls{syscall} table and prepend domain authentication routines using the \gls{pa} instructions. This method allows our reference monitor with minimal overheads. Note that the method is similar t
+
+
+% \hdr{Programming interfaces}
+
+% \added{
+% A user employs \thename to isolate file system resources through \libcapac APIs, namely \texttt{capac\_init}, \texttt{capac\_delegate\_fd} and \texttt{capac\_limit\_fd}, which are described in \autoref{tab:apis}.
+% Notably, the protection of file system object is kickstarted by the \texttt{capac\_init} function call.
+% The function receives a configuration structure, including a file path-owner domains mapping and other necessary information.
+% \texttt{capac\_init} then transitions the program into an irreversible \emph{protected mode}, where the reference monitor authenticates every \cpath and \fd arguments used in \glspl{syscall}.
+% Afterward, \thename protection coherently exists in the program, with file descriptors and path being transparently turned into unforgeable capability tokens used to request access to resources. 
+% }
+
+% \texttt{capac\_init} performs the initialization of \thename facilities, such as initializing the kernel-managed domain keys. 
+% It also receives from the user a list of domain-private \cpath and their owner domains, which it uses to establish the file-owner relationship (described later in \cref{sec:design:path}). 
+
+% \added{
+% The \texttt{capac\_delegate\_fd} API provides a \emph{runtime} mechanism for domains to share access to domain-private file descriptors.
+% When a delegation request is received, the reference monitor authenticates the delegated \fd to verify that its owner is requesting delegation.
+% It then re-signs the reference with the target's domain key and the requested context, then returns the newly signed \fd to the userspace.
+% }
+
+% \added{
+% Finally, \texttt{capac\_limit\_fd}
+% }
+
+
+% \subsection{Authenticating file system paths}\label{sec:design:path}
+\subsection{Enforcing domain-private file-system paths}
+\label{sec:design:path}
+% \issue{Maybe remove figure 5}
+% \begin{figure}[b]
+% 	\centering \includegraphics[width=0.90\columnwidth]{images/capacity-path-filter}
+% 	\caption{\thename file path authentication logic}
+% 	\label{fig:path}
+% \end{figure}
+\keypoint{
+	\thename supports file path isolation to be compatible with existing programs without significant rewriting effort.
+}
+\thename's file path authentication utilizes the pre-existing methods for attaching policies to file system objects used by kernel security subsystems (e.g., SELinux~\cite{selinux}).
+
+File paths protection is kickstarted by the \texttt{capac\_init} API call that sends a list of domain-private files and their owners to the reference monitor.
+The reference monitor first resolves each path to obtain the corresponding \texttt{inode} structure.
+It creates a per-process table in the file's \texttt{inode->f\_security}.
+For each owner domain of a file path, it stores the \emph{domain signature}, \pac{DB}{\texttt{NULL}}{0}, in the table.
+If the file is not domain-private, the table is left as \texttt{NULL}.
+After, the reference monitor transitions the process into the \emph{protected mode}, where the reference monitor authenticates every path and \fd arguments used in syscalls.
+
+
+Before authenticating a file object import, the requested file path is first resolved to obtain the underlying \texttt{inode} structure.
+This is to avoid confusion when encountering relative paths and symbolic links.
+If the table for the current process in \texttt{inode->f\_security} is \texttt{NULL}, the reference monitor recognizes that it is an \emph{ambient} object and can be accessed without further authentication.
+If domain signatures are present, the reference monitor authenticates them using the corresponding domain key until a valid signature is found.
+The reference monitor verifies that the current user context is in the object's owner domain if any valid signature is found while rejecting the file access otherwise.
+Finally, the returned \fd for the requested file is signed with \key{DA} for ambient objects or the domain key for domain-private objects.
+% Details of \fd signing are presented in the next subsection.
+
+% \added{
+
+% }
+
+
+% The reference monitor will intervene and examine the \texttt{inode} structure.
+
+
+\subsection{Enforcing domain-private file descriptors}
+% \subsection{File descriptors as in-process capabilities}
+\label{sec:design:fd}
+% \begin{figure}[t] \centering \includegraphics[width=0.90\columnwidth]{images/capacity-fd-filter}
+% 	\caption{\thename file descriptor authentication logic}
+% 	\label{fig:ref}
+% \end{figure}
+\keypoint{
+	\thename's reference monitor intercepts syscalls that generate \fds and create signed \fds before they are sent to the userspace.
+	It also intercepts \fd-accepting syscalls (\eg, \texttt{read}) for \fd authentication.
+}
+Hence, all \fds issued to the process carry \glspl{ac} that are authenticated on use.
+Additionally, we use a \emph{secret modifier} only known to the kernel as the \gls{pa} signing modifier, to prevent forging by signing a plain integer with \texttt{pac} instructions in the userspace (\srforge).
+\thename's security model also requires that the integer for \fds are not reused (\srreuse), even after they are closed. 
+We achieve this by changing the hook for the \texttt{close} to reserve the closed \fd in the thread's \fd table, preventing the OS from reusing it.
+
+\hdr{In-process FD capabilities}
+\keypoint{
+	\thename's \fd access control scheme resembles that of Capsicum's capability-enabled \fds~\cite{capsicum} but is much more lightweight and is enforced at the in-process granularity.
+}
+\thename's \fd capabilities scheme requires no additional kernel metadata for the permissions of \fds since the information necessary to authorize an \fd use is engraved in the \fd itself.
+Moreover, thanks to integrity protection provided by cryptographic authentication, we can securely embed fine-grained access control attributes into the file descriptors themself (\texttt{FD->Attr.} in \autoref{fig:ref-encapsulation}) without extensive bookkeeping.
+% and the \fds are integrity-protected by \gls{pa}'s cryptographic authentication.
+A combination of \gls{pa}-assisted authentication on the \fd and a per-syscall check based on static policies is sufficient to grant or reject file descriptor access.
+
+Our prototype supports four capabilities, represented as a bitmask of enabled capabilities.
+The \texttt{CAP\_WRITE} and \texttt{CAP\_READ} capabilities allow read-related syscalls (\eg, \texttt{read}, \texttt{recvfrom}) and write-related syscalls (\eg, \texttt{write}) to use the \fd.
+\texttt{CAP\_SOCKET} enables network-related syscalls, such as \texttt{accept} and \texttt{listen}.
+\texttt{CAP\_DELEGATE} allows the \fd to be delegated to other domains.
+The reference monitor uses a capability bitmask for each syscall to validate the \fd's attributes.
+% The capabilities are revoked from an \fd using simple bit masking operations.
+% We also introduce an API to remove capabilities from \fds, 
+On the other hand, \texttt{cap\_limit\_fd()} instructs the reference monitor to remove the selected capabilities from an \fd and re-sign it.
+
+
+\hdr{Signing and authentication of 32-bit \fds}
+\autoref{fig:ref-encapsulation} demonstrates the signing strategy of file descriptors.
+Since most file descriptors are 32-bit signed integers, we devised a 32-bit signing and authentication scheme.
+To sign an \fd, the reference monitor first signs its 64-bit zero-extended value like a normal pointer.
+Then, it attaches the PAC to bits[30:23] of the \fd.
+The monitor uses bit[22] (\texttt{FD->D}) bit to distinguish between domain-private and ambient \fd, such that domain-private {\fd}s are authenticated using the domain key.
+Bit[17:21] stores the bitmask of the previously described \fd capabilities.
+bit[31] is unused to prevent the descriptor from being interpreted as an error code (e.g., \texttt{if (fd < 0)}).
+\fd authentication on 32-bit \fds happens likewise.
+
+\hdr{Handling special \fd values} During our implementation, we found that special \fd values, such as \texttt{STDIN}, \texttt{STDOUT}, or \texttt{AT\_FDCW}, need to be handled differently since they are often hard-coded into the application as integer values (e.g., 1 and 2). We currently make our reference monitor omit their authentication for compatibility, given that they are always ambient objects.
+
+% \hdr{Considerations for \fd reuse}
+
+% NOTE: 
+% \hj{maybe remove this}
+% \added{
+% 	Note that the limited number of capabilities currently supported by \thename is not a fundamental limitation.
+% 	One approach to support more capabilities would be to reduce the number of available bits for file descriptor values to express additional capabilities.
+% 	Furthermore, the decision to support 32-bit \fd capabilities was made for compatibility with existing applications.
+% 	If a program were to support 64-bit file descriptors, it would be possible to provide more fine-grained capabilities while maintaining a sizable file descriptor space.
+% }
+
+
+
+% \hdr{Delegation}
+
+% In our example in \autoref{fig:code-example}, \action{FD-Auth} occurs in \texttt{sys\_read} under the monitor's intervention.
+% The monitor first checks \texttt{FD->D} and finds that it should be authenticated with the domain key.
+% % Then, the reference monitor moves the \gls{pac} value from the 32-bit file descriptor to bits [54:48] of the zero-extended \fd and invokes the authentication instruction on the \fd.
+% If authentication succeeds, the requested \gls{syscalsysteml} is then performed on the raw \fd.
+
+% \hdr{Delegating \fds} 
+% A domain can also request the reference monitor to create  \fds usable by another domain from an \fd that it owns, using the \texttt{delegate\_fd} API. 
+% We further demonstrate the usage of \fd delegation in the \thename-enabled webserver in \cref{sec:evaluation:porting-app}.
+
+% Not terribly important
+% \hdr{Special file descriptors and \texttt{stdin}/\texttt{stdout}}
+% \thename also supports \fds that are not file-backed like socket, pipe, or shared memory.
+% For example, socket \fds are signed and authenticated in \glspl{syscall} (e.g., \texttt{sys\_socket}, \texttt{sys\_accept4}) identically to the case of sensitive files shown above.
+% Also, in the current implementation, we heuristically ignore \texttt{stdin},\texttt{stdout}, \texttt{stderr} (\fd numbers 0-3) that are opened by the libc during its initialization, along with other OS-reserved special \fd values.
+% This is because those \fd are almost always ambient objects.
+
+% The user can configure whether newly created non-file \fds should be domain-private or ambient; for the former case, our reference monitor always returns domain-private \fds when {\fd}s could create new {\fd}s that are signed by \thename's reference monitor.
+% In fact, we demonstrate socket isolation with our real-world application example in \cref{sec:evaluation}.
+
+
+
+% Note that \thename's capability model also protects {\fd}s that do not have backing files in the file system, e.g., {\fd}s for sockets and events.
+% For instance, socket {\fd}s are protected by signing the return value of \texttt{sys\_socket} \gls{syscall} with the domain key, making it domain-private.
+% The reference monitor then simply authenticates the \fd argument of socket-related \glspl{syscall} (e.g., \texttt{sys\_bind}, \texttt{sys\_accept4}) and signs their return \fd returned values.
+
+
+

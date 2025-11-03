@@ -1,0 +1,123 @@
+\newcommand*{\thenameplain}[0]{\textsc{Capacity}\xspace}
+\newcommand*{\libcapac}[0]{\texttt{libcapacity}\xspace}
+\newcommand*{\libcapacplain}[0]{Libcapacity\xspace}
+
+
+% \newacronym{syscall}{syscall}{system call}
+% \newacronym{pa}{PA}{Pointer Authentication}
+% \newacronym{pac}{PAC}{Pointer Authentication Code}
+% \newacronym{tbi}{TBI}{Top-Byte Ignore}
+% \newacronym{ipi}{\textcolor{red}{?????IPI?????}}{Intra-Process Isolation}
+% \newacronym{pku}{PKU}{Protection Keys for Userspace}
+% \newacronym{cfi}{CFI}{Control-Flow Integrity}
+% \newacronym{lsm}{LSM}{Linux Security Modules}
+% \newacronym{aslr}{ASLR}{Address Space Layout Randomization}
+% \newacronym{hmac}{HMAC}{Hash-based Message Authentication Code}
+% \newacronym{mte}{MTE}{Memory Tagging Extension}
+% \newacronym{acl}{ACL}{Access Control List}
+% \newacronym{dst}{DST}{Domain Signature Table}
+% \newacronym{uuid}{UUID}{Uniquely Identifiable IDentification}
+% \newacronym{sfi}{SFI}{Software Fault Isolation}
+% \newacronym{ipc}{IPC}{Inter-Process Communication}
+% \newacronym{pdg}{PDG}{Program Dependence Graph}
+% \newacronym{iot}{IoT}{Internet of Things}
+% \newacronym{dpi}{DPI}{Data Pointer Integrity}
+% \newacronym{mmu}{MMU}{Memory Management Unit}
+% \newacronym{mpu}{MPU}{Memory Protection Unit}
+% \newacronym{ac}{AC}{Authentication Code}
+% \newacronym{ir}{IR}{Intermediate Representation}
+% \newacronym{mir}{MIR}{Machine IR}
+
+
+% ######################################################################
+% #########################  Notations  ################################
+% ######################################################################
+
+% ##########################  PA & MTE  ################################
+
+% \newcommand*{\pac}[3]{\sloppy\texttt{PAC}$_{\textbf{K}_{#1}}$({#2}, {#3})}
+\newcommand*{\pac}[3]{\sloppy\texttt{PAC}({${\textbf{K}_{#1}}$}, {#2}, {#3})}
+\newcommand*{\pacga}[0]{\texttt{pacga}\xspace}
+\newcommand*{\packey}[1]{\sloppy\texttt{PAC}$_{\textbf{K}_{#1}}$}
+\newcommand*{\pactwokey}[2]{\sloppy\texttt{PAC}$_{\textbf{K}_{#1}+\textbf{K}_{#2}}$}
+\newcommand*{\autkey}[1]{\sloppy\texttt{AUT}$_{\textbf{K}_{#1}}$}
+\newcommand*{\auttwokey}[2]{\sloppy\texttt{AUT}$_{\textbf{K}_{#1}+\textbf{K}_{#2}}$}
+\newcommand*{\pacv}[3]{\texttt{PAC}({$\textbf{K}_{#1}$},{#2}, {#3})}
+\newcommand*{\pacz}[2]{\sloppy\texttt{PAC}$_{\textbf{K}_{#1}}$({#2})}
+\newcommand*{\autz}[2]{\texttt{AUT}({$\textbf{K}_{#1}$}, ${#2}$)}
+% \newcommand*{\aut}[3]{\sloppy\texttt{AUT}$_{\textbf{K}_{#1}}$({#2}, {#3})}
+\newcommand*{\aut}[3]{\sloppy\texttt{AUT}({${\textbf{K}_{#1}}$}, {#2}, {#3})}
+
+\newcommand*{\pacsmol}[3]{\sloppy\texttt{PAC}$_{\textbf{K}_{#1}}$({#2}, {#3})}
+\newcommand*{\tagnum}[1]{\textbf{T}$_{#1}$}
+\newcommand*{\typeid}[0]{\textit{type-id}}
+\newcommand*{\attrs}[0]{\textit{attrs}}
+\newcommand*{\dflag}[0]{\textit{D}}
+\newcommand*{\stag}[2]{\texttt{TAG}(#1, #2)}
+\newcommand*{\tagz}[2]{\texttt{TAG}(#2, $\textbf{T}_{#1}$, \texttt{size})}
+
+\newcommand*{\key}[1]{\textbf{K}$_{#1}$\xspace}
+\newcommand{\iakey}[0]{\key{IA}}
+\newcommand{\ibkey}[0]{\key{IB}}
+\newcommand{\dakey}[0]{\key{DA}}
+\newcommand{\dbkey}[0]{\key{DB}}
+\newcommand{\gkey}[0]{\key{G}}
+
+
+
+% ###################  Security Requirements  ##########################
+% \newcommand{\circnum}[1]{\circlednum{\small {\texttt{#1}}}}
+\newcommand*{\fd}[0]{\texttt{FD}\xspace}
+\newcommand*{\ptr}[0]{\texttt{PTR}\xspace}
+\newcommand*{\fds}[0]{\texttt{FD}s\xspace}
+\newcommand*{\ptrs}[0]{\texttt{PTR}s\xspace}
+
+\newcommand*{\cpath}[0]{\texttt{PATH}\xspace}
+
+
+\newcommand\action[2][]{
+\Circled[fill color=ssblue,inner color=white,#1]{\scriptsize\sffamily #2}
+}
+
+\newcommand\actionambient[2][]{
+\Circled[fill color=lgray!90,inner color=black,#1]{\scriptsize\sffamily #2}
+}
+% \newcommand{\domconn}{\texttt{DOM\_CONN}\xspace}
+% \newcommand{\domhs}{\texttt{DOM\_HS}\xspace}
+% \newcommand{\domses}{\texttt{DOM\_SESS}\xspace}
+% \newcommand{\domamb}{\texttt{DOM\_AMB}\xspace}
+
+\newcommand{\domconn}{\textsc{Connection}\xspace}
+\newcommand{\domhs}{\textsc{Handshake}\xspace}
+\newcommand{\domses}{\textsc{Session}\xspace}
+\newcommand{\domamb}{\textsc{Ambient}\xspace}
+
+\newcommand\secreq[2][]{\ifmmode
+\Circled[fill color=ssblue,inner color=white,#1]{\scriptsize\mathsf{#2}}
+\else
+\Circled[fill color=white,inner color=black,#1]{\scriptsize\bfseries\sffamily#2}
+\fi
+}
+
+\newcommand{\srimper}[0]{\secreq{R1}}
+\newcommand{\srimpers}[0]{\secreq{R1}}
+\newcommand{\srcompmed}[0]{\secreq{R2}}
+\newcommand{\srreuse}[0]{\secreq{R3}}
+\newcommand{\srforge}[0]{\secreq{R4}}
+
+% ###########################  Colors  #################################
+\definecolor{allowed}{RGB}{0,150,0}
+\definecolor{kindof}{RGB}{200,200,0}
+\definecolor{lgray}{gray}{0.8}
+\definecolor{ssblue}{RGB}{42,100,168}
+
+% ############################  ETC  ###################################
+\newcommand*{\dom}[1]{Dom\textsubscript{#1}}
+% \newcommand{\etal}[0]{et al.\xspace}
+\newcommand*{\pamte}[0]{\gls{pa}+\gls{mte}\xspace}
+
+\newcommand{\keypoint}[1]{#1\xspace}
+\newcommand{\hlblue}[1]{{\tt\color{white}\sethlcolor{ssblue}\hl{#1}}}
+\newcommand{\hlgray}[1]{{\tt\sethlcolor{lgray}\hl{#1}}}
+
+

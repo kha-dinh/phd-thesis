@@ -1,0 +1,69 @@
+
+
+\section{Background}
+% In this section, we explain the hardware primitives that \thename incorporates into its design and the fundamentals of capability-based access control.
+% Also, we introduce the notations that we will use consistently throughout the paper.
+
+\subsection{Pointer Authentication (PA)}
+\label{sec:background:pac}
+\emph{\Glsentryfull{pa}}, introduced on ARMv8.3-A~\cite{arm-arch}, provides hardware acceleration and ISA extension for cryptographically authenticated pointers.
+The design of \gls{pa} is inspired by previous works that protect pointers from corruption~\cite{ccfi,cpi}.
+\gls{pa} allows attaching a \gls{pac} to a pointer in the unused bits [54:48] of a 64-bit address.
+A \gls{pac} is generated using one of the five keys stored in the newly added registers that can only be accessed or modified with privileged instructions.
+The five keys consist of two keys for signing code/instruction pointers (Instruction-\{A,B\}), another two for signing data (Data-\{A,B\}) pointers, and one general-purpose key (G).
+We denote these keys as \key{IA},\key{IB}, \key{DA}, \key{DB} and \key{G}.
+\Gls{pa} also introduces \texttt{pac} and \texttt{aut} families of instructions to \emph{sign} (i.e., calculate the \gls{pac} and attach it to the value in the operand register) and \emph{authenticate} a 64-bit value with an \emph{optional} modifier using the key indicated by the instruction name.
+If authentication on a pointer succeeds, the authentication code in the pointer is cleared, making the pointer usable.
+The \gls{pac} value is corrupted if the check fails, which triggers a segmentation fault when the pointer is dereferenced.
+We denote the operations of \texttt{pac} and \texttt{aut} instructions that use the key \key{} to sign and authenticate a given data \emph{D} as \pac{}{\emph{D}}{\emph{mod}} and \aut{}{\emph{D}}{\emph{mod}}.
+
+
+% \emph{\Glsentryfull{pa}}, introduced on ARMv8.3-A~\cite{arm-arch} and ARMv8-M~\cite{armv8-m}, provides hardware acceleration and ISA extension for cryptographically authenticated pointers.
+% The design of \gls{pa} is inspired by previous works that protect pointers from corruption (\ie, \emph{pointer integrity})~\cite{ccfi,cpi}.
+% \gls{pa} allows attaching a \gls{pac} to a pointer in the unused bits [54:48] of a 64-bit pointer.
+% A \gls{pac} is generated using one of the five keys stored in the newly added registers that can only be accessed or modified with privileged instructions.
+% The five keys consist of two keys for signing code/instruction pointers (Instruction-\{A,B\}), another two for singing data (Data-\{A,B\}) pointers, and one general-purpose key (G).
+% We denote five keys as \key{IA},\key{IB}, \key{DA}, \key{DB} and \key{G}.
+% \noh{Moreover, \gls{pa} introduces \texttt{pac} and \texttt{aut} family of instructions to sign and authenticate pointers.
+% The \texttt{pac} family of instructions calculate a hash of a given pointer in the operand register
+
+% PA also introduces \texttt{pac} and aut families of instructions to sign (i.e., calculate the PAC and attach it to
+% the input) and verify a 64-bit value with an optional modifier using the key indicated by the instruction name. If authentication on a pointer succeeds, the authentication code in the pointer is cleared, making the pointer usable.
+% The PAC value is corrupted if the check fails, which triggers a segmentation
+% fault when the pointer is dereferenced.
+
+% These instructions optionally take context along with the pointer as operands.
+
+% Intuitively, the signing context associates a given pointer with a context, such that a signed pointer is only valid if its authenticating context is identical.
+% The upper bits of a pointer are corrupted if \gls{pa} authentication fail, which will trigger a segmentation fault when dereferenced.
+% Hereinafer, we denote the signing and authentication operations that use the key \key{} to sign or authenticate a given pointer \emph{P} as \pac{}{\emph{P}}{\emph{mod}} or \aut{}{\emph{P}}{\emph{mod}}.
+% }
+
+
+\subsection{Memory Tagging Extension (MTE)}
+\label{sec:background:mte}
+\emph{\Glsentryfull{mte}}~\cite{mte} is another hardware-backed security feature to ARMv8.5-A~\cite{arm-arch}.
+\Gls{mte} adapts the principles of tagged memory in the existing research proposals and implementations in other architectures~\cite{timber-v,hw-tagged-memory,sparc-adi}. 
+It facilitates memory safety by enabling the 4-bit tagging of pointers and 16-byte aligned address ranges.
+When \gls{mte} is enabled, the processor raises an interrupt if the tags differ between the memory and the pointer, allowing vulnerabilities such as buffer overflow to be captured.
+We denote \tagz{}{\emph{P}} as the tagging operation that first assigns the 4-bit tag \textbf{T} to the bits [59:56] of a pointer \emph{P}, then tag 16-byte-aligned memory region between \emph{P} and \emph{P}$+$size with \textbf{T}.
+In addition, \gls{pa} and \gls{mte} can be \emph{simultaneously} enabled.
+Hence, a pointer can be tagged \emph{then} signed, and the resulting pointer would carry a tag in bits [60:56] and \gls{pac} in [54:48].
+% Hence, the security guarantees of \gls{pa} and \gls{mte} are complementary.
+% NOTE: Trimmed
+% \Gls{mte} alone cannot guarantee memory isolation due to the lack of a secure pointer tagging mechanism; an attacker can craft maliciously tagged pointers (\eg, through memory corruption) to access tagged memory of any color.
+% On the other hand, \gls{pa} alone is incapable of ensuring memory isolation; an adversary can authenticate a pointer and then perform an out-of-bounds memory (\eg, \texttt{gets(AUT(\emph{P}))}).
+% Hence, \thename adapts tagged and signed pointers and turns them into non-forgeable memory references, which we will explain in the following sections.
+
+
+
+% \subsection{Capability-based access control}
+% \label{sec:background:capability}
+% \deleted{
+% Capability-based access control revolves around non-forgeable \emph{capability tokens}, or \emph{references}, representing a subject's access rights to protected resources.
+% Such capability-based security allows precisely defined \emph{least privilege} and privilege sharing through delegation in compartments.
+% Due to its potential in and hence has been sought after by many historical and recent works~\cite{obj-cap,cap-addressing,eros,capsicum,cheri,cheri-risc,wasi,fuchsia,framer}.
+% By requiring the capabilities of each software component to be explicitly given, capability-based access control is the ideal scheme for achieving the \emph{least privilege principle} and eliminating \emph{ambient authority} of software~\cite{cheri,capsicum,eros}.
+% Access control decisions are made simply by verifying and authenticating the requested subjects' resource references in such systems.
+% Notably, recent undertakings towards a design of access control systems from scratch~\cite{fuchsia,wasi}, such as Google's Fushcia OS~\cite{fuchsia}, adapted the capability model.
+% }

@@ -1,0 +1,118 @@
+% \newcommand*{\belowrulesepcolor}[1]{%
+%   \noalign{%
+%     \kern-\belowrulesep
+%     \begingroup
+%       \color{#1}%
+%       \hrule height\belowrulesep
+%     \endgroup
+%   }%
+% }
+% \newcommand*{\aboverulesepcolor}[1]{%
+%   \noalign{%
+%     \begingroup
+%       \color{#1}%
+%       \hrule height\aboverulesep
+%     \endgroup
+%     \kern-\aboverulesep
+%   }%
+% }
+\vspace{-8em}
+\begin{adjustbox}{angle=90}
+\begin{threeparttable}
+\scriptsize
+    % \begin{tabu} to \textwidth {@{}llp{3cm}ccYcccc@{}}
+
+  \begin{tabularx}{1.6\textwidth}{@{}lp{1.7cm}p{5cm}ccYcccc}
+ % \begin{NiceTabular}[width=\textwidth,colortbl-like]{@{}llp{3cm}ccYcccc@{}}
+    \toprule
+    &\multirow{2}{*}{\thead{Domain}}                          &
+    \multirow{2}{*}{\thead{Isolated Objects \{Ref. types\}}} &
+    \multirow{2}{*}{\thead{Domain                                                                                                                                                                         \\Switches}} &
+    \multirow{2}{*}{\thead{Auth.                                                                                                                                                                          \\Syscalls}} &
+    \multirow{2}{*}{\thead{$\mathcal{A}$}} &
+    \multicolumn{2}{c}{\thead{Executed PACs}}                &
+    \multicolumn{2}{c}{\thead{Executed AUTs}}                                                                                                                                                             \\
+    % \cmidrule(lr){7-8} \cmidrule(lr){9-10}
+      &   &   &   &   &   & \packey{DB} & \packey{DA} & \autkey{DB} & \autkey{DA} \\[1ex]
+    \toprule
+    \multirow{4}{*}[-2em]{\begin{sideways}\thead{NGINX + LibreSSL}\end{sideways}}
+    &
+    % \rule{0pt}{20pt}
+    \domconn                                                 & \makecell[l]{Server socket \{\fd\}                                                                                                         \\Client connection socket \{\fd\}}   &
+    $2$                                                      & $16$                                                         & $-$ & $-$ & $104$   & $-$         & $590$                                   \rule{0pt}{4.0ex}\\[2ex]
+    % \cdashline{2-10}\noalign{\vskip\belowrulesep}
+    % \cmidrule{2-10}
+    % \aboverulesepcolor{lightgray}
+    &  
+    \rowcolor[gray]{0.925}
+    % \rowcolor{lightgray} \rule{0pt}{20pt}
+    \domhs                                                   & \makecell[l]{Server priv. key \{\cpath, \fd, \ptr\}                                                                                        \\TLS session key \{\ptr\}\\Client connection socket \{\fd\textsuperscript{\ddag}\}} &
+    $3$                                                      & $18$                                                         & $4$ & $9$ & $10.1$K & $13$        & $134$K                                   \rule{0pt}{6.0ex}\\[2ex]
+
+    
+    % \cmidrule{2-10}
+    % \cdashline{2-10}\noalign{\vskip\belowrulesep}
+    & 
+    % \rule{0pt}{20pt}
+    
+    \domses                                                  & \makecell[l]{TLS session key \{\ptr\textsuperscript{\ddag}\}                                                                               \\Client connection socket \{\fd\textsuperscript{\ddag}\} } &
+    \makecell[c]{$7$/$8$/$10$/$13$                                                                                                                                                                        \\/$22$/$37$/$70$\textsuperscript{\dag}} &
+    \makecell[c]{$14$/$16$/$20$/$28$                                                                                                                                                                      \\/$44$/$76$/$140$\textsuperscript{\dag}} &
+    $3$                                                      &
+    \makecell[c]{$43$/$49$/$61$/$85$                                                                                                                                                                      \\/$133$/$229$/$421$\textsuperscript{\dag}} &
+    \makecell[c]{$818$/$852$/$917$/$1$K                                                                                                                                                                   \\/$1.3$K/$1.8$K/$2.9$K\textsuperscript{\dag}} &
+    \makecell[c]{$3.4$K/$6.5$K/$12$K/$25$K                                                                                                                                                                \\/$50$K/$99$K/$199$K\textsuperscript{\dag}} &
+    \makecell[c]{$7.7$K/$10$K/$14$K/$24$K                                                                                                                                                                 \\/$42$K/$79$K/$154$K\textsuperscript{\dag}}   \rule{0pt}{5.0ex}\\[2ex]
+    % \cmidrule{2-10}
+    % \cdashline{2-10}\noalign{\vskip\belowrulesep}
+    & 
+    % \rule{0pt}{20pt}
+    % \rowcolor{lightgray}
+    \rowcolor[gray]{0.925}
+    \domamb                                                  & $-$                                                          &
+    $-$                                                      &
+    \makecell[c]{$94$/$99$/$100$/$109$                                                                                                                                                                    \\/$121$/$145$/$193$\textsuperscript{\dag}}  & $-$ & $-$ & $33.6$K & $-$   & $164$K \rule{0pt}{4.0ex} \\[2ex]
+    \midrule
+    \multirow{1}{*}[-1.1em]{\begin{sideways}\thead{SSH}\end{sideways}}
+    &\textsc{PrivKey}                                                 & \makecell[l]{Client private key \{\cpath,\fd,\ptr\}}   &
+    $1$                                                      & $72$                                                         & $55$ & $18$ & $6$K   & $24$         & $33.5$K                                 \rule{0pt}{2.0ex} \\
+    % \cmidrule{2-10}
+    % \cdashline{2-10}
+    &
+    % \rowcolor{lightgray}
+    \rowcolor[gray]{0.925}
+    \domamb                                                  & $-$                                                          &
+    $-$                & $37$                                      &
+    $-$ & $-$ & $14.7$K & $-$   & $114$K \rule{0pt}{3.0ex}\\[1ex]
+    \midrule
+    \multirow{2}{*}[-0.9em]{\begin{sideways}\thead{wget}\end{sideways}}
+    &\textsc{FileDownload}                                                 & \makecell[l]{Downloaded file \{\cpath,\fd,\ptr\}}   &
+    $3$                                                      & $325$                                                         & $1$ & $129$ & $3$K   & $385$         & $8.6$K                                   \rule{0pt}{2.0ex}\\
+    % \cmidrule{2-10}
+    % \vspace{.1em}
+    % \cdashline{2-10}
+    % \vspace{.1em}
+    &
+    \rowcolor[gray]{0.925}
+    % \rowcolor{lightgray}
+    % \rule{0pt}{20pt}
+    \domamb                                                                                                      &
+    $-$                                               & $-$ &     $131$ & $-$ & $-$ & $703$ & $-$   & $1.6$K \rule{0pt}{3.0ex}\\[1ex] \bottomrule
+  \end{tabularx}
+  % \end{tabu}
+  % \end{NiceTabular}
+
+  \begin{tablenotes}
+    \item  \textsuperscript{\dag}  {\small Measurements from \{16K,32K,64K,128K,256K,512K,1024K\} HTTPS file size configurations } \hspace{1.0em} \textsuperscript{\ddag}  {\small  Delegated references} \vspace{0.5em}
+    \item {\small$ \mathcal{A}$ = Number of domain-private memory allocations}
+    %\item \textbf{Dom. SW:}\# Domain switches\hspace{0.8em} \textbf{Auth. Syscalls:} \# of \fd-authenticated syscall invocations \hspace{0.8em} \textbf{Dom-Priv MemAlloc.:} \# of \texttt{capac\_malloc()} invocation
+    %         \item \hfil \textsuperscript{\dag}  {\small  Delegated references} % \textbf{/} {\small \{Total PAC/AUTs in Program\}}
+  \end{tablenotes}
+
+  \caption{\thename domains and protected assets in evaluated applications. Columns 3-9 show runtime measurements of \thename operations executed during a single iteration of \{HTTPS file transfer (NGINX) / SSH handshake / wget file download\}.}
+
+  \label{tbl:porting-app}
+  \label{tbl:app}
+  % \vspace{-2em}
+\end{threeparttable}
+\end{adjustbox}

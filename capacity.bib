@@ -1,0 +1,2035 @@
+@misc{capacity-extended,
+  title           = {Capacity: Cryptographically-Enforced In-Process Capabilities for Modern ARM Architectures (Extended Version)},
+  author          = {Kha Dinh Duy and Kyuwon Cho and Taehyun Noh and Hojoon Lee},
+  year            = 2023,
+  publisher       = {arXiv},
+  doi             = {https://doi.org/10.48550/arXiv.2309.11151},
+  copyright       = {arXiv.org perpetual, non-exclusive license},
+}
+
+@inproceedings{ptrsplit,
+  author          = {Liu, Shen and Tan, Gang and Jaeger, Trent},
+  title           = {PtrSplit: Supporting General Pointers in Automatic Program
+                  Partitioning},
+  year            = 2017,
+  isbn            = 9781450349468,
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  url             = {https://doi.org/10.1145/3133956.3134066},
+  doi             = {10.1145/3133956.3134066},
+  booktitle       = {Proceedings of the 2017 ACM SIGSAC Conference on Computer
+                  and Communications Security},
+  pages           = {2359–2371},
+  numpages        = 13,
+  keywords        = {automatic program partitioning, data marshalling, bounds
+                  tracking},
+  location        = {Dallas, Texas, USA},
+  series          = {CCS '17}
+}
+
+@article{cap-addressing,
+  title           = {Capability-Based Addressing},
+  author          = {Fabry, R. S.},
+  year            = 1974,
+  month           = {jul},
+  journal         = {Commun. ACM},
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  volume          = 17,
+  number          = 7,
+  pages           = {403–412},
+  doi             = {10.1145/361011.361070},
+  issn            = {0001-0782},
+  issue_date      = {July 1974},
+  numpages        = 10,
+}
+
+@inproceedings{wave,
+  author          = {E. Johnson and E. Laufer and Z. Zhao and D. Gohman and S.
+                  Narayan and S. Savage and D. Stefan and F. Brown},
+  booktitle       = {2023 2023 IEEE Symposium on Security and Privacy (SP) (SP)},
+  title           = {WaVe: A Verifiably Secure WebAssembly Sandboxing Runtime},
+  year            = 2023,
+  pages           = {1986-2001},
+  doi             = {10.1109/SP46215.2023.00114},
+  url             =
+                  {https://doi.ieeecomputersociety.org/10.1109/SP46215.2023.00114},
+  publisher       = {IEEE Computer Society},
+  address         = {Los Alamitos, CA, USA},
+  month           = {may},
+}
+
+@inproceedings{cambridge-cap,
+  title           = {The Cambridge CAP Computer and Its Protection System},
+  author          = {Needham, R. M. and Walker, R. D.H.},
+  year            = 1977,
+  booktitle       = {Proceedings of the Sixth ACM Symposium on Operating Systems
+                  Principles},
+  location        = {West Lafayette, Indiana, USA},
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  series          = {SOSP '77},
+  pages           = {1–10},
+  doi             = {10.1145/800214.806541},
+  isbn            = 9781450378673,
+  numpages        = 10,
+}
+
+@misc{color-my-world,
+  title           = {Color {My World}: {Deterministic Tagging} for {Memory
+                  Safety}},
+  shorttitle      = {Color {{My World}}},
+  author          = {Liljestrand, Hans and Chinea, Carlos and {Denis-Courmont},
+                  R{\'e}mi and Ekberg, Jan-Erik and Asokan, N.},
+  year            = 2022,
+  month           = apr,
+  number          = {arXiv:2204.03781},
+  eprint          = {2204.03781},
+  eprinttype      = {arxiv},
+  primaryclass    = {cs},
+  publisher       = {arXiv},
+  abstract        = {Hardware-assisted memory protection features are
+                  increasingly being deployed in COTS processors. ARMv8.5 Memory
+                  Tagging Extensions (MTE) is a recent example, which has been
+                  used to provide probabilistic checks for memory safety. This
+                  use of MTE is not secure against the standard adversary with
+                  arbitrary read/write access to memory. Consequently MTE is
+                  used as a software development tool. In this paper we present
+                  the first design for deterministic memory protection using MTE
+                  that can resist the standard adversary, and hence is suitable
+                  for post-deployment memory safety. We describe our compiler
+                  extensions for LLVM Clang implementing static analysis and
+                  subsequent MTE instrumentation. Via a comprehensive evaluation
+                  we show that our scheme is effective.},
+  archiveprefix   = {arXiv},
+  annotation      = {0 citations (Semantic Scholar/arXiv) [2022-08-22] 0
+                  citations (Semantic Scholar/DOI) [2022-08-22]},
+}
+
+@inproceedings{sel4,
+  author          = {Klein, Gerwin and Elphinstone, Kevin and Heiser, Gernot and
+                  Andronick, June and Cock, David and Derrin, Philip and
+                  Elkaduwe, Dhammika and Engelhardt, Kai and Kolanski, Rafal and
+                  Norrish, Michael and Sewell, Thomas and Tuch, Harvey and
+                  Winwood, Simon},
+  title           = {SeL4: Formal Verification of an OS Kernel},
+  year            = 2009,
+  isbn            = 9781605587523,
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  url             = {https://doi.org/10.1145/1629575.1629596},
+  doi             = {10.1145/1629575.1629596},
+  abstract        = {Complete formal verification is the only known way to
+                  guarantee that a system is free of programming errors.We
+                  present our experience in performing the formal,
+                  machine-checked verification of the seL5 microkernel from an
+                  abstract specification down to its C implementation. We assume
+                  correctness of compiler, assembly code, and hardware, and we
+                  used a unique design approach that fuses formal and operating
+                  systems techniques. To our knowledge, this is the first formal
+                  proof of functional correctness of a complete, general-purpose
+                  operating-system kernel. Functional correctness means here
+                  that the implementation always strictly follows our high-level
+                  abstract specification of kernel behaviour. This encompasses
+                  traditional design and implementation safety properties such
+                  as the kernel will never crash, and it will never perform an
+                  unsafe operation. It also proves much more: we can predict
+                  precisely how the kernel will behave in every possible
+                  situation.seL4, a third-generation microkernel of L4
+                  provenance, comprises 8,700 lines of C code and 600 lines of
+                  assembler. Its performance is comparable to other
+                  high-performance L4 kernels.},
+  booktitle       = {Proceedings of the ACM SIGOPS 22nd Symposium on Operating
+                  Systems Principles},
+  pages           = {207–220},
+  numpages        = 14,
+  keywords        = {microkernel, sel4, l4, isabelle/hol},
+  location        = {Big Sky, Montana, USA},
+  series          = {SOSP '09}
+}
+
+@inproceedings {capstone,
+  author          = {Jason Zhijingcheng Yu and Conrad Watt and Aditya Badole and
+                  Trevor E. Carlson and Prateek Saxena},
+  title           = {Capstone: A Capability-based Foundation for Trustless
+                  Secure Memory Access},
+  booktitle       = {32nd USENIX Security Symposium (USENIX Security 23)},
+  year            = 2023,
+  isbn            = {978-1-939133-37-3},
+  address         = {Anaheim, CA},
+  pages           = {787--804},
+  url             =
+                  {https://www.usenix.org/conference/usenixsecurity23/presentation/yu-jason},
+  publisher       = {USENIX Association},
+  month           = aug,
+}
+
+@INPROCEEDINGS {muswitch,
+  author          = {D. Peng and C. Liu and T. Palit and P. Fonseca and A.
+                  Vahldiek-Oberwagner and M. Vij},
+  booktitle       = {2023 IEEE Symposium on Security and Privacy (SP)},
+  title           = {$\mu$Switch: Fast Kernel Context Isolation with Implicit
+                  Context Switches},
+  year            = 2023,
+  pages           = {2956-2973},
+  abstract        = {Isolating application components is crucial to limit the
+                  exposure of sensitive data and code to vulnerabilities in the
+                  untrusted components. Process-based isolation is the de facto
+                  isolation used in practice, e.g., web browsers. However, it
+                  incurs significant performance overhead and is typically
+                  infeasible when frequent switches between isolation domains
+                  are expected. To address this problem, many intra-process
+                  memory isolation techniques have been proposed using novel
+                  kernel abstractions, recent CPU extensions (e.g., Intel® MPK),
+                  and software-based fault isolation (e.g., WebAssembly).
+                  However, these techniques insufficiently isolate kernel
+                  resources, such as file descriptors, or do so by incurring
+                  high overheads when resources are accessed. Other work
+                  virtualizes the kernel context inside a privileged user space
+                  domain, but this is ad-hoc, error-prone, and provides only
+                  limited kernel functionalities.We propose μSwitch, an
+                  efficient kernel context isolation mechanism with memory
+                  protection that addresses these limitations. We use a
+                  protected structure, shared by the kernel and the user space,
+                  for context switching and propose implicit context switching
+                  to improve its performance by deferring the kernel resource
+                  switch to the next system call. We apply μSWITCH to isolate
+                  libraries in the Firefox web browser and an HTTP server, and
+                  reduce the overhead of isolation by 32.7% to 98.4% compared
+                  with other isolation techniques.},
+  keywords        = {privacy;codes;memory
+                  management;switches;libraries;browsers;security},
+  doi             = {10.1109/SP46215.2023.10179284},
+  url             =
+                  {https://doi.ieeecomputersociety.org/10.1109/SP46215.2023.10179284},
+  publisher       = {IEEE Computer Society},
+  address         = {Los Alamitos, CA, USA},
+  month           = {may}
+}
+
+@article{hydra,
+  title           = {HYDRA: The Kernel of a Multiprocessor Operating System},
+  author          = {Wulf, W. and Cohen, E. and Corwin, W. and Jones, A. and
+                  Levin, R. and Pierson, C. and Pollack, F.},
+  year            = 1974,
+  month           = {jun},
+  journal         = {Commun. ACM},
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  volume          = 17,
+  number          = 6,
+  pages           = {337–345},
+  doi             = {10.1145/355616.364017},
+  issn            = {0001-0782},
+  issue_date      = {June 1974},
+  numpages        = 9,
+}
+
+@inproceedings{capsicum,
+  title           = {Capsicum: Practical Capabilities for {UNIX}},
+  author          = {Robert N. M. Watson and Jonathan Anderson and Ben Laurie
+                  and Kris Kennaway},
+  year            = 2010,
+  booktitle       = {19th {USENIX} Security Symposium, Washington, DC, USA,
+                  August 11-13, 2010, Proceedings},
+  publisher       = {{USENIX} Association},
+  pages           = {29--46},
+  timestamp       = {Thu, 12 Mar 2020 11:35:00 +0100},
+}
+
+@inproceedings{eros,
+  title           = {EROS: A Fast Capability System},
+  author          = {Shapiro, Jonathan S. and Smith, Jonathan M. and Farber,
+                  David J.},
+  year            = 1999,
+  booktitle       = {Proceedings of the Seventeenth ACM Symposium on Operating
+                  Systems Principles},
+  location        = {Charleston, South Carolina, USA},
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  series          = {SOSP '99},
+  pages           = {170–185},
+  isbn            = 1581131402,
+  numpages        = 16,
+}
+
+@article{obj-cap,
+  title           = {Programming Semantics for Multiprogrammed Computations},
+  author          = {Dennis, Jack B. and Van Horn, Earl C.},
+  year            = 1966,
+  month           = mar,
+  journal         = {Commun. ACM},
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  volume          = 9,
+  number          = 3,
+  pages           = {143–155},
+  issn            = {0001-0782},
+  issue_date      = {March 1966},
+  numpages        = 13,
+}
+
+@inproceedings{cheri,
+  title           = {{CHERI:} {A} Hybrid Capability-System Architecture for
+                  Scalable Software Compartmentalization},
+  author          = {Robert N. M. Watson and Jonathan Woodruff and Peter G.
+                  Neumann and Simon W. Moore and Jonathan Anderson and David
+                  Chisnall and Nirav H. Dave and Brooks Davis and Khilan Gudka
+                  and Ben Laurie and Steven J. Murdoch and Robert M. Norton and
+                  Michael Roe and Stacey D. Son and Munraj Vadera},
+  year            = 2015,
+  booktitle       = {2015 {IEEE} Symposium on Security and Privacy, {SP} 2015,
+                  San Jose, CA, USA, May 17-21, 2015},
+  publisher       = {{IEEE} Computer Society},
+  pages           = {20--37},
+  timestamp       = {Fri, 09 Apr 2021 18:46:07 +0200},
+}
+
+@inproceedings{cheri-risc,
+  title           = {The {CHERI} capability model: Revisiting {RISC} in an age
+                  of risk},
+  author          = {Jonathan Woodruff and Robert N. M. Watson and David
+                  Chisnall and Simon W. Moore and Jonathan Anderson and Brooks
+                  Davis and Ben Laurie and Peter G. Neumann and Robert M. Norton
+                  and Michael Roe},
+  year            = 2014,
+  booktitle       = {{ACM/IEEE} 41st International Symposium on Computer
+                  Architecture, {ISCA} 2014, Minneapolis, MN, USA, June 14-18,
+                  2014},
+  publisher       = {{IEEE} Computer Society},
+  pages           = {457--468},
+  timestamp       = {Fri, 09 Apr 2021 18:46:06 +0200},
+}
+
+@inproceedings{cheriabi,
+  title           = {CheriABI: Enforcing Valid Pointer Provenance and Minimizing
+                  Pointer Privilege in the POSIX C Run-Time Environment},
+  author          = {Davis, Brooks and Watson, Robert N. M. and Richardson,
+                  Alexander and Neumann, Peter G. and Moore, Simon W. and
+                  Baldwin, John and Chisnall, David and Clarke, Jessica and
+                  Filardo, Nathaniel Wesley and Gudka, Khilan and Joannou,
+                  Alexandre and Laurie, Ben and Markettos, A. Theodore and
+                  Maste, J. Edward and Mazzinghi, Alfredo and Napierala, Edward
+                  Tomasz and Norton, Robert M. and Roe, Michael and Sewell,
+                  Peter and Son, Stacey and Woodruff, Jonathan},
+  year            = 2019,
+  booktitle       = {Proceedings of the Twenty-Fourth International Conference
+                  on Architectural Support for Programming Languages and
+                  Operating Systems},
+  location        = {Providence, RI, USA},
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  series          = {ASPLOS '19},
+  pages           = {379–393},
+  doi             = {10.1145/3297858.3304042},
+  isbn            = 9781450362405,
+  numpages        = 15,
+}
+
+@inproceedings{lowfat-pointer,
+  title           = {Low-Fat Pointers: Compact Encoding and Efficient Gate-Level
+                  Implementation of Fat Pointers for Spatial Safety and
+                  Capability-Based Security},
+  author          = {Kwon, Albert and Dhawan, Udit and Smith, Jonathan M. and
+                  Knight, Thomas F. and DeHon, Andre},
+  year            = 2013,
+  booktitle       = {Proceedings of the 2013 ACM SIGSAC Conference on Computer
+                  \& Communications Security},
+  location        = {Berlin, Germany},
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  series          = {CCS '13},
+  pages           = {721–732},
+  doi             = {10.1145/2508859.2516713},
+  isbn            = 9781450324779,
+  numpages        = 12,
+}
+
+@misc{freebsd-capsicum,
+  title           = {{FreeBSD} {Manual} {Pages}},
+  author = {FreeBSD Project},
+  shorttitle      = {{CAPSICUM}(4)},
+  howpublished    = {\url{https://www.freebsd.org/cgi/man.cgi?capsicum(4)}},
+  year            = 2023,
+  lastaccessed    = {2022-10-16},
+  file            = {
+                  capsicum(4):/Users/hojoon/Cloud/Papers/zotero/storage/39XAIZ94/man.html:text/html
+                  },
+}
+
+@misc{fuchsia,
+  title           = {Fuchsia},
+  author          = {Google},
+  year            = 2021,
+  note            = {Last accessed Apr 31, 2021,},
+  howpublished    = {\url{
+                  https://fuchsia.dev/fuchsia-src/concepts/principles/secure}},
+}
+
+@misc{wasi,
+  title           = {{WASI}},
+  author          = {WebAssembly},
+  year            = 2022,
+  note            = {Last accessed Mar 31 , 2022,},
+  howpublished    = {\url{https://wasi.dev/}},
+}
+
+@inproceedings{donky,
+  title           = {Donky: Domain Keys {\textendash} Efficient {In-Process}
+                  Isolation for {RISC-V} and x86},
+  author          = {David Schrammel and Samuel Weiser and Stefan Steinegger and
+                  Martin Schwarzl and Michael Schwarz and Stefan Mangard and
+                  Daniel Gruss},
+  year            = 2020,
+  month           = aug,
+  booktitle       = {29th USENIX Security Symposium (USENIX Security 20)},
+  publisher       = {USENIX Association},
+  pages           = {1677--1694},
+  isbn            = {978-1-939133-17-5},
+}
+
+@misc{arm-arch,
+  title           = {{Arm Architecture Reference Manual Armv8, for Armv8-A
+                  architecture profile}},
+  author          = {{ARM Ltd}},
+  year            = 2021,
+  note            = {{Last accessed Nov 18 , 2021,}},
+  howpublished    = {\url{https://developer.arm.com/documentation/ddi0487/ga}},
+}
+
+@misc{armv9,
+  title           = {{The foundation of Total Compute: First Armv9 Cortex CPUs}},
+  author          = {ARM Ltd.},
+  year            = 2021,
+  note            = {{Last accessed May 25, 2022,}},
+  howpublished    = {\url{
+                  https://community.arm.com/arm-community-blogs/b/architectures-and-processors-blog/posts/first-armv9-cpu-cores
+                  }},
+}
+
+@misc{fpac,
+  title           = {{Developments in the Arm A-Profile Architecture:
+                  Armv8.6-A}},
+  author          = {ARM Ltd.},
+  year            = 2019,
+  note            = {{Last accessed May 25, 2022,}},
+  howpublished    = {\url{
+                  https://community.arm.com/arm-community-blogs/b/architectures-and-processors-blog/posts/arm-architecture-developments-armv8-6-a
+                  }},
+}
+
+@misc{armv8-m,
+  title           = {{Armv8-M Architecture Reference Manual}},
+  author          = {{ARM Ltd}},
+  year            = 2022,
+  note            = {{Last accessed May 15 , 2022,}},
+  howpublished    = {\url{https://developer.arm.com/documentation/ddi0553/bs}},
+}
+
+@misc{qualcomm-pac,
+  title           = {{Pointer authentication on ARMv8.3}},
+  author          = {{QUALCOMM TECHNOLOGIES, INC}},
+  year            = 2017,
+  note            = {{Last accessed Nov 15 , 2021,}},
+  howpublished    = {\url{
+                  https://www.qualcomm.com/media/documents/files/whitepaper-pointer-authentication-on-armv8-3.pdf
+                  }},
+}
+
+@inproceedings{hakc,
+  title           = {Preventing Kernel Hacks with HAKC},
+  author          = {McKee, Derrick and Giannaris, Yianni and Perez, Carolina
+                  Ortega and Shrobe, Howard and Payer, Mathias and Okhravi,
+                  Hamed and Burow, Nathan},
+  booktitle       = {Proceedings 2022 Network and Distributed System Security
+                  Symposium. NDSS},
+  year = 2022,
+  volume          = 22,
+  pages           = {1--17},
+}
+
+@inproceedings{ccfi,
+  title           = {CCFI: Cryptographically Enforced Control Flow Integrity},
+  author          = {Mashtizadeh, Ali Jose and Bittau, Andrea and Boneh, Dan and
+                  Mazi\`{e }res, David},
+  year            = 2015,
+  booktitle       = {Proceedings of the 22nd ACM SIGSAC Conference on Computer
+                  and Communications Security},
+  location        = {Denver, Colorado, USA},
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  series          = {CCS '15},
+  pages           = {941–951},
+  isbn            = 9781450338325,
+  numpages        = 11,
+}
+
+@inproceedings{pac-it-up,
+  title           = {{PAC} it up: Towards Pointer Integrity using {ARM} Pointer
+                  Authentication},
+  author          = {Hans Liljestrand and Thomas Nyman and Kui Wang and Carlos
+                  Chinea Perez and Jan-Erik Ekberg and N. Asokan},
+  year            = 2019,
+  month           = aug,
+  booktitle       = {28th {USENIX} Security Symposium ({USENIX} Security 19)},
+  publisher       = {{USENIX} Association},
+  address         = {Santa Clara, CA},
+  pages           = {177--194},
+  isbn            = {978-1-939133-06-9},
+}
+
+@inproceedings{pcan,
+  title           = {Protecting the Stack with PACed Canaries},
+  author          = {Liljestrand, Hans and Gauhar, Zaheer and Nyman, Thomas and
+                  Ekberg, Jan-Erik and Asokan, N.},
+  year            = 2019,
+  booktitle       = {Proceedings of the 4th Workshop on System Software for
+                  Trusted Execution},
+  location        = {Huntsville, Ontario, Canada},
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  series          = {SysTEX '19},
+  isbn            = 9781450368889,
+  articleno       = 4,
+  numpages        = 6,
+}
+
+@inproceedings{pacstack,
+  title           = {PACStack: an Authenticated Call Stack},
+  author          = {Hans Liljestrand and Thomas Nyman and Lachlan J. Gunn and
+                  Jan-Erik Ekberg and N. Asokan},
+  year            = 2021,
+  month           = aug,
+  booktitle       = {30th {USENIX} Security Symposium ({USENIX} Security 21)},
+  publisher       = {{USENIX} Association},
+}
+
+@inproceedings{ptauth,
+  title           = {PTAuth: Temporal Memory Safety via Robust Points-to
+                  Authentication},
+  author          = {Reza Mirzazade farkhani and Mansour Ahmadi and Long Lu},
+  year            = 2021,
+  month           = aug,
+  booktitle       = {30th {USENIX} Security Symposium ({USENIX} Security 21)},
+  publisher       = {{USENIX} Association},
+}
+
+@misc{pactight,
+  title           = {Tightly Seal Your Sensitive Pointers with PACTight},
+  author          = {Ismail, Mohannad and Quach, Andrew and Jelesnianski,
+                  Christopher and Jang, Yeongjin and Min, Changwoo},
+  year            = 2022,
+  publisher       = {arXiv},
+  doi             = {10.48550/ARXIV.2203.15121},
+  copyright       = {Creative Commons Attribution 4.0 International},
+}
+
+@misc{pacsan,
+  title           = {PACSan: Enforcing Memory Safety Based on ARM PA},
+  author          = {Li, Yuan and Tan, Wende and Lv, Zhizheng and Yang, Songtao
+                  and Payer , Mathias and Liu, Ying and Zhang, Chao},
+  year            = 2022,
+  publisher       = {arXiv},
+  doi             = {10.48550/ARXIV.2202.03950},
+  copyright       = {arXiv.org perpetual, non-exclusive license},
+}
+
+@inproceedings{cpi,
+  title           = {{Code-Pointer} Integrity},
+  author          = {Volodymyr Kuznetsov and Laszlo Szekeres and Mathias Payer
+                  and George Candea and R. Sekar and Dawn Song},
+  year            = 2014,
+  month           = oct,
+  booktitle       = {11th USENIX Symposium on Operating Systems Design and
+                  Implementation (OSDI 14)},
+  publisher       = {USENIX Association},
+  address         = {Broomfield, CO},
+  pages           = {147--163},
+  isbn            = {978-1-931971-16-4},
+}
+
+@inproceedings{hw-tagged-memory,
+  title           = {Hardware Enforcement of Application Security Policies Using
+                  Tagged Memory},
+  author          = {Nickolai Zeldovich and Hari Kannan and Michael Dalton and
+                  Christos Kozyrakis},
+  year            = 2008,
+  booktitle       = {8th {USENIX} Symposium on Operating Systems Design and
+                  Implementation, {OSDI} 2008, December 8-10, 2008, San Diego,
+                  California, USA, Proceedings},
+  publisher       = {{USENIX} Association},
+  pages           = {225--240},
+  editor          = {Richard Draves and Robbert van Renesse},
+  timestamp       = {Thu, 12 Mar 2020 11:35:56 +0100},
+  bibsource       = {dblp computer science bibliography, https://dblp.org},
+}
+
+@inproceedings{in-fat-pointer,
+  title           = {In-Fat Pointer: Hardware-Assisted Tagged-Pointer Spatial
+                  Memory Safety Defense with Subobject Granularity Protection},
+  author          = {Xu, Shengjie and Huang, Wei and Lie, David},
+  year            = 2021,
+  booktitle       = {Proceedings of the 26th ACM International Conference on
+                  Architectural Support for Programming Languages and Operating
+                  Systems},
+  location        = {Virtual, USA},
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  series          = {ASPLOS 2021},
+  pages           = {224–240},
+  doi             = {10.1145/3445814.3446761},
+  isbn            = 9781450383172,
+  numpages        = 17,
+}
+
+@inproceedings{framer,
+  title           = {{FRAMER:} a tagged-pointer capability system with memory
+                  safety applications},
+  author          = {Myoung Jin Nam and Periklis Akritidis and David J. Greaves},
+  year            = 2019,
+  booktitle       = {Proceedings of the 35th Annual Computer Security
+                  Applications Conference, {ACSAC} 2019, San Juan, PR, USA,
+                  December 09-13, 2019},
+  publisher       = {{ACM}},
+  pages           = {612--626},
+  doi             = {10.1145/3359789.3359799},
+  editor          = {David Balenson},
+  timestamp       = {Tue, 26 Nov 2019 09:57:54 +0100},
+  bibsource       = {dblp computer science bibliography, https://dblp.org},
+}
+
+@misc{selinux,
+  title           = {{What is SELinux}},
+  author          = {{Red Hat}},
+  year            = 2021,
+  note            = {Last accessed Apr 28 , 2021,},
+  howpublished    =
+                  {\url{https://www.redhat.com/en/topics/linux/what-is-selinux}},
+}
+
+@misc{apparmor-web,
+  title           = {{AppArmor Linux kernel security module}},
+  year            = 2021,
+  note            = {Last accessed Apr 28 , 2021,},
+  howpublished    = {\url{https://apparmor.net}},
+}
+
+@misc{apparmor-paper,
+  title           = {{AppArmor Technical Documentation}},
+  author          = {Adreas Gruenbacher and Seth Arnold},
+  year            = 2021,
+  note            = {Last accessed Apr 28 , 2021,},
+  howpublished    = {\url{
+                  https://lists.linuxcoding.com/kernel/2007-q2/attachments/pdfwqGtvU2wyT.pdf
+                  }},
+}
+
+@misc{fdsan,
+  title           = {{FDSan}},
+  author          = {Google},
+  year            = 2021,
+  note            = {Last accessed Apr 31 , 2021,},
+  howpublished    = {\url{
+                  https://android.googlesource.com/platform/bionic/+/master/docs/fdsan.md
+                  }},
+}
+
+@inproceedings{ppe,
+  title           = {Preventing Privilege Escalation},
+  author          = {Provos, Niels and Friedl, Markus and Honeyman, Peter},
+  year            = 2003,
+  booktitle       = {Proceedings of the 12th Conference on USENIX Security
+                  Symposium - Volume 12},
+  location        = {Washington, DC},
+  publisher       = {USENIX Association},
+  address         = {Berkeley, CA, USA},
+  series          = {SSYM'03},
+  pages           = {16--16},
+  numpages        = 1,
+  acmid           = 1251369,
+}
+
+@inproceedings{wedge,
+  title           = {Wedge: Splitting Applications into Reduced-privilege
+                  Compartments},
+  author          = {Bittau, Andrea and Marchenko, Petr and Handley, Mark and
+                  Karp, Brad},
+  year            = 2008,
+  booktitle       = {Proceedings of the 5th USENIX Symposium on Networked
+                  Systems Design and Implementation},
+  location        = {San Francisco, California},
+  publisher       = {USENIX Association},
+  address         = {Berkeley, CA, USA},
+  series          = {NSDI'08},
+  pages           = {309--322},
+  isbn            = {111-999-5555-22-1},
+  numpages        = 14,
+  acmid           = 1387611,
+}
+
+@inproceedings{privtrans,
+  title           = {Privtrans: Automatically Partitioning Programs for
+                  Privilege Separation},
+  author          = {Brumley, David and Song, Dawn},
+  year            = 2004,
+  booktitle       = {Proceedings of the 13th Conference on USENIX Security
+                  Symposium - Volume 13},
+  location        = {San Diego, CA},
+  publisher       = {USENIX Association},
+  address         = {Berkeley, CA, USA},
+  series          = {SSYM'04},
+  pages           = {5--5},
+  numpages        = 1,
+  acmid           = 1251380,
+}
+
+@misc{kernel-pac,
+  title           = {In-Kernel Control-Flow Integrity on Commodity OSes using
+                  ARM Pointer Authentication},
+  author          = {Yoo, Sungbae and Park, Jinbum and Kim, Seolheui and Kim,
+                  Yeji and Kim, Taesoo},
+  year            = 2021,
+  publisher       = {arXiv},
+  doi             = {10.48550/ARXIV.2112.07213},
+  url             = {https://arxiv.org/abs/2112.07213},
+  copyright       = {Creative Commons Attribution Non Commercial No Derivatives
+                  4.0 International},
+  keywords        = {Cryptography and Security (cs.CR), Operating Systems
+                  (cs.OS), FOS: Computer and information sciences, FOS: Computer
+                  and information sciences, D.4.6},
+}
+
+@inproceedings{privman,
+  title           = {Privman: A Library for Partitioning Applications.},
+  author          = {Kilpatrick, Douglas},
+  year            = 2003,
+  booktitle       = {USENIX Annual Technical Conference, FREENIX Track},
+  publisher       = {USENIX},
+  pages           = {273--284},
+  isbn            = {1-931971-11-0},
+  added-at        = {2003-09-03T00:00:00.000+0200},
+  date            = {2003-09-03},
+  ee              =
+                  {http://www.usenix.org/events/usenix03/tech/freenix03/kilpatrick.html},
+  interhash       = {facc6b2a11ebe1a20d04f5e46035da23},
+  intrahash       = {043400f8b8c39faffa4bb40662b4b8c5},
+  timestamp       = {2003-09-03T00:00:00.000+0200},
+}
+
+@inproceedings{hodor,
+  title           = {Hodor: Intra-process isolation for high-throughput data
+                  plane libraries},
+  author          = {Hedayati, Mohammad and Gravani, Spyridoula and Johnson,
+                  Ethan and Criswell, John and Scott, Michael L and Shen, Kai
+                  and Marty, Mike},
+  year            = 2019,
+  booktitle       = {2019 {USENIX} Annual Technical Conference
+                  ({USENIX}{ATC} 19)},
+  pages           = {489--504},
+}
+
+@inproceedings{erim,
+  title           = {ERIM: Secure, efficient in-process isolation with
+                  protection keys ({ MPK})},
+  author          = {Vahldiek-Oberwagner, Anjo and Elnikety, Eslam and Duarte,
+                  Nuno O and Sammler, Michael and Druschel, Peter and Garg,
+                  Deepak},
+  year            = 2019,
+  booktitle       = {28th {USENIX} Security Symposium ({USENIX} Security 19)},
+  pages           = {1221--1238},
+}
+
+@inproceedings{pku-pitfall,
+  title           = {{PKU} Pitfalls: Attacks on PKU-based Memory Isolation
+                  Systems},
+  author          = {R. Joseph Connor and Tyler McDaniel and Jared M. Smith and
+                  Max Schuchard},
+  year            = 2020,
+  booktitle       = {29th {USENIX} Security Symposium, {USENIX} Security 2020,
+                  August 12-14, 2020},
+  publisher       = {{USENIX} Association},
+  pages           = {1409--1426},
+  editor          = {Srdjan Capkun and Franziska Roesner},
+  timestamp       = {Fri, 29 Jan 2021 22:08:57 +0100},
+}
+
+@misc{endokernel,
+  title           = {{The Endokernel: Fast, Secure, and Programmable Subprocess
+                  Virtualization}},
+  author          = {Bumjin Im and Fangfei Yang and Chia-Che Tsai and Michael
+                  LeMay and Anjo Vahldiek-Oberwagner and Nathan Dautenhahn},
+  year            = 2021,
+  eprint          = {2108.03705},
+  archiveprefix   = {arXiv},
+  primaryclass    = {cs.CR},
+}
+
+@inproceedings{jenny,
+author = {David Schrammel and Samuel Weiser and Richard Sadek and Stefan Mangard},
+title = {Jenny: Securing Syscalls for {PKU-based} Memory Isolation Systems},
+booktitle = {31st USENIX Security Symposium (USENIX Security 22)},
+year = {2022},
+isbn = {978-1-939133-31-1},
+address = {Boston, MA},
+pages = {936--952},
+url = {https://www.usenix.org/conference/usenixsecurity22/presentation/schrammel},
+publisher = {USENIX Association},
+month = aug,
+}
+
+@inproceedings{cerberus,
+  title           = {You Shall Not (by)Pass! Practical, Secure, and Fast
+                  PKU-Based Sandboxing},
+  author          = {Voulimeneas, Alexios and Vinck, Jonas and Mechelinck, Ruben
+                  and Volckaert, Stijn},
+  year            = 2022,
+  booktitle       = {Proceedings of the Seventeenth European Conference on
+                  Computer Systems},
+  location        = {Rennes, France},
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  series          = {EuroSys '22},
+  pages           = {266–282},
+  doi             = {10.1145/3492321.3519560},
+  isbn            = 9781450391627,
+  numpages        = 17,
+}
+
+@inproceedings{monguard,
+  title           = {Secure and Efficient In-Process Monitor (and Library)
+                  Protection with Intel MPK},
+  author          = {Wang, Xiaoguang and Yeoh, SengMing and Olivier, Pierre and
+                  Ravindran , Binoy},
+  year            = 2020,
+  booktitle       = {Proceedings of the 13th European Workshop on Systems
+                  Security},
+  location        = {Heraklion, Greece},
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  series          = {EuroSec '20},
+  pages           = {7–12},
+  doi             = {10.1145/3380786.3391398},
+  isbn            = 9781450375238,
+  numpages        = 6,
+}
+
+@inproceedings{shreds,
+  title           = {Shreds: Fine-Grained Execution Units with Private Memory},
+  author          = {Chen, Yaohui and Reymondjohnson, Sebassujeen and Sun,
+                  Zhichuang and Lu, Long},
+  year            = 2016,
+  booktitle       = {2016 IEEE Symposium on Security and Privacy (SP)},
+  pages           = {56--71},
+}
+
+@inproceedings{imix,
+  title           = {{IMIX}: {In-Process} Memory Isolation {EXtension}},
+  author          = {Tommaso Frassetto and Patrick Jauernig and Christopher
+                  Liebchen and Ahmad-Reza Sadeghi},
+  year            = 2018,
+  month           = aug,
+  booktitle       = {27th USENIX Security Symposium (USENIX Security 18)},
+  publisher       = {USENIX Association},
+  address         = {Baltimore, MD},
+  pages           = {83--97},
+  isbn            = {978-1-939133-04-5},
+}
+
+@inproceedings{hdfi,
+  title           = {HDFI: Hardware-Assisted Data-Flow Isolation},
+  author          = {Song, Chengyu and Moon, Hyungon and Alam, Monjur and Yun,
+                  Insu and Lee, Byoungyoung and Kim, Taesoo and Lee, Wenke and
+                  Paek, Yunheung},
+  year            = 2016,
+  booktitle       = {2016 IEEE Symposium on Security and Privacy (SP)},
+  pages           = {1--17},
+  doi             = {10.1109/SP.2016.9},
+}
+
+@inproceedings{pmo,
+  title           = {Hardware-Based Domain Virtualization for Intra-Process
+                  Isolation of Persistent Memory Objects},
+  author          = {Xu, Yuanchao and Ye, ChenCheng and Solihin, Yan and Shen,
+                  Xipeng},
+  year            = 2020,
+  booktitle       = {2020 ACM/IEEE 47th Annual International Symposium on
+                  Computer Architecture (ISCA)},
+  pages           = {680--692},
+  doi             = {10.1109/ISCA45697.2020.00062},
+}
+
+@inproceedings{lotrx86,
+  title           = {Lord of the X86 Rings: A Portable User Mode Privilege
+                  Separation Architecture on X86},
+  author          = {Lee, Hojoon and Song, Chihyun and Kang, Brent Byunghoon},
+  year            = 2018,
+  booktitle       = {Proceedings of the 2018 ACM SIGSAC Conference on Computer
+                  and Communications Security},
+  location        = {Toronto, Canada},
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  series          = {CCS '18},
+  pages           = {1441–1454},
+  isbn            = 9781450356930,
+  numpages        = 14,
+}
+
+@inproceedings{no-need-to-hide,
+  title           = {No Need to Hide: Protecting Safe Regions on Commodity
+                  Hardware},
+  author          = {Koning, Koen and Chen, Xi and Bos, Herbert and Giuffrida,
+                  Cristiano and Athanasopoulos, Elias},
+  year            = 2017,
+  booktitle       = {Proceedings of the Twelfth European Conference on Computer
+                  Systems},
+  location        = {Belgrade, Serbia},
+  publisher       = {ACM},
+  address         = {New York, NY, USA},
+  series          = {EuroSys '17},
+  pages           = {437--452},
+  doi             = {10.1145/3064176.3064217},
+  isbn            = {978-1-4503-4938-3},
+  numpages        = 16,
+  acmid           = 3064217,
+}
+
+@inproceedings{seimi,
+  title           = {Seimi: Efficient and secure smap-enabled intra-process
+                  memory isolation},
+  author          = {Wang, Zhe and Wu, Chenggang and Xie, Mengyao and Zhang,
+                  Yinqian and Lu, Kangjie and Zhang, Xiaofeng and Lai, Yuanming
+                  and Kang, Yan and Yang, Min},
+  year            = 2020,
+  booktitle       = {2020 IEEE Symposium on Security and Privacy (SP)},
+  pages           = {592--607},
+  organization    = {IEEE},
+}
+
+@inproceedings{secage,
+  title           = {Thwarting Memory Disclosure with Efficient
+                  Hypervisor-enforced Intra-domain Isolation},
+  author          = {Liu, Yutao and Zhou, Tianyu and Chen, Kexin and Chen, Haibo
+                  and Xia, Yubin},
+  year            = 2015,
+  booktitle       = {Proceedings of the 22Nd ACM SIGSAC Conference on Computer
+                  and Communications Security},
+  location        = {Denver, Colorado, USA},
+  publisher       = {ACM},
+  address         = {New York, NY, USA},
+  series          = {CCS '15},
+  pages           = {1607--1619},
+  doi             = {10.1145/2810103.2813690},
+  isbn            = {978-1-4503-3832-5},
+  numpages        = 13,
+  acmid           = 2813690,
+}
+
+@inproceedings{safekeeping,
+  title           = {A Method for Safekeeping Cryptographic Keys from Memory
+                  Disclosure Attacks},
+  author          = {Parker, T. Paul and Xu, Shouhuai},
+  year            = 2010,
+  booktitle       = {Trusted Systems},
+  publisher       = {Springer Berlin Heidelberg},
+  address         = {Berlin, Heidelberg},
+  pages           = {39--59},
+  isbn            = {978-3-642-14597-1},
+  editor          = {Chen, Liqun and Yung, Moti},
+}
+
+@inproceedings{dynpta,
+  title           = {DynPTA: Combining Static and Dynamic Analysis for Practical
+                  Selective Data Protection},
+  author          = {Palit, Tapti and Firose Moon, Jarin and Monrose, Fabian and
+                  Polychronakis, Michalis},
+  year            = 2021,
+  booktitle       = {2021 IEEE Symposium on Security and Privacy (SP)},
+  pages           = {1919--1937},
+  doi             = {10.1109/SP40001.2021.00082},
+}
+
+@inproceedings{cryptompk,
+  title           = {Annotating, Tracking, and Protecting Cryptographic Secrets
+                  with CryptoMPK},
+  author          = {X. Jin and X. Xiao and S. Jia and W. Gao and H. Zhang and
+                  D. Gu and S. Ma and Z. Qian and J. Li},
+  year            = 2022,
+  month           = {may},
+  booktitle       = {2022 2022 IEEE Symposium on Security and Privacy (SP) (SP)},
+  publisher       = {IEEE Computer Society},
+  address         = {Los Alamitos, CA, USA},
+  pages           = {473--488},
+  doi             = {10.1109/SP46214.2022.00028},
+  issn            = {2375-1207},
+}
+
+@inproceedings{sfi,
+  title           = {Efficient Software-based Fault Isolation},
+  author          = {Wahbe, Robert and Lucco, Steven and Anderson, Thomas E. and
+                  Graham, Susan L.},
+  year            = 1993,
+  booktitle       = {Proceedings of the Fourteenth ACM Symposium on Operating
+                  Systems Principles},
+  location        = {Asheville, North Carolina, USA},
+  publisher       = {ACM},
+  address         = {New York, NY, USA},
+  series          = {SOSP '93},
+  pages           = {203--216},
+  doi             = {10.1145/168619.168635},
+  isbn            = {0-89791-632-8},
+  numpages        = 14,
+  acmid           = 168635,
+}
+
+@inproceedings{nacl,
+  title           = {Native Client: A Sandbox for Portable, Untrusted x86 Native
+                  Code},
+  author          = {Yee, Bennet and Sehr, David and Dardyk, Gregory and Chen,
+                  J. Bradley and Muth, Robert and Ormandy, Tavis and Okasaka,
+                  Shiki and Narula, Neha and Fullagar, Nicholas},
+  year            = 2009,
+  booktitle       = {Proceedings of the 2009 30th IEEE Symposium on Security and
+                  Privacy},
+  publisher       = {IEEE Computer Society},
+  address         = {Washington, DC, USA},
+  series          = {SP '09},
+  pages           = {79--93},
+  doi             = {10.1109/SP.2009.25},
+  isbn            = {978-0-7695-3633-0},
+  numpages        = 15,
+  acmid           = 1608126,
+}
+
+@inproceedings{nacl-ext,
+  title           = {Adapting Software Fault Isolation to Contemporary CPU
+                  Architectures},
+  author          = {Sehr, David and Muth, Robert and Biffle, Cliff and
+                  Khimenko, Victor and Pasko, Egor and Schimpf, Karl and Yee,
+                  Bennet and Chen, Brad},
+  year            = 2010,
+  booktitle       = {Proceedings of the 19th USENIX Conference on Security},
+  location        = {Washington, DC},
+  publisher       = {USENIX Association},
+  address         = {Berkeley, CA, USA},
+  series          = {USENIX Security'10},
+  pages           = {1--1},
+  isbn            = {888-7-6666-5555-4},
+  numpages        = 1,
+  acmid           = 1929822,
+}
+
+@inproceedings{pkrusafe,
+  author          = {Kirth, Paul and Dickerson, Mitchel and Crane, Stephen and
+                  Larsen, Per and Dabrowski, Adrian and Gens, David and Na,
+                  Yeoul and Volckaert , Stijn and Franz, Michael},
+  title           = {PKRU-Safe: Automatically Locking down the Heap between Safe
+                  and Unsafe Languages},
+  year            = 2022,
+  isbn            = 9781450391627,
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  url             = {https://doi.org/10.1145/3492321.3519582},
+  doi             = {10.1145/3492321.3519582},
+  abstract        = {After more than twenty-five years of research, memory
+                  safety violations remain one of the major causes of security
+                  vulnerabilities in real-world software. Memory-safe languages,
+                  like Rust, have demonstrated that compiler technology can
+                  assist developers in writing efficient low-level code without
+                  the risk of memory corruption. However, many memory-safe
+                  languages still have to interface with unsafe code to some
+                  extent, which opens up the possibility for attackers to
+                  exploit memory-corruption vulnerabilities in the unsafe part
+                  of the system and subvert the safety guarantees provided by
+                  the memory-safe language.In this paper, we present PKRU-Safe,
+                  an automated method for enforcing the principle of least
+                  privilege on unsafe components in mixed-language environments.
+                  PKRU-Safe ensures that unsafe (external) code cannot corrupt
+                  or otherwise abuse memory used exclusively by the
+                  safe-language components. Our approach is automated using
+                  traditional compiler infrastructure to limit memory accesses
+                  for developer-designated components efficiently. PKRU-Safe
+                  does not require any modifications to the program's original
+                  data flows or execution model. It can be adopted by projects
+                  containing legacy code with minimal effort, requiring only a
+                  small number of changes to a project's build files and
+                  dependencies, and a few lines of annotations for each
+                  untrusted library.We apply PKRU-Safe to Servo, one of the
+                  largest Rust projects with approximately two million lines of
+                  Rust code (including dependencies) to automatically partition
+                  and protect the browser's heap from its JavaScript engine
+                  written in unsafe C/C++. Our detailed evaluation shows that
+                  PKRU-Safe is able to thwart real-world exploits, often without
+                  measurable overhead, and with a mean overhead under 11.55% in
+                  our most pessimistic benchmark suite. As the method is
+                  language agnostic and major prototype components operate
+                  directly on LLVM IR , applying our techniques to other
+                  languages is straightforward.},
+  booktitle       = {Proceedings of the Seventeenth European Conference on
+                  Computer Systems},
+  pages           = {132–148},
+  numpages        = 17,
+  keywords        = {MPK, security, compilers, compartmentalization},
+  location        = {Rennes, France},
+  series          = {EuroSys '22},
+}
+
+@inproceedings{rlbox,
+  author          = {Shravan Narayan and Craig Disselkoen and Tal Garfinkel and
+                  Nathan Froyd and Eric Rahm and Sorin Lerner and Hovav Shacham
+                  and Deian Stefan},
+  title           = {Retrofitting Fine Grain Isolation in the Firefox Renderer},
+  booktitle       = {29th USENIX Security Symposium (USENIX Security 20)},
+  year            = 2020,
+  isbn            = {978-1-939133-17-5},
+  pages           = {699--716},
+  url             =
+                  {https://www.usenix.org/conference/usenixsecurity20/presentation/narayan
+                  },
+  publisher       = {USENIX Association},
+  month           = aug,
+}
+
+@inproceedings{asan,
+  title           = {The Study and Realization of a Binary-Based Address
+                  Sanitizer Based on Code Injection},
+  author          = {Yuchao Wang and Baojiang Cui},
+  year            = 2020,
+  booktitle       = {Innovative Mobile and Internet Services in Ubiquitous
+                  Computing - Proceedings of the 14th International Conference
+                  on Innovative Mobile and Internet Services in Ubiquitous
+                  Computing (IMIS-2020), Lodz, Poland, 1-3 July, 2020},
+  publisher       = {Springer},
+  series          = {Advances in Intelligent Systems and Computing},
+  volume          = 1195,
+  pages           = {125--134},
+  doi             = {10.1007/978-3-030-50399-4\_13},
+  editor          = {Leonard Barolli and Aneta Poniszewska{-}Maranda and Hyunhee
+                  Park},
+  timestamp       = {Fri, 12 Jun 2020 14:53:11 +0200},
+}
+
+@misc{webassembly,
+  title           = {WebAssembly},
+  author          = {WebAssembly},
+  year            = 2021,
+  howpublished    = {\url{https://webassembly.org}},
+}
+
+@inproceedings{lsm,
+  title           = {Linux security module framework},
+  author          = {Wright, Chris and Cowan, Crispin and Morris, James and
+                  Smalley, Stephen and Kroah-Hartman, Greg},
+  year            = 2002,
+  booktitle       = {Ottawa Linux Symposium},
+  volume          = 8032,
+  pages           = {6--16},
+  organization    = {Citeseer},
+}
+
+@inproceedings{hackingblind,
+  title           = {Hacking Blind},
+  author          = {Bittau, Andrea and Belay, Adam and Mashtizadeh, Ali and
+                  Mazières, David and Boneh, Dan},
+  year            = 2014,
+  booktitle       = {2014 IEEE Symposium on Security and Privacy},
+  pages           = {227--242},
+}
+
+@inproceedings{dop,
+  title           = {Data-Oriented Programming: On the Expressiveness of
+                  Non-control Data Attacks},
+  author          = {Hu, Hong and Shinde, Shweta and Adrian, Sendroiu and Chua,
+                  Zheng Leong and Saxena, Prateek and Liang, Zhenkai},
+  year            = 2016,
+  booktitle       = {2016 IEEE Symposium on Security and Privacy (SP)},
+  pages           = {969--986},
+}
+
+@misc{apple-pac,
+  title           = {Apple Platform Security},
+  author          = {{Apple}},
+  year            = 2021,
+  note            = {Last accessed May 05 , 2021,},
+  howpublished    = {\url{               https://manuals.info.apple.com/MANUALS/1000/MA1902/en_US/apple-platform-security-guide.pdf
+                  }},
+}
+
+@misc{llvm-cfi,
+  title           = {Control Flow Integrity},
+  year            = 2022,
+  note            = {Last accessed May 05 , 2022,},
+  howpublished    =
+                  {\url{https://clang.llvm.org/docs/ControlFlowIntegrity.html}},
+}
+
+@misc{llvm-ret-addr,
+  title           = {[AArch64] - return address signing},
+  author = {LLVM Project},
+  year            = 2022,
+  note            = {Last accessed May 05 , 2022,},
+  howpublished    = {\url{https://reviews.llvm.org/D49793}},
+}
+
+@misc{llvm-stack-tagging,
+  title           = {MemTagSanitizer},
+  author          = {LLVM Project},
+  year            = 2022,
+  note            = {Last accessed May 05 , 2022,},
+  howpublished    = {\url{https://llvm.org/docs/MemTagSanitizer.html}},
+}
+
+@misc{glibc-std,
+  title           = {Standard Streams},
+  year            = 2021,
+  author          = {Free Software Foundation},
+  note            = {Last accessed May 05 , 2022,},
+  howpublished    = {\url{
+                  https://www.gnu.org/software/libc/manual/html_node/Standard-Streams.html
+                  }},
+}
+
+@misc{ebpf,
+  title           = {eBPF},
+  author          = {The Linux Foundation},
+  year            = 2021,
+  note            = {Last accessed May 10 , 2021,},
+  howpublished    = {\url{https://ebpf.io}},
+}
+
+@book{intel-manual,
+  title           = {{Intel\textsuperscript{\textregistered} 64 and IA-32
+                  Architectures Software Developer's Manual}},
+  author          = {{Intel Corporation}},
+  year            = 2021,
+  month           = {June},
+  number          = {325462-075US},
+}
+
+@misc{mte,
+  title           = {{ARMv8.5-A Memory Tagging Extension}},
+  author          = {{ARM Ltd.}},
+  year = 2023,
+  note            = {Last accessed March 10 , 2022,},
+  howpublished    = {\url{https://developer.arm.com/-/media/Arm Developer
+                  Community/PDF/Arm_Memory_Tagging_Extension_Whitepaper.pdf}},
+}
+
+@misc{mte-kernel-support,
+  title           = {Memory Tagging Extension (MTE) in AArch64 Linux},
+  author          = {Vincenzo Frascino},
+  year            = 2020,
+  note            = {Last accessed March 10 , 2022,},
+  howpublished    = {\url{
+                  https://www.kernel.org/doc/html/latest/arm64/memory-tagging-extension.html
+                  }},
+}
+
+@inproceedings{camouflage,
+  title           = {Camouflage: Hardware-assisted CFI for the ARM Linux kernel},
+  author          = {Denis-Courmont, Rémi and Liljestrand, Hans and Chinea,
+                  Carlos and Ekberg, Jan-Erik},
+  year            = 2020,
+  booktitle       = {2020 57th ACM/IEEE Design Automation Conference (DAC)},
+  pages           = {1--6},
+  doi             = {10.1109/DAC18072.2020.9218535},
+}
+
+@inproceedings{svf,
+  title           = {SVF: interprocedural static value-flow analysis in LLVM},
+  author          = {Sui, Yulei and Xue, Jingling},
+  year            = 2016,
+  booktitle       = {Proceedings of the 25th international conference on
+                  compiler construction},
+  pages           = {265--266},
+  organization    = {ACM},
+}
+
+@article{qarma,
+  title           = {The {QARMA} block cipher family. {Almost} {MDS} matrices
+                  over rings with zero divisors, nearly symmetric even-mansour
+                  constructions with non-involutory central rounds, and search
+                  heuristics for low-latency s-boxes},
+  author          = {Avanzi, Roberto},
+  year            = 2017,
+  month           = mar,
+  journal         = {IACR Transactions on Symmetric Cryptology},
+  volume          = 2017,
+  number          = 1,
+  pages           = {4--44},
+  doi             = {10.13154/tosc.v2017.i1.4-44},
+}
+
+@inproceedings{libmpk,
+  title           = {libmpk: Software Abstraction for Intel Memory Protection
+                  Keys (Intel {MPK})},
+  author          = {Soyeon Park and Sangho Lee and Wen Xu and HyunGon Moon and
+                  Taesoo Kim},
+  year            = 2019,
+  month           = jul,
+  booktitle       = {2019 USENIX Annual Technical Conference (USENIX ATC 19)},
+  publisher       = {USENIX Association},
+  address         = {Renton, WA},
+  pages           = {241--254},
+  isbn            = {978-1-939133-03-8},
+}
+
+@misc{hwasan,
+  title           = {{HWAddressSanitizer}},
+  year            = 2022,
+  note            = {Last accessed March 10 , 2022,},
+  howpublished    = {\url{https://source.android.com/devices/tech/debug/hwasan}},
+}
+
+@misc{asahi-linux,
+  title           = {{Asahi Linux}},
+  author = {Hector Martin and Alyssa Rosenzweig and Asahi Lina and Dougall Johnson and Sven Peter and Mark Kettenis and Martin Povišer and Janne Grunau},
+  year            = 2022,
+  note            = {Last accessed March 08 , 2022,},
+  howpublished    = {\url{https://asahilinux.org}},
+}
+
+@misc{nbench,
+  title           = {{Linux/Unix nbench}},
+  author = {{Uwe F. Mayer}},
+  year            = 2017,
+  note            = {Last accessed March 08 , 2022,},
+  howpublished    = {\url{https://www.math.utah.edu/~mayer/linux/bmark.html}},
+}
+
+@misc{qemu,
+  title           = {{QEMU: A generic and open source machine emulator and
+                  virtualizer}},
+  year            = 2022,
+  author          = {QEMU},
+  note            = {Last accessed March 08 , 2022,},
+  howpublished    = {\url{https://www.qemu.org}},
+}
+
+@inproceedings{heartbleed,
+  title           = {{The Matter of Heartbleed}},
+  author          = {Durumeric, Zakir and Li, Frank and Kasten, James and Amann,
+                  Johanna and Beekman, Jethro and Payer, Mathias and Weaver,
+                  Nicolas and Adrian , David and Paxson, Vern and Bailey,
+                  Michael and Halderman, J. Alex},
+  year            = 2014,
+  booktitle       = {Proceedings of the 2014 Conference on Internet Measurement
+                  Conference},
+  location        = {Vancouver, BC, Canada},
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  series          = {IMC '14},
+  pages           = {475–488},
+  doi             = {10.1145/2663716.2663755},
+  isbn            = 9781450332132,
+  numpages        = 14,
+}
+
+@misc{sparc-adi,
+  title           = {{Using Application Data Integrity (ADI)}},
+  author          = {Oracle},
+  year            = 2022,
+  note            = {Last accessed March 02 , 2022,},
+  howpublished    =
+                  {\url{https://docs.oracle.com/cd/E37838_01/html/E61059/gqajs.html}},
+}
+
+@misc{wget,
+  title           = {{GNU Wget}},
+  author          = {Free Software Foundation},
+  year            = 2023,
+  note            = {Last accessed Jan 14 , 2022,},
+  howpublished    = {\url{https://www.gnu.org/software/wget}},
+}
+
+@misc{openssh,
+  title           = {{OpenSSH}},
+  author          = {OpenBSD Foundation},
+  year            = 2023,
+  note            = {Last accessed Jan 14 , 2022,},
+  howpublished    = {\url{https://www.openssh.com}},
+}
+
+@misc{nginx,
+  title           = {{Advanced Load Balancer, Web Server, \& Reverse Proxy}},
+  author          = {F5 Networks, Inc.},
+  year            = 2023,
+  note            = {Last accessed Jan 14 , 2022,},
+  howpublished    = {\url{https://www.nginx.com}},
+}
+
+@misc{apache-benchmark,
+  title           = {{ab - Apache HTTP server benchmarking tool}},
+  author          = {The Apache Software Foundation},
+  year            = 2022,
+  note            = {Last accessed Jan 14 , 2022,},
+  howpublished    = {\url{https://httpd.apache.org/docs/2.4/programs/ab.html}},
+}
+
+@misc{libressl,
+  title           = {{LibreSSL}},
+  author = {OpenBSD Project},
+  year            = 2022,
+  note            = {Last accessed Jan 14 , 2022,},
+  howpublished    = {\url{https://www.libressl.org}},
+}
+
+@misc{llvm,
+  title           = {{The LLVM Compiler Infrastructure}},
+  author={LLVM Project},
+  year            = 2022,
+  note            = {Last accessed Jan 14 , 2022,},
+  howpublished    = {\url{https://llvm.org}},
+}
+
+@misc{llvm-aa,
+  title           = {{LLVM Alias Analysis Infrastructure}},
+  year            = 2022,
+  note            = {Last accessed Jan 14 , 2022,},
+  howpublished    = {\url{https://llvm.org/docs/AliasAnalysis.html}},
+}
+
+@misc{kasan,
+  author={Eklektix},
+  title           = {kasan: add hardware tag-based mode for arm64},
+  year            = 2022,
+  note            = {Last accessed Jan 14 , 2022,},
+  howpublished    = {\url{https://lwn.net/Articles/831624/}},
+}
+
+@misc{mte-stack,
+  title           = {-mmemtag-stack, -mno-memtag-stack},
+  author          = {Arm Ltd.},
+  year            = 2022,
+  note            = {Last accessed Jan 14 , 2022,},
+  howpublished    = {\url{
+                  https://developer.arm.com/documentation/100067/0612/armclang-Command-line-Options/-mmemtag-stack---mno-memtag-stack
+                  }},
+}
+
+@misc{pac-elf,
+  title           = {{PAuth ABI Extension to ELF for the Arm® 64-bit
+                  Architecture (AArch64)}},
+  year            = 2022,
+  note            = {Last accessed Jan 14 , 2022,},
+  howpublished    = {\url{
+                  https://github.com/ARM-software/abi-aa/blob/main/pauthabielf64/pauthabielf64.rst
+                  }},
+}
+
+@misc{lighttpd,
+  title           = {{LIGHTTPD: fly light}},
+  year            = 2022,
+  note            = {Last accessed Jan 14 , 2022,},
+  howpublished    = {\url{https://www.lighttpd.net}},
+}
+
+@misc{mbedtls,
+  title           = {{arm MBED}},
+  author          = {ARM Ltd.},
+  year            = 2022,
+  note            = {Last accessed Jan 14 , 2022,},
+  howpublished    = {\url{https://tls.mbed.org}},
+}
+
+@inproceedings{suv,
+  title           = {S<i>$\mu$</i>V - the Security Microvisor: A
+                  Virtualisation-Based Security Middleware for the Internet of
+                  Things},
+  author          = {Daniels, Wilfried and Hughes, Danny and Ammar, Mahmoud and
+                  Crispo, Bruno and Matthys, Nelson and Joosen, Wouter},
+  year            = 2017,
+  booktitle       = {Proceedings of the 18th ACM/IFIP/USENIX Middleware
+                  Conference: Industrial Track},
+  location        = {Las Vegas, Nevada},
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  series          = {Middleware '17},
+  pages           = {36–42},
+  doi             = {10.1145/3154448.3154454},
+  isbn            = 9781450352000,
+  numpages        = 7,
+}
+
+@inproceedings{epoxy,
+  title           = {Protecting Bare-Metal Embedded Systems with Privilege
+                  Overlays},
+  author          = {Clements, Abraham A. and Almakhdhub, Naif Saleh and Saab,
+                  Khaled S. and Srivastava, Prashast and Koo, Jinkyu and Bagchi,
+                  Saurabh and Payer, Mathias},
+  year            = 2017,
+  booktitle       = {2017 IEEE Symposium on Security and Privacy (SP)},
+  pages           = {289--303},
+  doi             = {10.1109/SP.2017.37},
+}
+
+@inproceedings{minion,
+  title           = {Securing {Real-Time} Microcontroller Systems through
+                  Customized Memory View Switching},
+  author          = {Chung Hwan Kim and Taegyu Kim and Hongjun Choi and Zhongshu
+                  Gu and Xiangyu Zhang and Dongyan Xu},
+  year            = 2018,
+  booktitle       = {NDSS},
+}
+
+@inproceedings{aces,
+  title           = {{ACES}: Automatic Compartments for Embedded Systems},
+  author          = {Abraham A Clements and Naif Saleh Almakhdhub and Saurabh
+                  Bagchi and Mathias Payer},
+  year            = 2018,
+  month           = aug,
+  booktitle       = {27th USENIX Security Symposium (USENIX Security 18)},
+  publisher       = {USENIX Association},
+  address         = {Baltimore, MD},
+  pages           = {65--82},
+  isbn            = {978-1-939133-04-5},
+}
+
+@inproceedings{usfi,
+  title           = {uSFI: Ultra-lightweight software fault isolation for
+                  IoT-class devices},
+  author          = {Aweke, Zelalem Birhanu and Austin, Todd},
+  year            = 2018,
+  booktitle       = {2018 Design, Automation Test in Europe Conference
+                  Exhibition (DATE)},
+  pages           = {1015--1020},
+  doi             = {10.23919/DATE.2018.8342161},
+}
+
+@inproceedings{lwc,
+  title           = {{Light-Weight} Contexts: An {OS} Abstraction for Safety and
+                  Performance},
+  author          = {James Litton and Anjo Vahldiek-Oberwagner and Eslam
+                  Elnikety and Deepak Garg and Bobby Bhattacharjee and Peter
+                  Druschel},
+  year            = 2016,
+  month           = nov,
+  booktitle       = {12th USENIX Symposium on Operating Systems Design and
+                  Implementation (OSDI 16)},
+  publisher       = {USENIX Association},
+  address         = {Savannah, GA},
+  pages           = {49--64},
+  isbn            = {978-1-931971-33-1},
+}
+
+@inproceedings{control-flow-bending,
+  address         = {Washington, D.C.},
+  title           = {Control-{Flow} {Bending}: {On} the {Effectiveness} of
+                  {Control}-{Flow } {Integrity}},
+  isbn            = {978-1-939133-11-3},
+  url             = {
+                  https://www.usenix.org/conference/usenixsecurity15/technical-sessions/presentation/carlini
+                  },
+  booktitle       = {24th {USENIX} {Security} {Symposium} ({USENIX} {Security}
+                  15)},
+  publisher       = {USENIX Association},
+  author          = {Carlini, Nicholas and Barresi, Antonio and Payer, Mathias
+                  and Wagner , David and Gross, Thomas R.},
+  month           = aug,
+  year            = 2015,
+  pages           = {161--176},
+}
+
+@inproceedings{non-control-data-attack,
+  title           = {Non-Control-Data Attacks Are Realistic Threats},
+  author          = {Chen, Shuo and Xu, Jun and Sezer, Emre C. and Gauriar,
+                  Prachi and Iyer, Ravishankar K.},
+  year            = 2005,
+  booktitle       = {Proceedings of the 14th Conference on USENIX Security
+                  Symposium - Volume 14},
+  location        = {Baltimore, MD},
+  publisher       = {USENIX Association},
+  address         = {USA},
+  series          = {SSYM'05},
+  pages           = 12,
+  numpages        = 1,
+}
+
+@article{ewasm,
+  title           = {eWASM: Practical Software Fault Isolation for Reliable
+                  Embedded Devices},
+  author          = {Peach, Gregor and Pan, Runyu and Wu, Zhuoyi and Parmer,
+                  Gabriel and Haster, Christopher and Cherkasova, Ludmila},
+  year            = 2020,
+  journal         = {IEEE Transactions on Computer-Aided Design of Integrated
+                  Circuits and Systems},
+  volume          = 39,
+  number          = 11,
+  pages           = {3492--3505},
+  doi             = {10.1109/TCAD.2020.3012647},
+}
+
+@misc{pacsafe,
+  title           = {PACSafe: Leveraging ARM Pointer Authentication for Memory
+                  Safety in C/C++},
+  author          = {Hohentanner, Konrad and Zieris, Philipp and Horsch, Julian},
+  year            = 2022,
+  publisher       = {arXiv},
+  doi             = {10.48550/ARXIV.2202.08669},
+  copyright       = {arXiv.org perpetual, non-exclusive license},
+}
+
+@misc{mbedos,
+  title           = {Mbed OS},
+  author          = {ARM Ltd},
+  year            = 2022,
+  note            = {Last accessed Apr 31 , 2022,},
+  howpublished    = {\url{https://os.mbed.com/mbed-os}},
+}
+
+@inproceedings{timber-v,
+  title           = {TIMBER-V: Tag-Isolated Memory Bringing Fine-grained
+                  Enclaves to RISC-V},
+  author          = {Samuel Weiser and Mario Werner and Ferdinand Brasser and
+                  Maja Malenko and Stefan Mangard and Ahmad-Reza Sadeghi},
+  year            = 2019,
+  booktitle       = {Proceedings 2019 - Network and Distributed System Security
+                  Symposium (NDSS)},
+  publisher       = {Internet Society},
+  doi             = {10.14722/ndss.2019.23068},
+  language        = {English},
+}
+
+@article{hardbound,
+  title           = {Hardbound: Architectural Support for Spatial Safety of the
+                  C Programming Language},
+  author          = {Devietti, Joe and Blundell, Colin and Martin, Milo M. K.
+                  and Zdancewic, Steve},
+  year            = 2008,
+  month           = {mar},
+  journal         = {SIGOPS Oper. Syst. Rev.},
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  volume          = 42,
+  number          = 2,
+  pages           = {103–114},
+  doi             = {10.1145/1353535.1346295},
+  issn            = {0163-5980},
+  issue_date      = {March 2008},
+  numpages        = 12,
+}
+
+@article{softbound,
+  title           = {SoftBound: Highly Compatible and Complete Spatial Memory
+                  Safety for c },
+  author          = {Nagarakatte, Santosh and Zhao, Jianzhou and Martin, Milo
+                  M.K. and Zdancewic, Steve},
+  year            = 2009,
+  month           = {jun},
+  journal         = {SIGPLAN Not.},
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  volume          = 44,
+  number          = 6,
+  pages           = {245–258},
+  doi             = {10.1145/1543135.1542504},
+  issn            = {0362-1340},
+  issue_date      = {June 2009},
+  numpages        = 14,
+}
+
+@inproceedings{new-lowfat-pointer,
+  title           = {Heap Bounds Protection with Low Fat Pointers},
+  author          = {Duck, Gregory J. and Yap, Roland H. C.},
+  year            = 2016,
+  location        = {Barcelona, Spain},
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  series          = {CC 2016},
+  pages           = {132–142},
+  doi             = {10.1145/2892208.2892212},
+  isbn            = 9781450342414,
+  numpages        = 11,
+}
+
+@misc{memory-tagging,
+  title           = {{Memory Tagging and how it improves C/C++ memory safety}},
+  author          = {Serebryany, Kostya and Stepanov, Evgenii and Shlyapnikov,
+                  Aleksey and Tsyrklevich, Vlad and Vyukov, Dmitry},
+  year            = 2018,
+  publisher       = {arXiv},
+  doi             = {10.48550/ARXIV.1802.09517},
+  copyright       = {arXiv.org perpetual, non-exclusive license},
+}
+
+@misc{wllvm,
+  title           = {{Whole-program LLVM}},
+  note            = {Last accessed Apr 31 , 2022,},
+  howpublished    = {\url{https://github.com/travitch/whole-program-llvm}},
+}
+
+@inproceedings{datashield,
+  title           = {Datashield: Configurable data confidentiality and
+                  integrity},
+  author          = {Carr, Scott A and Payer, Mathias},
+  year            = 2017,
+  booktitle       = {Proceedings of the 2017 ACM on Asia Conference on Computer
+                  and Communications Security},
+  pages           = {193--204},
+}
+
+@inproceedings{muscope,
+  title           = {$\mu$SCOPE: A Methodology for Analyzing Least-Privilege
+                  Compartmentalization in Large Software Artifacts},
+  author          = {Roessler, Nick and Atayde, Lucas and Palmer, Imani and
+                  McKee, Derrick and Pandey, Jai and Kemerlis, Vasileios P and
+                  Payer, Mathias and Bates, Adam and Smith, Jonathan M and
+                  DeHon, Andre and others},
+  year            = 2021,
+  booktitle       = {24th International Symposium on Research in Attacks,
+                  Intrusions and Defenses},
+  pages           = {296--311},
+}
+
+@inproceedings{droidcap,
+  title           = {DroidCap: OS Support for Capability-based Permissions in
+                  Android},
+  author          = {Abdallah Dawoud and Sven Bugiel},
+  year            = 2019,
+  booktitle       = {26th Annual Network & Distributed System Security Symposium
+                  (NDSS '19)},
+  publisher       = {ISOC},
+}
+
+@inproceedings{semperos,
+  title           = {{SemperOS}: A Distributed Capability System},
+  author          = {Matthias Hille and Nils Asmussen and Pramod Bhatotia and
+                  Hermann H{ \"a}rtig},
+  year            = 2019,
+  month           = jul,
+  booktitle       = {2019 USENIX Annual Technical Conference (USENIX ATC 19)},
+  publisher       = {USENIX Association},
+  address         = {Renton, WA},
+  pages           = {709--722},
+  isbn            = {978-1-939133-03-8},
+  url             = {https://www.usenix.org/conference/atc19/presentation/hille},
+}
+
+@article{reg-alloc,
+  title           = {Linear Scan Register Allocation},
+  author          = {Poletto, Massimiliano and Sarkar, Vivek},
+  year            = 1999,
+  month           = {sep},
+  journal         = {ACM Trans. Program. Lang. Syst.},
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  volume          = 21,
+  number          = 5,
+  pages           = {895–913},
+  doi             = {10.1145/330249.330250},
+  issn            = {0164-0925},
+  url             = {https://doi.org/10.1145/330249.330250},
+  issue_date      = {Sept. 1999},
+  numpages        = 19,
+  keywords        = {code optimization, register allocation, compilers},
+}
+
+@misc{pointer-auth-iphone,
+  title           = {Examining Pointer Authentication on the iPhone XS},
+  author          = {Brandon Azad, {\relax Google Project Zero}},
+  year            = 2019,
+  note            = {Last accessed Apr 31 , 2022,},
+  howpublished    = {\url{
+                  https://googleprojectzero.blogspot.com/2019/02/examining-pointer-authentication-on.html
+                  }},
+}
+
+@inproceedings{multi-layer-type,
+  author          = {Lu, Kangjie and Hu, Hong},
+  title           = {Where Does It Go? Refining Indirect-Call Targets with
+                  Multi-Layer Type Analysis},
+  year            = 2019,
+  isbn            = 9781450367479,
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  url             = {https://doi.org/10.1145/3319535.3354244},
+  doi             = {10.1145/3319535.3354244},
+  booktitle       = {Proceedings of the 2019 ACM SIGSAC Conference on Computer
+                  and Communications Security},
+  pages           = {1867–1881},
+  numpages        = 15,
+  keywords        = {function pointers, indirect-call targets, cfi, layered type
+                  analysis},
+  location        = {London, United Kingdom},
+  series          = {CCS '19},
+}
+
+@inproceedings{unique-code-target,
+  author          = {Hu, Hong and Qian, Chenxiong and Yagemann, Carter and
+                  Chung, Simon Pak Ho and Harris, William R. and Kim, Taesoo and
+                  Lee, Wenke},
+  title           = {Enforcing Unique Code Target Property for Control-Flow
+                  Integrity},
+  year            = 2018,
+  isbn            = 9781450356930,
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  url             = {https://doi.org/10.1145/3243734.3243797},
+  doi             = {10.1145/3243734.3243797},
+  booktitle       = {Proceedings of the 2018 ACM SIGSAC Conference on Computer
+                  and Communications Security},
+  pages           = {1470–1486},
+  numpages        = 17,
+  keywords        = {performance, Intel PT, unique code target, control-flow
+                  integrity},
+  location        = {Toronto, Canada},
+  series          = {CCS '18},
+}
+
+@inproceedings{type-after-type,
+  author          = {van der Kouwe, Erik and Kroes, Taddeus and Ouwehand, Chris
+                  and Bos, Herbert and Giuffrida, Cristiano},
+  title           = {Type-After-Type: Practical and Complete Type-Safe Memory
+                  Reuse},
+  year            = 2018,
+  isbn            = 9781450365697,
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  url             = {https://doi.org/10.1145/3274694.3274705},
+  doi             = {10.1145/3274694.3274705},
+  booktitle       = {Proceedings of the 34th Annual Computer Security
+                  Applications Conference},
+  pages           = {17–27},
+  numpages        = 11,
+  keywords        = {LLVM, uninitialized read, Use-after-free, defense, computer
+                  systems},
+  location        = {San Juan, PR, USA},
+  series          = {ACSAC '18},
+}
+
+@misc{musl,
+  title           = {musl libc},
+  author = {Rich Felker},
+  howpublished    = {\url{https://musl.libc.org}},
+  year            = 2022,
+  urldate         = {2022-10-01},
+}
+
+@article{caja,
+  title           = {Caja: Safe active content in sanitized JavaScript},
+  year            = 2008,
+  month           = {June 7},
+  type            = {PDF},
+  author          = {Miller, Mark S. and Samuel, Mike and Laurie, Ben and Awad,
+                  Ihab and Stay, Mike},
+}
+
+@inproceedings{dbox,
+  title           = {D-{{Box}}: {{DMA-enabled Compartmentalization}} for
+                  {{Embedded Applications}}},
+  shorttitle      = {D-{{Box}}},
+  booktitle       = {Proceedings 2022 {{Network}} and {{Distributed System
+                  Security Symposium}}},
+  author          = {Mera, Alejandro and Chen, Yi Hui and Sun, Ruimin and Kirda,
+                  Engin and Lu, Long},
+  year            = 2022,
+  eprint          = {2201.05199},
+  eprinttype      = {arxiv},
+  primaryclass    = {cs},
+  archiveprefix   = {arXiv},
+  annotation      = {1 citations (Semantic Scholar/arXiv) [2022-08-22] 1
+                  citations (Semantic Scholar/DOI) [2022-08-22]},
+}
+
+@inbook{jkernel,
+  author          = "von Eicken, Thorsten and Chang, Chi-Chao and Czajkowski,
+                  Grzegorz and Hawblitzel, Chris and Hu, Deyu and Spoonhower,
+                  Dan",
+  editor          = "Vitek, Jan and Jensen, Christian D.",
+  title           = "J-Kernel: A Capability-Based Operating System for Java",
+  bookTitle       = "Secure Internet Programming: Security Issues for Mobile and
+                  Distributed Objects",
+  year            = 1999,
+  publisher       = "Springer Berlin Heidelberg",
+  address         = "Berlin, Heidelberg",
+  pages           = "369--393",
+  isbn            = "978-3-540-48749-4",
+  doi             = "10.1007/3-540-48749-2_17",
+  url             = "https://doi.org/10.1007/3-540-48749-2_17",
+}
+
+@inproceedings{10.1145/3037697.3037725,
+  author          = {Chisnall, David and Davis, Brooks and Gudka, Khilan and
+                  Brazdil, David and Joannou, Alexandre and Woodruff, Jonathan
+                  and Markettos, A. Theodore and Maste, J. Edward and Norton,
+                  Robert and Son, Stacey and Roe, Michael and Moore, Simon W.
+                  and Neumann, Peter G. and Laurie, Ben and Watson, Robert N.M.},
+  title           = {CHERI JNI: Sinking the Java Security Model into the C},
+  year            = 2017,
+  isbn            = 9781450344654,
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  url             = {https://doi.org/10.1145/3037697.3037725},
+  doi             = {10.1145/3037697.3037725},
+  abstract        = {Java provides security and robustness by building a
+                  high-level security model atop the foundation of memory
+                  protection. Unfortunately, any native code linked into a Java
+                  program -- including the million lines used to implement the
+                  standard library -- is able to bypass both the memory
+                  protection and the higher-level policies. We present a
+                  hardware-assisted implementation of the Java native code
+                  interface, which extends the guarantees required for Java's
+                  security model to native code.Our design supports safe direct
+                  access to buffers owned by the JVM, including
+                  hardware-enforced read-only access where appropriate. We also
+                  present Java language syntax to declaratively describe
+                  isolated compartments for native code.We show that it is
+                  possible to preserve the memory safety and isolation
+                  requirements of the Java security model in C code, allowing
+                  native code to run in the same process as Java code with the
+                  same impact on security as running equivalent Java code. Our
+                  approach has a negligible impact on performance, compared with
+                  the existing unsafe native code interface. We demonstrate a
+                  prototype implementation running on the CHERI microprocessor
+                  synthesized in FPGA.},
+  booktitle       = {Proceedings of the Twenty-Second International Conference
+                  on Architectural Support for Programming Languages and
+                  Operating Systems},
+  pages           = {569–583},
+  numpages        = 15,
+  keywords        = {compartmentalization, memory protection, capability
+                  systems, jni, compilers, sandboxing, hardware security, cheri,
+                  language security, architecture, java},
+  location        = {Xi'an, China},
+  series          = {ASPLOS '17},
+}
+
+@article{10.1145/3093336.3037725,
+  author          = {Chisnall, David and Davis, Brooks and Gudka, Khilan and
+                  Brazdil, David and Joannou, Alexandre and Woodruff, Jonathan
+                  and Markettos, A. Theodore and Maste, J. Edward and Norton,
+                  Robert and Son, Stacey and Roe, Michael and Moore, Simon W.
+                  and Neumann, Peter G. and Laurie, Ben and Watson, Robert N.M.},
+  title           = {CHERI JNI: Sinking the Java Security Model into the C},
+  year            = 2017,
+  issue_date      = {April 2017},
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  volume          = 52,
+  number          = 4,
+  issn            = {0362-1340},
+  url             = {https://doi.org/10.1145/3093336.3037725},
+  doi             = {10.1145/3093336.3037725},
+  abstract        = {Java provides security and robustness by building a
+                  high-level security model atop the foundation of memory
+                  protection. Unfortunately, any native code linked into a Java
+                  program -- including the million lines used to implement the
+                  standard library -- is able to bypass both the memory
+                  protection and the higher-level policies. We present a
+                  hardware-assisted implementation of the Java native code
+                  interface, which extends the guarantees required for Java's
+                  security model to native code.Our design supports safe direct
+                  access to buffers owned by the JVM, including
+                  hardware-enforced read-only access where appropriate. We also
+                  present Java language syntax to declaratively describe
+                  isolated compartments for native code.We show that it is
+                  possible to preserve the memory safety and isolation
+                  requirements of the Java security model in C code, allowing
+                  native code to run in the same process as Java code with the
+                  same impact on security as running equivalent Java code. Our
+                  approach has a negligible impact on performance, compared with
+                  the existing unsafe native code interface. We demonstrate a
+                  prototype implementation running on the CHERI microprocessor
+                  synthesized in FPGA.},
+  journal         = {SIGPLAN Not.},
+  month           = {apr},
+  pages           = {569–583},
+  numpages        = 15,
+  keywords        = {compartmentalization, sandboxing, compilers, java,
+                  architecture, jni, language security, cheri, capability
+                  systems, hardware security, memory protection},
+}
+
+@article{cheri-jni,
+  author          = {Chisnall, David and Davis, Brooks and Gudka, Khilan and
+                  Brazdil, David and Joannou, Alexandre and Woodruff, Jonathan
+                  and Markettos, A. Theodore and Maste, J. Edward and Norton,
+                  Robert and Son, Stacey and Roe, Michael and Moore, Simon W.
+                  and Neumann, Peter G. and Laurie, Ben and Watson, Robert N.M.},
+  title           = {CHERI JNI: Sinking the Java Security Model into the C},
+  year            = 2017,
+  issue_date      = {March 2017},
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  volume          = 45,
+  number          = 1,
+  issn            = {0163-5964},
+  url             = {https://doi.org/10.1145/3093337.3037725},
+  doi             = {10.1145/3093337.3037725},
+  journal         = {SIGARCH Comput. Archit. News},
+  month           = {apr},
+  pages           = {569–583},
+  numpages        = 15,
+  keywords        = {hardware security, cheri, jni, capability systems,
+                  compilers, memory protection, compartmentalization, java,
+                  language security, sandboxing, architecture},
+}
+
+@inproceedings{civ,
+  title           = {Assessing the Impact of Interface Vulnerabilities in
+                  Compartmentalized Software},
+  booktitle       = {Proceedings 2023 Network and Distributed System Security
+                  Symposium. NDSS},
+  abstract        = {Least-privilege separation decomposes applications into
+                  compartments limited to accessing only what they need. When
+                  compartmentalizing existing software, many approaches neglect
+                  securing the new inter-compartment interfaces, although what
+                  used to be a function call from/to a trusted component is now
+                  potentially a targeted attack from a malicious compartment.
+                  This results in an entire class of security bugs: Compartment
+                  Interface Vulnerabilities ({CIVs}).},
+  author = {Hugo Lefeuvre and Vlad-Andrei B{\u{a}}doiu and Yi Chen and Felipe Huici and Nathan Dautenhahn and Pierre Olivier},  
+ year            = 2023,
+}
+
+@INPROCEEDINGS{hacking-blind,
+  author          = {Bittau, Andrea and Belay, Adam and Mashtizadeh, Ali and
+                  Mazières, David and Boneh, Dan},
+  booktitle       = {2014 IEEE Symposium on Security and Privacy},
+  title           = {Hacking Blind},
+  year            = 2014,
+  pages           = {227-242},
+  doi             = {10.1109/SP.2014.22}
+}
+
+@inproceedings{spoon-and-shield,
+  author          = {Sartakov, Vasily A. and O'Keeffe, Daniel and Eyers, David
+                  and Vilanova, Llu\'{\i}, and Pietzuch, Peter},
+  title           = {Spons &amp; Shields: Practical Isolation for Trusted
+                  Execution},
+  year            = 2021,
+  isbn            = 9781450383943,
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  url             = {https://doi.org/10.1145/3453933.3454024},
+  doi             = {10.1145/3453933.3454024},
+  booktitle       = {Proceedings of the 17th ACM SIGPLAN/SIGOPS International
+                  Conference on Virtual Execution Environments},
+  pages           = {186–200},
+  numpages        = 15,
+  keywords        = {trusted execution, SGX, compartments, isolation},
+  location        = {Virtual, USA},
+  series          = {VEE 2021}
+}
+
+@inproceedings{occlum,
+  author          = {Shen, Youren and Tian, Hongliang and Chen, Yu and Chen,
+                  Kang and Wang, Runji and Xu, Yi and Xia, Yubin and Yan,
+                  Shoumeng},
+  title           = {Occlum: Secure and Efficient Multitasking Inside a Single
+                  Enclave of Intel SGX},
+  year            = 2020,
+  isbn            = 9781450371025,
+  publisher       = {Association for Computing Machinery},
+  address         = {New York, NY, USA},
+  url             = {https://doi.org/10.1145/3373376.3378469},
+  doi             = {10.1145/3373376.3378469},
+  booktitle       = {Proceedings of the Twenty-Fifth International Conference on
+                  Architectural Support for Programming Languages and Operating
+                  Systems},
+  pages           = {955–970},
+  numpages        = 16,
+  keywords        = {intel mpx, library os, intel sgx, software fault isolation,
+                  multitasking},
+  location        = {Lausanne, Switzerland},
+  series          = {ASPLOS '20},
+}

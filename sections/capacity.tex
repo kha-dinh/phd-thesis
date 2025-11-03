@@ -1,0 +1,37 @@
+\chapter{Retrofitting OS security with modern hardware features}
+
+\emph{* The content of this chapter were published in Proceedings of the 2023 ACM SIGSAC Conference on Computer and Communications Security (CCS '23). Association for Computing Machinery, New York, NY, USA, 874-888.}
+\\
+
+% \pagenumbering{arabic}
+\renewcommand{\thename}{\capacity}
+\label{chap:capacity}
+\input{sections/capacity/sslab-code}
+\input{sections/capacity/terminologies}
+
+  In-process compartmentalization and access control have been actively explored to provide in-place and efficient isolation of in-process security domains. Many works have proposed compartmentalization schemes that leverage hardware features.
+    Newer ARM architectures introduce Pointer Authentication (PA) and Memory Tagging Extension (MTE), adapting the reference validation model for memory safety and runtime exploit mitigation. 
+    Despite their potential, these features are underexplored in the context of userspace program compartmentalization.
+
+   	This paper presents \thename, a novel hardware-assisted intra-process access control design that embraces capability-based security principles.
+	\thename coherently incorporates the new hardware security features on ARM, based on the insight that the features already exhibit inherent capability characteristics.
+	It supports the life-cycle protection of the domain's sensitive objects -- starting from their import from the file system to their place in memory.
+	With intra-process domains authenticated with unique PA keys, \thename transforms file descriptors and memory pointers into cryptographically-authenticated references and completely mediates reference usage with its program instrumentation framework and an efficient system call monitor.
+	We evaluate our \thename-enabled NGINX web server prototype and other common applications in which sensitive resources are isolated into different domains. Our evaluation shows that \thename incurs a low-performance overhead of approximately $17\%$ for the single-threaded and $13.54\%$ for the multi-threaded webserver.
+
+\input{sections/capacity/introduction}
+\input{sections/capacity/background}
+\input{sections/capacity/overview}
+\input{sections/capacity/dom-auth}
+\input{sections/capacity/ref-mon}
+\input{sections/capacity/instrumentation}
+\input{sections/capacity/evaluation}
+\input{sections/capacity/discussion}
+\input{sections/capacity/related-work}
+
+
+\section{Conclusion}
+This paper proposed a novel design called \thename that enables the compartmentalization of in-process domains by employing hardware-accelerated and cryptographically-authenticated capabilities.
+We presented complete mediation and authentication schemes that satisfy the security requirements of capability systems throughout the life cycle of sensitive domain objects and addressed compatibility issues when adapting \pamte-based instrumentation for large programs.
+We evaluated \thename through microbenchmarks and real-world applications, including an NGINX webserver prototype in which the important resources are protected in secure domains.
+The results show the efficacy of \thename the in terms of performance with an average webserver throughput overhead of $17\%$ for single-threaded and $13.54\%$ for multi-threaded experiments.

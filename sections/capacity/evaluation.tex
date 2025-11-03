@@ -1,0 +1,322 @@
+\section{Evaluation}
+
+\label{sec:evaluation}
+
+In this section, we first conduct a set of microbenchmarks on the reference monitor and \libcapac to illustrate the overhead induced by individual operations of \thename (\cref{sec:evaluation:mon-microbench}).
+% We measure the performance overheads of \thename's instrumentation on the nbench-byte benchmark to study its impact on real-world applications~(\cref{sec:evaluation:nbench}).
+We describe the adaptation of \thename in protecting sensitive resources of three real-world applications in \cref{sec:evaluation:porting-app}.
+Finally, we evaluate the performance of \thename-adapted applications in \cref{sec:evaluation:macrobench} to show \thename's overall impact on performance.
+% of throughput of \thename-enabled webserver, one of the adapted applications,  
+
+% Nevertheless, we plan to evaluate \thename on hardware with native support for \gls{mte} in the future.
+\hdr{Evaluation method} We ensured the functional correctness of our implementation by using a QEMU~\cite{qemu} ARM virtual machine that supports both \gls{pa} and \gls{mte} and conducted performance evaluations using the Apple Mac Mini with an M1 processor running Asahi Linux~\cite{asahi-linux}.
+The M1 processor includes the \gls{pa} extension; however, to our knowledge, there is no publicly available hardware with ARM MTE.
+The QEMU's MTE emulation is mature to a point where it is used for developing a \gls{mte}-based security feature for the Linux kernel to be used in the near future~\cite{kasan}.
+We follow the method from a previous work~\cite{hakc} that emulated the \emph{worst-case} performance impact of \gls{mte} by using \emph{\gls{mte} analogs}.
+We insert the \gls{mte} analogs to replace the tagging instructions in our tagged heap memory allocator and also modify \thename's instrumentation to automatically insert the \gls{mte} analogs in places of LLVM's \gls{mte} intrinsics.
+
+
+
+
+\input{figures/capacity/eval-micro}
+
+
+\subsection{Microbenchmarks}
+\label{sec:evaluation:mon-microbench}
+We perform a set of isolated microbenchmarks on the syscalls intervened by the reference monitor, \libcapac API functions, and the instrumentation. The results are listed in \autoref{tbl:micro}.
+% For the intervened syscalls and \thename heap allocator, we compare their latency against their baseline counterparts: syscalls without monitor and unmodified \texttt{dlmalloc}.
+
+
+
+
+
+\hdr{System call latency with reference monitor}
+We measured the average latency of \thename-protected syscall used in our evaluated applications that authenticate file paths and \fds, and compared them against un-protected syscalls.
+% The evaluated \glspl{syscall} are the ones used by our tested applications.
+The overhead induced by \thename includes the latency from syscall hooking and \thename's reference authentication.
+Our results reported an average of $2.65\%$ across the measured syscalls.
+This shows the efficiency of \thename reference monitor design that fully utilizes hardware acceleration provided by \gls{pa}, not to mention the simplicity of capability where the reference alone is enough to make access control decisions without complex bookkeeping on domains and resources.
+Also, this overhead is imposed only on the \thename-enabled processes.
+
+
+
+
+\hdr{\libcapac APIs latencies}
+The overhead of \texttt{capac\_malloc()} and \texttt{capac\_free()} originates from domain authentication and \gls{mte}-based memory tagging. 
+Measuring the latency of domain private memory allocation and free on blocks of $1$KB, \texttt{capac\_malloc()} and \texttt{capac\_free()} reported approximately $114.6\%$ and $154.4\%$ .
+\texttt{capac\_enter} and \texttt{capac\_exit}, \texttt{capac\_delegate\_ptr}, \texttt{capac\_delegate\_fd} and \texttt{capac\_limit\_fd} are simple \texttt{ioctl} calls to the in-kernel reference monitor, where only \texttt{capac\_limit\_fd} does not requires the key switching.
+Their latencies are on par with general syscalls.
+Besides a roundtrip to the kernel mode, we suspect their main source of overhead is from writing to the \gls{pa} key registers.
+% \texttt{capac\_delegate\_ptr} and \texttt{capac\_delegate\_fd} have higher latency due to 
+% \texttt{capac\_delegate\_ptr()} and \texttt{delegate\_fd()} whose inner-workings are explained in~\cref{sec:design}, also measured to have reasonable latencies.
+
+
+
+
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=.95\columnwidth]{figures/capacity/nbench-overheads.pdf}
+	\caption{Overhead of instrumented nbench-byte, normalized to uninstrumented baseline and sorted by overhead.}
+	\label{fig:nbench}
+\end{figure}
+
+
+
+
+
+% \FloatBarrier
+\hdr{nbench-byte benchmark}
+\label{sec:evaluation:nbench}
+We measure the isolated overhead of \thename's instrumentation on the \emph{nbench-byte}~\cite{nbench} benchmark, which is also used by several previous works on \gls{pa}-based defenses~\cite{pactight,pac-it-up}.
+nbench-byte consists of $11$ CPU and memory subsystem benchmarks that allow us to measure the overhead of \thename in general computations.
+\autoref{fig:nbench} shows the results of nbench-byte compiled with \thename's instrumentation that enforces \gls{pa} on on-save signing and on-load authentication of all in-program pointers.
+On average, \thename's instrumentation incurs $11.37\%$ performance degradation to the uninstrumented version.
+% The highest overhead was observed in FP Emulation (39.20\%) and Huffman (38.48\%).
+
+
+% \input{tables/eval-applications}
+
+
+
+
+%We expect the reason is that our instrumentation also works with compiler optimizations, which removed many redundant on-load authentications, while PARTS disables all optimizations in their tests~\cite{pac-it-up}. --> discuss this separately maybe design:instrumentaiton.
+
+
+
+
+% \vspace{-1em}
+\subsection{Adapting \thename to real-world programs}
+We exemplify \thename's capability domains by adapting it to several open-source applications studied by previous isolation frameworks~\cite{erim,shreds,ptrsplit}. 
+These applications include OpenSSH's \texttt{ssh} utility~\cite{openssh}, \texttt{wget} file download utility~\cite{wget}, and NGINX webserver~\cite{nginx} compiled along the TLS library LibreSSL~\cite{libressl}. 
+Representative code examples of our modifications can be found in the appendix of the extended version of this paper~\cite{capacity-extended}.
+% Different from other compartmentalization frameworks~\cite{erim,jenny,shreds,ptrsplit,hakc}, on top of memory isolation, \thename also enables the coherent in-process isolation of system resources, such as file descriptors of private files and sockets.
+The applications are also compiled with the \thename-instrumented \emph{musl} libc~\cite{musl} adapted to handle signed pointers in system call arguments.
+\autoref{tbl:porting-app} summarizes the \thename domains in protected applications and their protected assets.
+%Our instrumentation framework is proven mature enough to compile complex real-world programs such as the webserver and its components.
+% We report the performance results for ssh in this section.
+
+
+% More specifically, we measured the cumulative occurrences of domain switches, \fd-authenticated \gls{syscall} invocation, \texttt{capac\_malloc()} invocation, and \texttt{pac}/\texttt{aut} instructions \emph{executed} for the varying file sizes.
+
+
+
+
+\hdr{OpenSSH's ssh (v9.3p1)}
+% The \texttt{ssh} utility uses a private key from the file system to establish a secure session with the remote host. 
+We demonstrate \thename's program secrets protection throughout their life-cycles with \texttt{ssh}.    
+We compile OpenSSH to use its built-in crypto library and use \thename to isolate the private key of \texttt{ssh}.
+We introduce a new domain, \textsc{Privkey}, with exclusive access to the private key file and its in-memory buffer.
+This domain spans from when the private key is loaded from the file system until after the login operation succeeds.
+ % Unlike previous systems \cite{shreds,ptrsplit}, \thename also protects the path and file descriptor of the private key.
+% To achieve this, 
+We then assign the static private key to the domain, allocate the private key buffer (\texttt{struct sshkey}) in private memory, annotate its pointers with \texttt{DOM\_PRIV}, and finally wrap functions that access the private key within domain entry gates.
+These changes require about $50$ LoC changes over 13 functions across 5 files.
+% in the files \texttt{sshkey.c}, \texttt{authfile.c}, \texttt{sshbuf.c}, \texttt{sshconnect2} and \texttt{ssh.c}. 
+
+
+\begin{figure*}[t]
+	\centering
+	% \includegraphics[width=0.92\textwidth]{images/webserver-capacity-final.pdf}
+	\includegraphics[width=\textwidth]{figures/capacity/webserver-overheads-3.pdf}
+	\begin{minipage}[t]{.49\linewidth}
+		\centering
+		% \vspace{-1em}
+		\subcaption{Single-threaded}
+		 \vspace{-1em}
+	\end{minipage}%
+	\begin{minipage}[t]{.49\linewidth}
+		\centering
+		% \vspace{-1em}
+		\subcaption{Multi-threaded (8 Threads)}
+		 \vspace{-1em}
+	\end{minipage}
+	\caption{\textsc{Baseline} webserver vs. \thename-enabled webserver throughput benchmark performed with local \texttt{ab} client.
+		% The \texttt{Baseline} is unmodified NGINX, whereas the \thename-enabled webserver runs with \thename reference monitor, \libcapac, and instrumented software components. 
+	}
+	\label{tab:exec-macro}
+\end{figure*}
+
+
+\hdr{\texttt{wget}  (v1.21.2)}
+% We port \texttt{wget} 
+We use \thename to isolate the file received from the internet in \texttt{wget} to demonstrate least-privilege compartmentalization.
+We create a domain called \textsc{FileDownload} with exclusive access to the downloaded buffer and the output file path/\fd. 
+We then modify the initialization of \texttt{wget} to assign the output file access to \textsc{FileDownload}, and use \texttt{cap\_limit\_fd} to revoke all other attributes from the file's \fd except \texttt{CAP\_WRITE}. 
+This ensures that the domain has write-only access to the output \fd \footnote{While \texttt{wget} already make the file handle write-only, \thename enables more fine-grained in-process access control that supports read and write domains.}.
+The domain encapsulates the function \texttt{retrieve\_url}, which fetches the requested file from a URL into a \texttt{capac\_malloc}-allocated buffer before writing into the output file's \fd. 
+We also annotate pointers variables that point to the downloaded file in memory with \texttt{CAPAC\_VAR}. 
+The total modifications to \texttt{wget} is about $30$ LoC.
+
+
+
+\begin{figure}[t]
+	% \centering	\includegraphics[width=0.9\columnwidth]{images/webserver-domains-libertine.pdf}
+	\centering	\includegraphics[width=0.9\columnwidth]{figures/capacity/nginx-domains.pdf}
+	\caption{\thename enables life-cycle private key protection and per-instance isolation of session keys in the NGINX webserver.}
+	\label{fig:webserver-domains}
+\end{figure}
+
+
+% \chcomment{Argument for reserving register: They are not used by the compiler under normal circumstances, so we reserve them}
+
+\label{sec:using-capacity}\label{sec:design:webserver}\label{sec:evaluation:porting-app}\label{sec:usage}
+
+
+
+
+\hdr{NGINX (v1.23.0) + LibreSSL (v3.5.3)}
+We use the NGINX webserver and its crypto library, LibreSSL, to demonstrate the multi-domain interaction of \thename. 
+We create three domains in the webserver, namely \domhs, \domses, and \domconn to isolate the server private key, session keys, and connection sockets with the least privilege principle in mind.
+\autoref{tbl:porting-app} displays a summary of the webserver domains and their isolated resources.
+We modified $223$ LoC in LibreSSL and $114$ LoC in NGINX.
+
+
+
+% The rest of the webserver not in a domain is the ambient domain, \domamb.
+% We construct the above domains by using the approach described in \cref{sec:design:prog-model}.
+% Then, the webserver and its dependencies are compiled with \thename instrumentation framework.
+% for complete mediation of pointer uses as well as domain-aware \gls{pa} instruction insertion.
+
+
+
+\autoref{fig:webserver-domains} illustrates the main operations and their interaction with domain-private objects in domain \domhs and \domses.
+\domhs, which consists of $5$ NGINX and $2$ LibreSSL functions endowed with exclusive rights to the server private key.
+
+
+% \deleted{
+	% In \thename's design, this means that all object references that can point to the private key in its life-cycle are signed and authenticated with \domhs's domain key instead of the ambient key.
+% }
+% Hence, the context must be inside \domhs to pass the authentication and interact with private key objects.
+% The private key protection is bootstrapped by \texttt{capac\_init()} that requests the kernel to bind the private key's file-system path to its owner domain during process initialization.
+% \deleted{
+% 	From then on, the reference monitor would only allow a thread to open (\texttt{sys\_open}) or read (\texttt{sys\_read}) if and only if the thread is executing inside \domhs and \fds carry a valid PAC with the domain's key.
+% }
+% \st{In \domhs, }
+% Additionally, the in-memory objects that hold the contents from the private key file are allocated with \texttt{capac\_malloc()}.
+% Additionally, the private key-containing structure (\texttt{struct EVP\_PKEY}) is placed in the domain-tagged memory with \texttt{capac\_malloc()}/, and its pointers are applied with \texttt{DOM\_PRIV}.
+% \texttt{DOM\_PRIV} is also applied to the \texttt{struct* EVP\_PKEY} arguments of functions that interact with the now-in-memory private key.
+\domses protects session keys by hosting $17$ functions,  mostly located inside LibreSSL's AES-GCM implementation.
+We generate a unique instance ID and use it as the modifier for each session since a session's resources are mostly temporary and can be isolated. 
+% Since the session key is generated anew on each connection through SSL handshaking, a connection-generated modifier isolates the SSL key's pointer, ensuring can only decrypt messages for a specific connection.
+As \domhs execution finishes, it produces a TLS session key, which is to be \emph{delegated} to the corresponding \domses instance using the API \texttt{capac\_delegate\_ptr} (\autoref{tab:apis}).
+% After delegation, the session key is in \domses's domain-private memory, and the domain is received a domain-privated pointer to the object (\texttt{struct* aead\_aes\_gcm\_ctx}).
+The domain-private stack  is a noteworthy feature of \thename used in \domses.
+When a function performs complex cryptographic operations, we use \texttt{DOM\_PRIV\_STACK} instead of tracking the data flow of sensitive data bouncing around in the function's local variables.
+% \hdr{Socket delegation and isolation} 
+
+
+
+Finally, \domconn manages the webserver's sockets.
+We wrap the functions that handle sockets inside its domain switches of \domconn, such that when the server requests its \emph{server socket} \fd using \texttt{sys\_socket}, the returned \fd is domain-private.
+On client connection requests, \domconn invokes \texttt{sys\_accept4} with the server socket as the input and retrieves a \emph{client} socket \fd.
+\domconn then delegate the returned \emph{client} socket \fd to \domhs, using \texttt{capac\_delegate\_fd}. 
+After TLS handshaking, \domhs again delegates the socket \fd to \domses.
+Notably, \texttt{CAP\_SOCKET} attribute is enabled by default when socket \fds are created, segregating socket and non-socket \fds in syscalls without the user's intervention.
+
+
+
+% \vspace{-.5}
+
+
+% \begin{tabular}{cc}
+% \toprule
+%        \thead{Program} &\thead{Overhead(\%)}  \\
+%         \midrule
+%      \texttt{ssh} & $0.37$ \\
+%      \texttt{wget} & $5.95$ \\
+%      \bottomrule
+% \end{tabular}
+
+% \begin{floatingfigure}{0.5\columnwidth}
+% \footnotesize
+% \centering
+
+% \caption{test}
+% \end{floatingfigure}
+
+
+\begin{table}[t]
+    \centering
+% \footnotesize
+\small
+\begin{tabular}{lccc}
+\toprule
+       \thead{Program} &\thead{Baseline (ms)} &\thead{w/ \thename (ms)}&\thead{Overhead (\%)}  \\
+        \midrule
+     \texttt{ssh}&$347.35$ & $348.62$  & $0.37$ \\
+ \rowcolor[gray]{0.925}    \texttt{wget}&  $17.12$ & $18.14$&$5.95$ \\
+     \bottomrule
+\end{tabular}
+    \caption{\thename overheads on  \texttt{ssh} and \texttt{wget}.}
+    \label{tbl:sshwget}
+\end{table}
+
+
+\subsection{Application performance benchmark} \label{sec:evaluation:macrobench}
+We perform performance benchmarks on the adapted applications.
+These applications run with all design components of \thename explained thus far, including compile-time instrumentation, compatibility fixes, \libcapac, the kernel-level reference monitor, and backward and forward-edge CFI.
+To accurately profile the source of \thename's performance overhead, we inserted probes into the reference monitor, \libcapac, and the instrumented program code to collect \emph{runtime} execution count of \thename operations during a single iteration of execution, as shown in~\autoref{tbl:porting-app}.
+
+
+% \begingroup
+% \setlength{\intextsep}{5pt}%
+% \setlength{\columnsep}{10pt}%
+% \begin{wrapfigure}{r}{3.4cm}
+
+% \caption{\thename overhead on \texttt{ssh} and \texttt{wget}.}
+% \label{tbl:sshwget}
+% % \vspace{-3mm}
+% \end{wrapfigure}
+% \hdr{Performance overheads}
+\hdr{\texttt{ssh} and \texttt{wget}} 
+For \texttt{ssh}, we measure the average overhead of connecting to a local server $10,000$ times and compare it against the unmodified version.
+We evaluate the protected \texttt{wget} by timing the average overhead in latency when requesting a 1MB file from a local http webserver $10,000$ times compared to the baseline.
+\autoref{tbl:sshwget} displays the \thename-incured performance overheads in \texttt{ssh} and \texttt{wget}, which shows only minimal slowdown for both applications. 
+
+\begin{table*}[t]
+	\centering
+	\footnotesize
+	\input{figures/capacity/eval-nginx}
+\end{table*}
+
+
+% \endgroup
+
+\hdr{NGINX + LibreSSL} We evaluate the throughput of the \thename-enabled NGINX webserver against its unmodified counterpart, which we shall call \textsc{Baseline}.
+% The isolated domains and their assets are as previously explained in \cref{sec:usage}.
+We use the Apache benchmarking tool, \texttt{ab}~\cite{apache-benchmark} locally (i.e., no network latency) to measure the number of requests processed per second, with varying file sizes, \{$16$K, $32$K ... $1$M\}, on also single-threaded and multi-threaded (8 threads) settings.
+$100,000$ requests were performed, and the keep-alive option was used to avoid re-initializing the connections.
+The cipher suite negotiated between the client and the server was \texttt{ECDHE-RSA-AES256-GCM-SHA384}.
+
+
+The webserver benchmark results are displayed in \autoref{tab:exec-macro}, which shows the average performance degrades about $17\%$ for the single-threaded server and $13.54\%$ for the multi-threaded settings across all file size configurations.
+The latency measurements for \thename operations from our microbenchmark (\autoref{tbl:micro}) allow us to reason that the performance overheads from the reference monitor and \libcapac would be very limited.
+The varied file sizes allow us to capture the characteristics of \thename's performance overhead, which increases as the requested file sizes increase.
+Along with the runtime statistic collected in \autoref{tbl:app}, it can be observed that \thename's overhead protecting pointers and memory is proportional to the amount of computation.
+We can conclude that the performance overhead of \thename would be predominantly from the increased number of instructions due to instrumentation.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% Note that API functions that are unique to \thename (e.g., \texttt{capac\_enter()}) do not have counterparts.
+% The reference monitor interposes a set of designated syscalls and enforces an efficient and minimal authentication routine centered around the \gls{pa} instructions, as described in~\cref{sec:implementation:ref-monitor}.
+
+
+
+
+
+
+
+
+%\hdr{Latency of \texttt{pac} and \texttt{aut} instructions}
+%We also measure the execution time of individual \texttt{pac} and \texttt{aut} instructions. We found that all \texttt{pac} and \texttt{aut}-family instruction performs roughly the same, about $13.1$ns per instruction.

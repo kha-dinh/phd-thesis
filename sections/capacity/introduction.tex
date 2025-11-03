@@ -1,0 +1,119 @@
+% !TeX root = ../main.tex
+
+\iffalse
+Challenge1: in-process userspace capability context design (we are the first and )
+-- Related work: 
++ CAPSICUM is per-process, CHERI requires hardware. HAKC only did kernel space and statically, 
++ Jenny and similar works requires user to write policies that are disjoint from the semantics of the program
+
+-- Solution: 
+----- key switching scheme provides PA context that spans user and kernel, therefore you enter kernel via syscall, this enables us to do life-cycle.
+----- coherent reference monitor: this allows consistent life-cycle reference validation model
+
+Challenge2: Fulfilling security requirements
+-- Solution: summary
+
+Challenge3: Robust compiler framework for general user programs
+-- Related work: pac-it-up only evaluated on a benchmark suite and we found that they are insufficient for large programs (e.g., NGINX, OpenSSH and things), HAKC only dealt with kernel modules whereas the level of required robustness is much higher for us.
+\fi
+
+\section{Introduction}
+\label{sec:intro}
+Modern software is often large and complex.
+As a result, it suffers from bugs, some of which are security vulnerabilities that concede program control to adversaries or leak sensitive program resources (e.g., cryptographic keys).
+Researchers and industry have therefore sought to isolate the monolithic program into multiple process-level compartments~\cite{aces,privman,privtrans,wedge,hakc,muscope}, each ideally performing a specific task (\emph{separation of privilege}) and is given only the essential privileges (\emph{least privilege}).
+The process-level compartments of the program must now communicate via \gls{ipc} which accompanies inherent performance overhead.
+% Another limitation of process-level compartmentalization is the difficulty of adoption; it requires incorporation during the initial design process and is much less applicable to existing programs.   
+
+
+% In-process memory isolation
+Many works have proposed in-process and in-place compartmentalization methodologies~\cite{lotrx86,shreds,seimi,erim,hodor,jenny,cerberus,donky} that either re-purposes existing hardware features~\cite{lotrx86,shreds,seimi} or adapts of newly introduced hardware features, most notably using Intel's \gls{pku}~\cite{intel-manual}.
+Recent \gls{pku}-based proposals~\cite{pkrusafe,hodor,erim,jenny,cerberus} have demonstrated in-place isolation with limited performance overhead.
+Hardware-assisted isolation on ARM was previously explored \cite{shreds} using \emph{domains} memory protection feature that had an uncanny resemblance to \gls{pku}.
+However, the domains feature has now been deprecated in AArch64.
+
+We argue that the in-process compartmentalization designs on the modern ARM architectures are currently underexplored.
+The ARM processor architecture's recent iterations introduced new hardware-assisted software security features.
+\Gls{pa}~\cite{arm-arch,armv8-m}, is a hardware feature in ARMv8 that employs cryptographic \gls{ac} to protect pointers from corruption.
+% that implements the principles from CCFI~\cite{ccfi} and CPI~\cite{cpi} to protects pointers from corruption.
+\gls{mte} is another hardware feature included in the ARMv8.5-A architecture that implements a key-and-lock mechanism
+to enable tagging of pointers and the 16-byte \emph{pointee} memory blocks.
+% \gls{mte}-enabled processors throw an exception when it detects a tag mismatch between the pointer and the memory location.
+However, the principles and mechanisms of the ARM's direction in hardware-assisted security are vastly different from those of x86, i.e., \gls{pku}, and open a new design space for program compartmentalization.
+
+
+In this paper, we propose \thename, a novel OS access control model that revolves around capability security principles~\cite{obj-cap,eros}. 
+A plethora of existing research has discussed capability as the ideal scheme for achieving the \emph{least privilege} compartments and eliminating \emph{ambient authority} in OSes~\cite{cheri,capsicum,eros,cheri,cheri-risc,cheriabi}.
+% explores a hardware-accelerated compartmentalization model that 
+We observe that the new ARM hardware extensions, \gls{pa} and \gls{mte}, carry inherent characteristics of \emph{capabilities}.
+\thename's design choices fully leverage these features. 
+It creates in-process \emph{domains}, subprogram components that are given exclusive access to private resources.
+Each domain is identified and authenticated by their \emph{domain authentication keys} (or domain keys), which is a \gls{pa} cryptographic key that \thename reserved for authenticating resources.
+Our work retrofits the OS-based access control with its consistent capability scheme that provides \emph{life-cycle} protection of sensitive objects; it transforms not only memory references (\ie, pointers) but also file object references into non-forgeable tokens.
+
+
+% Novelty1: life-cycle
+\textbf{In-process capabilities for object life-cycles.}
+\thename brings a coherent in-process capability for compartments within the process (subjects) and abstract process resources (objects) whose state may alternate between a file or memory content throughout its life cycle.
+Capability-based \emph{memory} access control has been explored by many previous works~\cite{cheri,cheri-risc,cheriabi,lowfat-pointer,new-lowfat-pointer}.
+Notably, the CHERI architecture~\cite{cheri,cheri-risc,cheriabi} applies memory capabilities to pointers, although the requirement of customized processor architecture limits its applicability.
+Process-level capabilities have also been studied from OS design perspectives~\cite{obj-cap,eros,freebsd-capsicum,cap-addressing,capsicum}. 
+These works focus on access control of OS resources bestowed on the process often represented in the form of \emph{files}.
+However, securing today's large monolithic user programs calls for finer-granular access control on files, not to mention the necessity of consolidating a memory access control for in-process compartments.
+
+% Novelty2: efficient and simple reference monitor
+\textbf{Simple and efficient reference monitoring.} \thename's coherent capability scheme also seamlessly incorporates a simple and efficient reference monitor design for in-process access control.
+The necessity and design space of efficient \gls{syscall} reference monitors for in-process domains have been discussed in many previous works~\cite{pku-pitfall,jenny,cerberus,monguard}.
+Since the OS kernel is unaware of the in-process compartments, a reference monitor must mediate accesses to process resources among the potentially mutually distrusting compartments in addition to \glspl{syscall} filtering that may undermine the security of the compartments.
+% \thename also implements a reference monitor to interpose \glspl{syscall}. 
+We take a different route from previous works to achieve both goals coherently.
+\thename's capability-engraved file descriptors carry information for authentication and authorization.
+This eliminates the need for separate data structures, i.e., an \gls{acl}, to keep track of each compartment domain's ownership and access rights on file objects.
+Also, the validation process of the capability is fast, as it is essentially achieved through a single \gls{pa} instruction.
+
+
+% Novelty3: Key usage
+% \hdr{\gls{pa} }
+
+\textbf{Novel domain and \gls{pa} context binding scheme.} 
+Our way of creating \gls{pa} contexts for in-process compartments is unique and specifically devised for \thename's life-cycle capabilities. 
+Previous work has presented a framework for using \gls{pa} and \gls{mte} that establishes kernel compartments with policy-defining \gls{pa} \emph{modifiers}~\cite{hakc}.
+However, \thename chooses to assign a unique \emph{\gls{pa} key} for each domain and perform \emph{key switches} during domain transitions and employs the \gls{pa} modifier to isolate references between domain \emph{instances}.
+\thename then uses the per-domain key and instance modifier to compute the cryptographic \gls{ac} for the resources and embeds them into the resource handles themselves.
+This seemingly small difference is a key design component for \thename.
+With a single key switch, \thename can efficiently switch the authentication context for both system resource handles and signed userspace pointers.
+This allows \thename to establish arbitrary compartmentalization boundaries within programs and enables a unified and consistent \gls{pa}-based authentication throughout the life cycles of program resources without a complex modifier management scheme.
+
+
+
+
+
+% Challenge1: Capability security requirements
+\textbf{Challenges.} Design and implementation of \thename must satisfy security requirements and be mature enough to be adopted to real-world applications.
+\thename rigorously assesses and addresses the security requirements for the capability references, namely \emph{non-forgeability} and \emph{non-reusability}.
+This effort has been made for every sensitive operation carried out by \thename, from domain transitions to signing and authentication of the capability tokens.
+We detail our security considerations as we elaborate on the design and provide a dedicated security analysis.
+
+In addition, \thename implements a robust instrumentation framework for complex user programs from scratch.
+\thename's \pamte-accelerated pointer capability requires \emph{complete mediation} of all pointer uses.
+Applying such a scheme  to complex programs poses a daunting challenge since a single incorrect instrumentation would inadvertently crash the program. 
+Similar \gls{pa}-based complete mediation of pointer uses have been developed by previous works; however, none with the level of maturity of \thename.
+For instance, PARTS~\cite{pac-it-up} was only evaluated with a benchmark suite.
+Also, \thename incorporates \gls{mte} to inter-domain memory isolation.
+HAKC~\cite{hakc} presented \pamte instrumentation for kernel module compartmentalization that only authenticates the cross-domain pointers only once before their first use, while \thename must provide a domain-aware and completely mediated pointer load and store instrumentation.
+As we will show through our evaluation, \thename's instrumentation framework is mature enough to compile programs such as NGINX-LibreSSL and OpenSSH SSH client.
+In summary, our contributions are as follows:
+\vspace{0.3em}
+\begin{itemize}
+	\setlength\itemsep{0.4em}
+	\item[-] We introduce a novel in-process compartmentalization design that adapts hardware-accelerated capabilities for the life-cycle protection of domain resources.
+    \item[-] We design a simple and efficient capability-based reference monitor to isolate in-process system resources.
+	\item[-] We establish \gls{pa} key-identified domains to efficiently isolate kernel and userspace resource references.
+	% \item We show life cycle protection of sensitive domain resources by protecting both file and memory references.
+	\item[-] We assess and address the unique security challenges of capability-based isolation that requires complete mediation on reference uses, prevention of impersonation, and protection against forging and reusing of references.
+	\item[-] We develop an instrumentation framework that is robust enough to completely mediate complex user programs by addressing compatibility issues.
+	\item[-] We evaluate our implementation on real-world applications and report low overheads on the approach.
+\end{itemize}
+
+
+

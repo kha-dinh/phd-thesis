@@ -1,0 +1,89 @@
+\usepackage{glossaries}
+\usepackage{glossaries-extra}
+
+\renewcommand*{\glsentryfmt}{%
+  \ifglsused{\glslabel}{\begingroup}{\begingroup\em}\glsgenentryfmt\endgroup
+}
+
+\glsdisablehyper
+\setabbreviationstyle[acronym]{long-short}
+
+\newacronym{syscall}{syscall}{system call}
+\newacronym{pim}{PIM}{processing-in-memory}
+\newacronym{pa}{PA}{Pointer Authentication}
+\newacronym{pac}{PAC}{Pointer Authentication Code}
+\newacronym{cgroup}{cgroup}{Control Group}
+\newacronym{tbi}{TBI}{Top-Byte Ignore}
+\newacronym{ipi}{\textcolor{red}{?????IPI?????}}{Intra-Process Isolation}
+\newacronym{pku}{PKU}{Protection Keys for Userspace}
+\newacronym{cfi}{CFI}{Control-Flow Integrity}
+\newacronym{lsm}{LSM}{Linux Security Modules}
+\newacronym{aslr}{ASLR}{Address Space Layout Randomization}
+\newacronym{hmac}{HMAC}{Hash-based Message Authentication Code}
+\newacronym{acl}{ACL}{Access Control List}
+\newacronym{mte}{MTE}{Memory Tagging Extension}
+\newacronym{dst}{DST}{Domain Signature Table}
+\newacronym{uuid}{UUID}{Uniquely Identifiable IDentification}
+\newacronym{sfi}{SFI}{Software Fault Isolation}
+\newacronym{ipc}{IPC}{Inter-Process Communication}
+\newacronym{pdg}{PDG}{Program Dependence Graph}
+\newacronym{iot}{IoT}{Internet of Things}
+\newacronym{dpi}{DPI}{Data Pointer Integrity}
+\newacronym{mmu}{MMU}{Memory Management Unit}
+\newacronym{mpu}{MPU}{Memory Protection Unit}
+\newacronym{ac}{AC}{Authentication Code}
+\newacronym{ir}{IR}{Intermediate Representation}
+\newacronym{mir}{MIR}{Machine IR}
+\newacronym{os}{OS}{Operating System}
+\newacronym{vm}{VM}{virtual machine}
+\newacronym{bpf}{BPF}{Berkley Packet Filter}
+\newacronym{ghcb}{GHCB}{Guest-Host Control Block}
+\newacronym{ebpf}{eBPF}{extended \gls{bpf}}
+\newacronym{tee}{TEE}{Trusted Execution Environment}
+\newacronym{csp}{CSP}{Cloud Service Provider}
+\newacronym{tcb}{TCB}{Trusted Computing Base}
+\newacronym{sev}{SEV}{Secure Encrypted Virtualization}
+\newacronym{tdx}{TDX}{Trust Domain Extensions}
+\newacronym{cca}{CCA}{Confidential Compute Architecture}
+\newacronym{sgx}{SGX}{Software Guard Extension}
+\newacronym{cvm}{CVM}{Confidential VM}
+\newacronym{npf}{NPF}{Nested Page Fault}
+\newacronym{pf}{PF}{Page Fault}
+\newacronym{gpf}{gPF}{Guest Page Fault}
+\newacronym{npt}{NPT}{Nested Page Table}
+\newacronym{seves}{SEV-ES}{SEV-Encrypted State}
+\newacronym{asid}{ASID}{Address Space Identifier}
+\newacronym{sevsnp}{SEV-SNP}{SEV-Secure Nested Paging}
+\newacronym{vmcb}{VMCB}{\gls{vm} Control Block}
+\newacronym{oram}{ORAM}{Oblivious RAM}
+
+% OBLIVM
+\newacronym{vmsa}{VMSA}{\gls{vm} Save Area}
+\newacronym{rmp}{RMP}{Reverse Mapping Table}
+\newacronym{gva}{gVA}{Guest Virtual Address}
+\newacronym{gpa}{gPA}{Guest Physical Address}
+\newacronym{hpa}{hPA}{Host Physical Address}
+\newacronym{sme}{SME}{Secure Memory Encryption}
+\newacronym{sp}{SP}{Secure Processor}
+\newacronym{vek}{VEK}{VM Encryption Key}
+\newacronym{gpt}{GPT}{Guest Page Table}
+\newacronym{slat}{SLAT}{Second-level Address Translation}
+\newacronym{vas}{VAS}{Virtual Address Space}
+\newacronym{vma}{VMA}{virtual Memory Area}
+
+
+\newcommand{\sepim}[0]{\textsc{SE-PIM}\xspace}
+\newcommand{\capacity}[0]{\textsc{Capacity}\xspace}
+\newcommand{\oblivm}[0]{\textsc{ObliVM}\xspace}
+
+\makeatletter
+\DeclareRobustCommand\onedot{\futurelet\@let@token\@onedot}
+\def\@onedot{\ifx\@let@token.\else.\null\fi\xspace}
+
+\def\eg{\emph{e.g}\onedot} \def\Eg{\emph{E.g}\onedot}
+\def\ie{\emph{i.e}\onedot} \def\Ie{\emph{I.e}\onedot}
+\def\cf{\emph{c.f}\onedot} \def\Cf{\emph{C.f}\onedot}
+\def\etc{\emph{etc}\onedot} \def\vs{\emph{vs}\onedot}
+\def\wrt{w.r.t\onedot} \def\dof{d.o.f\onedot}
+\def\etal{\emph{et al}\onedot}
+\makeatother

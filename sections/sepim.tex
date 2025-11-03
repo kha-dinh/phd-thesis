@@ -1,0 +1,75 @@
+\chapter{Retrofitting in-memory processing for confidential computing}
+% \pagenumbering{arabic}
+% \begin{center}
+
+\emph{* The content of this chapter were published in IEEE Transactions on Cloud Computing, vol. 11, no. 3, pp. 2473-2490, 1 July-Sept. 2023, doi: 10.1109/TCC.2022.3207145.}
+% \end{center}
+% \begin{minipage}{.8\textwidth}
+% \end{minipage}
+% \vspace{1em}
+\\
+
+\label{chap:sepim}
+
+\newcommand{\thename}{TITLE HERE}
+\renewcommand{\thename}{\sepim}
+\newcommand{\baseline}{\textsc{Baseline}\xspace}
+\newcommand{\hdr}{\subsubsection}
+Demand for data-intensive workloads and confidential computing are the prominent research directions shaping the future of cloud computing. Computer architectures are evolving to accommodate the computing of large data. Meanwhile, a plethora of works have explored protecting the confidentiality of the in-cloud computation in the context of hardware-based secure enclaves. However, the approach has faced challenges in achieving efficient large-data computation. In this paper, we present a novel design, called \thename, that retrofits Processing-In-Memory (PIM) as a data-intensive confidential computing accelerator. PIM-accelerated computation renders large data computation highly efficient by minimizing data movement. Based on our observation that moving computation closer to memory can achieve efficiency of computation and confidentiality of the processed information simultaneously, we study the advantages of confidential computing \emph{inside} memory. We construct our findings into a software-hardware co-design called \thename. Our design illustrates the advantages of PIM-based confidential computing acceleration. We study the challenges in adapting PIM in confidential computing and propose a set of imperative changes, as well as a programming model that can utilize them. Our evaluation shows \thename can provide a side-channel resistant secure computation offloading and run data-intensive applications with negligible performance overhead compared to the baseline PIM model.
+
+\section{Introduction}\label{sec:introduction}
+
+Today's cloud computing is facing two urgent challenges: improving efficiency in data-centric computation and providing confidentiality of sensitive data computation. Data-intensive workloads such as large data analytics and training of neural networks have become the most common use cases of the cloud. Recent advancements and future research directions in processor architectures, accelerators, and memory technology are also centered around this trend. Ensuring the confidentiality of the computation in the cloud is another agenda shaping the future of cloud computing. Many cloud service providers are already providing confidential computing services that adapt security extensions to modern processor architectures~\cite{google-confidential-computing,azure,nitro}.
+
+
+% Secure applications and SGX and memory limitation
+Many previous works have proposed methods for securing data computation in the cloud based on commonly available processor-supported \emph{secure enclaves}~\cite{vc3,occulemency,oblivious-ml}. Secure enclaves such as Intel SGX~\cite{sgx} allow the construction of a robust security model in which the data and its computation are protected from possibly malicious cloud service providers and co-tenants. The code and data inside an enclave are only visible when a thread is in enclave mode and protected from any other software, including the OS kernel. Also, enclave-protected contents are encrypted upon leaving the CPU package to memory. Applications can be modified or developed to protect sensitive code and data by placing them inside enclaves. For instance, VC3~\cite{vc3} retrofits the MapReduce framework to protect processed data, and Occlumency~\cite{occulemency} proposes SGX-protected deep learning inference. Secure enclaves in the cloud also have limited memory (e.g., $128$ MB in the case of SGXv1)~\cite{sgx-explained}. This is a critical impediment for adapting SGX to data-intensive applications; existing works resorted to splitting workloads into batches due to the limited memory accepting the performance degradation and additional complexity in programming.~\cite{occulemency,bigmatrix}.
+
+% Side channels and ORAM
+
+
+Additionally, recent works have revealed that upholding a robust security model of secure enclaves amid surrounding threats proved to be much more complicated than initially considered. Studies showed that \emph{side-channel attacks} are sufficient to compromise the confidentiality of the computation encapsulated by secure enclaves~\cite{sgx-cache-attack,sgx-grand-exposure,membuster}. Especially, researchers have shown that even when the memory content of a secure enclave is automatically encrypted by hardware, the \emph{data access pattern} on the bus could still leak sensitive information about the enclave execution~\cite{membuster}. To this end, many works proposed defenses that hide the data access pattern of secure enclaves. Oblivious RAM (ORAM)-based approaches for SGX have been explored by many works~\cite{obfuscuro,zerotrace,raccoon}. Those approaches transform the protected program such that its memory access pattern appears random across different executions. However, applying ORAM to a program makes its memory access time and throughout several magnitudes slower than native~\cite{obfuscuro,zerotrace}. In response, hardware-based approaches are proposed that provide ORAM-like security, but without the prohibitive performance overhead~\cite{invisimem,obfusmem,trustore}. Those approaches establish a secure channel between a host-side memory controller (software or hardware) and external memory with computing capabilities (e.g., 3D-stacked memory or an FPGA device). For instance, Trustore~\cite{trustore} propose using an enclave-protected software memory controller and a trusted FPGA device that serves as secure memory. The approach attains significant performance improvements over ORAM-based approaches, showing its practicality. However, those approaches leave the side-channels incurred from the enclave execution (e.g., control-flow side-channels) out of scope and only protect the access pattern of the memory controller. The design of \thename is based on the following observation: first, moving sensitive computation from the secure enclaves into memory hides the memory access pattern. Second, it also narrows the attack surface of confidential computations against CPU-based side-channels.
+% \st{Researchers have shown that secure enclaves can be vulnerable to microarchitectural side-channel attacks~\cite{sgx-grand-exposure,sgx-cache-attack}, or controlled side-channel attacks~\cite{sgx-page-table,sgx-step,plundervolt} launched by system software that enclaves depend on for accessing system resources (e.g., Intel SGX model)}. 
+% \fix{out of scope?}
+
+% Data-centric
+% FIXME better citation on PIM and NDP
+Another struggle in the cloud is to overcome the data movement bottleneck, which is often referred to as the \emph{memory wall problem}. The size of the processed data sets is ever-increasing, and computer architectures and the cloud are evolving to become more efficient in computing over large data sets. Today's computer architectures spend more than half of their cycles moving the data. The near-data processing approach seeks to solve the problem by enabling computation inside storage devices to minimize data movement~\cite{ndp-framework,near-data-uncore, computing-with-near-data}. \emph{Processor-In-Memory (PIM)} is one of the most prominent directions in the trend~\cite{enabling-practical-pim,lazypim,ndp-framework,in-memory-parallel}. In fact, many semiconductor makers have disclosed their plans for processor-embedding memory devices ~\cite{samsung-pim,amd-hbm}. The idea is to bring the computation inside memory such that the computation enjoys very low-latency access to data residing in memory and, at the same time, minimize unnecessary data movement through the system bus. The approach is actively being explored by the industry~\cite{samsung-pim,upmem} and in academia~\cite{tesseract,pei,smcsim,enabling-practical-pim,lazypim}. PIM-accelerated computation of large data has shown its potential through many works~\cite{nda,prime, chameleon, mr-ndc, tesseract,pei, graphpim}. Notably, a few works~\cite{invisimem,obfusmem,hega,sdimm,near-data-security} have explored the use of PIM for security. For instance, \cite{invisimem,obfusmem} proposed PIM-assisted address side-channel mitigation on the system bus. 
+
+
+
+% Problems 
+This work presents a novel CPU-Memory cooperation model for confidential computing, based on our observation that PIM can simultaneously achieve confidentiality and efficiency in large data computation in the cloud. Moving data to computation (i.e., the main processor) creates a constraint on the memory channel and may create side channels along the way. We argue that bringing computation to memory instead of the opposite significantly reduces the attack surface against confidential computing. However, security requirements and applications of PIM are still underexplored. We explain our study on the security model and programming model for enclave functionality in PIM and generalize them into a software-hardware co-design called \emph{\textbf{S}ecure Computation \textbf{E}xentesion for \textbf{PIM}} (\thename). Then, we show the merits of secure acceleration provided by PIM in two aspects. First, \thename can function as a side-channel resistant trusted memory extension for secure enclaves to overcome the memory limitation. Second, \thename can turn a memory module into secure in-memory accelerators to facilitate fast large data computation that is infeasible in the current processor enclave design (i.e., Intel SGX). 
+%Our system can hide the memory access pattern of sensitive workloads by computing them in memory, eliminating address side-channels of data movement in the memory bus and main processor caches. Moreover, we proposed modifications to hide the data access pattern of PIM and the host enclave from observers.
+We summarize the contributions of this work as the following:
+
+% Standalone vs enclaves 
+% Need rewrite
+\begin{itemize}
+\setlength\itemsep{1pt}
+\item[-] This is the first work that explores the potential of PIM as a secure computation accelerator and discusses its inherent advantages.
+%robust to side-channels.
+
+\item[-] We present a novel design for confidential computing using PIM by studying the design space and performing a thorough security requirements analysis. 
+
+\item[-] We outlined the challenges in terms of security and performance when using PIM as an accelerator for confidential computation. 
+\item[-] We propose a set of non-intrusive yet imperative modifications to the PIM architecture for ensuring the confidentiality and integrity of data and computation inside the memory. 
+
+%\new{\item We devised a secure memory access method that hides the memory access pattern of the host into the }
+
+\item[-] We evaluate our design through a confidential computation of data-intensive workloads on our architecture to show that our proposal for PIM-based confidential computing achieves both efficiency and security.
+
+\end{itemize}
+
+\input{sections/sepim/background}
+\input{sections/sepim/objectives}
+\input{sections/sepim/design}
+\input{sections/sepim/prog-model}
+\input{sections/sepim/implementation}
+\input{sections/sepim/evaluation}
+\input{sections/sepim/discussion}
+
+\section{Conclusion}
+We presented \thename, an architecture that enables confidential computing inside memory by retrofitting the processor-in-memory architecture. Through a careful security analysis of the new architecture, we proposed a set of non-intrusive yet imperative changes that guarantees the data's confidentiality and integrity computed inside PIM. We evaluated our design and a proof-of-concept application for our design using a cycle-accurate full-system simulation. Our evaluation shows that the encrypted data transfer in our design only incurs a $17.85\%$ overhead in the maximum throughput inside memory compared to the unmodified PIM architecture that does not support encryption. We also evaluated a confidential k-mean program that runs on our architecture to accelerate data-intensive operations. We observed only $0.05$\% increase in total execution time on the most significant data size compared to offloading to the unprotected PIM architecture. 
+
+

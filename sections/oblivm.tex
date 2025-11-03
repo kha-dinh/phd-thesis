@@ -1,0 +1,21 @@
+\chapter{Toward Portable Confidential VM Self-protection with Operating System Supports (Work-in-progress)}
+\renewcommand{\thename}{\oblivm}
+% \pagenumbering{arabic}
+\label{chap:oblivm}
+
+Confidential Computing technologies such as AMD SEV and Intel TDX enable entire virtual machines to be executed within a confidentiality- and integrity-protected environment. However, a malicious hypervisor can still perform \emph{side-channel} attacks on the protected VM to extract information or hijack the control flow.
+
+Previously, side-channel protection mechanisms were discussed in the context of Intel SGX enclaves. Previous works leverage compiler instrumentations to transform program memory access patterns or insert inline checks to detect attack attempts.
+Unfortunately, such approaches lack (1) portability due to maintaining complex compiler toolchains and (2) flexibility in implementing diverse defense mechanisms.
+
+On the other hand, with the adoption of unikernels, many privileged primitives, such as the page table and the fault handler, become efficient for the applications to access.
+We observe that side-channel defenses could be implemented on top of these primitives, alleviating the need for a separate compiler toolchain.
+
+This paper is a design exploration of operating system-supported confidential VM side-channel defense.
+First, we designed a paging scheme that implements ORAM to obfuscate the \emph{physical memory access pattern} of a VM. Next, we introduced a page fault-based instruction emulation primitive. Leveraging this primitive, we created a salting-on-access scheme and an in-register sensitive data protection scheme to defend against the recently discovered ciphertext side-channel and the cache-based data-only attack.
+
+We are implementing our prototype on top of the Unikraft unikernel. The plan is to study the performance impact of such schemes on real-world applications and also to explore different optimizations to improve the performance.
+
+
+\input{sections/oblivm/background}
+\input{sections/oblivm/design}

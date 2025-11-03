@@ -1,0 +1,48 @@
+\section{Security Analysis and Discussion}
+\label{sec:sec-analysis}
+\label{sec:discussion}
+
+
+
+\begin{table}[t]
+    \scriptsize
+	\renewcommand{\arraystretch}{0.8}
+	\renewcommand{\theadgape}{\Gape[.2pt]}
+	
+    \centering
+  	\renewcommand\theadfont{\bfseries}
+    \begin{tabular}{p{5.8cm}p{7.5cm}}
+        \toprule
+        \thead{Attack Vector} & \thead{Mitigation}\\
+        % \midrule
+        % CPU-side side-channels & Offload the computation to \thename\\ 
+        \midrule
+        \makecell[l]{Capturing and tampering of host-\thename \\communication, unauthorized \thename\\ commands, side-channels and replaying\\ of messages}& Secure channel protected by authenticated encryption~(\cref{subsec:attestation})\\ 
+        \midrule
+        Address side-channel on bus from host-side memory accesses(\challenge{2}) & Controlled memory access channel~(\cref{subsec:secure-access})\\ 
+        \midrule
+        \makecell[l]{Memory content change side-channel (\challenge{3}), \\  encrypted data modification (\challenge{4})} & \makecell[l]{DRAM lockdown unit~(\cref{subsec:access-control})}\\ 
+       \midrule
+        Cold boot attacks & Maintaining encrypted bank memory and only keep decrypted data in the protected local memory (\cref{subsec:aes-dma}) \\ 
+    
+        \bottomrule
+    \end{tabular}
+    \caption{Attack Vectors on \thename's confidential computation and mitigations.}
+    \label{tab:sec-analysis}
+\end{table}
+
+% \subsection{Security analysis}
+In this section, we provide a security analysis of our proposed solution. Apart from the imperative features for confidential computation, we also propose solutions for each of the challenges identified in \cref{subsec:challenges}. \autoref{tab:sec-analysis} summarizes the attack vectors and our proposed mitigation in \thename. We also discuss the potential side-channel within a \thename-enabled memory module. 
+
+%\hdr{Secure communication channel.} 
+
+
+\subsection{Address side-channel on bus} An attacker with physical access that snoops on the memory bus will only see the commands sent to \thename from the host enclave and the encrypted parameters. This is further confirmed in our memory access pattern evaluation shown in~\cref{subsect:memory-access-pattern}. With the introduction of remote attestation capabilities and secure channel establishment (\cref{subsec:attestation}), \thename can build a secure communication channel between the host enclave and the assisting \thename unit. Standard techniques are employed to secure the channels against tampering and side-channel. An increasing counter is used to prevent the replaying of messages. We also use fix-sized messages to thwart side channels from different message sizes. \thename also prevents unauthorized commands by using authenticated encryption. Our programming model moves the sensitive operations into memory, eliminating the memory access pattern shown on the bus.  With our controlled access channel (described in~\cref{subsec:secure-access}), memory accesses from the host enclave are also resistant against the address side-channels.
+
+\subsection{Unauthorized memory accesses and cold boot attacks} Our DRAM lockdown unit (\cref{subsec:access-control}) deny accesses to \thename-protected data during PIM computation. This brings two advantages. First, unauthorized system software (e.g., the kernel) or malicious DMA devices cannot capture memory snapshots and extract the memory content changes. Second, adversaries cannot modify the memory content to perform splicing and replaying attacks.
+On the other hand, our design choice was to keep the data residing in the memory bank encrypted, even with the new capability to drop access to the memory bank. An adversary with physical access to the memory module may launch a cold boot attack to dump the memory contents in the memory bank but can only obtain encrypted values. This guarantees the confidentiality of data protected by \thename.
+
+
+\subsection{Potential side-channels inside memory module}
+In our current design, a \thename-enabled memory module can support multiple users by allowing the remote user to establish trust with each \thename unit independently (e.g., through PIM attestation). Only one host enclave can establish a secure channel and use a \thename unit in a single session.
+Moreover, there is no communication or shared resources among the memory banks inside \thename-enabled memory modules. A PIM core can only access its local memory and bank memory (i.e., it cannot access other bank memory). Hence, no hardware connections can be exploited to create side channels between PIM cores. Such strict separation prevents security risks from malicious co-tenants who have access to one or more \thename banks. Being the first to explore confidential computing inside PIMs, our design focuses on maintaining the confidentiality of the computation. We expect that secure communication between PIM banks can enable more flexible forms of computation inside PIM~\cite{tesseract}. 

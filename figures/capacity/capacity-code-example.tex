@@ -1,0 +1,41 @@
+\centering
+\begin{minipage}[b][11cm][b]{.95\textwidth}
+\begin{minted}[escapeinside=||]{c}
+  capac_init(...);
+  ...
+  // |{\tt \key{DB} $=$ \key{Dom_{crypt}}, Dom$_{curr}$ $=$ Dom$_{crypt}$, $\texttt{Mod}_{curr}$ $=$ ctx->id }|
+  capac_enter(DOM_CRYPTO, ctx->id);
+  load_secret(|\hlblue{ctx}|, |\hlblue{\textquotesingle{}\textquotesingle{}secret.key\textquotesingle{}\textquotesingle{}}|);
+  encrypt(|\hlblue{ctx}|, |\hlgray{req}|);
+  capac_exit();
+  ...
+void load_secret(|{\textcolor{blue}{\underline{\tt{}DOM\_PRIV}}}| crypto_ctx_t* |\hlblue{ctx}|,
+                     const char * |\hlblue{key\_path}|){
+  // Import the secret key from the filesystem
+  int |\hlblue{fd}|  |\hfill\action{FD-Sign}|
+      = open(|\hlblue{key\_path}|, O_RDONLY); |\hfill\action{PATH-Auth}|
+  |\hlblue{ctx->secret\_key}| = capac_malloc(KEY_LEN + 1); |\hfill\action{PTR-Sign}|
+  read(|\hlblue{fd}|, |\hlblue{ctx->secret\_key}|, KEY_LEN); |\hfill\action{FD-Auth}/\action{PTR-Auth}|
+  ...
+}
+|\textcolor{blue}{\underline{\tt{}DOM\_PRIV\_FUNC}}|  // Isolate function stack frame
+void encrypt(|\textcolor{blue}{\underline{\tt{}DOM\_PRIV}}| crypto_ctx_t* |\hlblue{ctx}|, req_t* |\hlgray{req}|) {
+  // Use the secret key to encrypt a plaintext string
+  for (int i = 0; i < KEY_LEN; i++)
+      |\hlgray{req->ciphertext}|[i] |\hfill\actionambient{PTR-Auth}|
+          = |\hlblue{ctx->secret\_key}|[i]|\hfill\action{PTR-Auth}||\label{line:ptr-auth}|
+            ^ |\hlgray{req->plaintext}|[i];  |\hfill\actionambient{PTR-Auth}|
+}
+\end{minted}
+% \vspace{-5em}
+\end{minipage}
+\begin{minipage}{.95\textwidth}
+\begin{flushleft}
+{\noindent\hlblue{\ \ \ \ \ \ \ \ } : Domain-private references
+\hspace{0.5em} \hlgray{\ \ \ \ \ \ \ \ } : Ambient references
+\\
+\action{Action} : \thename actions
+\hspace{0.5em} \textcolor{blue}{\underline{\tt{}ANNOT}}: \thename annotations
+}
+\end{flushleft}
+\end{minipage}

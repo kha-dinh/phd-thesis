@@ -1,0 +1,138 @@
+\newcommand{\abs}[1]{\lvert #1 \rvert}
+\newcommand{\argmax}{\arg\!\max}
+\newcommand{\argmin}{\arg\!\min}
+%\newcommand{\arc}[2]{\langle #1, #2 \rangle}
+\newcommand{\sch}[1]{\mathrm{TS}(#1)}
+\newcommand{\rcv}[1]{\mathrm{rcv}(#1)}
+\newcommand{\txtime}[2]{\langle #1, #2 \rangle}
+\newcommand{\tr}[2]{\mathrm{tr}(#1, #2)} %transmitting time slot of node #1 to its childrent in level #2
+\newcommand{\lmax}{l_\mathrm{max}}
+\newcommand{\dcf}{d_\mathrm{CF}}
+\newcommand{\dct}{d_\mathrm{CT}}
+%\newcommand{\dmax}{d}
+\newcommand{\lmin}{l_\mathrm{min}}
+\newcommand{\nbr}[1]{\mathrm{N}(#1)}
+\newcommand{\nbrt}[2]{\mathrm{N}(#1, #2)}
+\newcommand{\nbrh}[1]{\mathit{N_2}(#1)}
+\newcommand{\activeslot}[1]{\mathit{a}(#1)}
+\newcommand{\ltoa}[1]{\mathrm{ltoa}(#1)} %active slot of node in a level
+\newcommand{\dtoa}[1]{(#1-1)\mod{T}}
+\newcommand{\child}[1]{\mathrm{C}(#1)}
+\newcommand{\childlv}[2]{\mathrm{C}(#1, #2)}
+\newcommand{\childlvp}[2]{\mathrm{C^1}(#1, #2)}
+\newcommand{\childlvs}[2]{\mathrm{C^2}(#1, #2)}
+\newcommand{\receiver}[2]{\mathrm{R}(#1, #2)}
+\newcommand{\lv}[1]{\mathrm{lv}(#1)}
+\newcommand{\interfere}[2]{\mathrm{IN}(#1, #2)}
+\newcommand{\p}[1]{\mathrm{parent}(#1)}
+\newcommand{\parent}[1]{\mathrm{P}(#1)} %parent set of a set of nodes
+\newcommand{\cost}[1]{\mathrm{cost}(#1)}
+\newcommand{\ceil}[1]{\lceil #1 \rceil}
+\newcommand{\floor}[1]{\lfloor #1 \rfloor}
+\newcommand\tab[1][1.2cm]{\hspace*{#1}}
+
+\newcommand{\la}[1]{\mathrm{la}(#1)}
+\newcommand{\num}[1]{\mathrm{num}(#1)}
+
+\newcommand{\mfont}[2]{\mathbb{#1}(#2)}
+
+\newcommand{\overbar}[1]{\mkern 1.5mu\overline{\mkern-1.5mu#1\mkern-1.5mu}\mkern 1.5mu}
+
+\newcommand{\etal}{\textit{et al.}~}
+
+
+
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{lemma}{Lemma}[chapter]
+%\newproof{pf}{Proof}
+
+\renewcommand{\arraystretch}{1.27}
+\newtheorem{remark}{\bf Remark}
+\makeatletter
+\raggedbottom
+\newcommand\restartchapters{\par
+	\setcounter{chapter}{0}%
+	\setcounter{section}{0}%
+	\gdef\@chapapp{\chaptername}%
+	\gdef\thechapter{\@arabic\c@chapter}}
+\makeatother
+
+\def\Integer{\mathsf{Z\hspace{-0.4em}Z}}
+\def\Natural{\mathrm{I\!N}}
+\def\Real{\mathrm{I\!R}}
+\def\Index{\mathrm{I\!I}}
+
+\newtheorem{corollary}{\bf Corollary}
+\newtheorem{definition}{\bf Definition}
+\newtheorem{notation}{\bf Notation}
+\newtheorem{property}{\bf Property}
+\newtheorem{proposition}{\bf Proposition}
+\newtheorem{example}{\bf Example}
+\newtheorem{case}{\bf Case}
+\newtheorem{conjecture}{\bf Conjecture}
+\newtheorem{comment}{\bf Comment}
+\newtheorem{fact}{\bf Fact}
+\newcommand{\reals}{\mathbb{R}}
+\newcommand{\posintegers}{\mathbb{Z}^+}
+\newcommand{\integers}{\mathbb{Z}}
+\newcommand{\negintegers}{\mathbb{Z}^-}
+\newcommand{\rationals}{\mathbb{Q}}
+\newcommand{\complex}{\mathbb{C}}
+\newcommand{\Fig}{\mbox{Fig.} }
+\newcommand{\Figs}{\mbox{Figs.} }
+\newcommand{\eqdef}{\stackrel{\bigtriangleup}{=}}
+\newcommand{\twolines}[2]{\genfrac{}{}{0pt}{}{#1}{#2}}
+\newcommand{\eqtag}[1]{\mathop{=}^{#1}}
+\newcommand{\nmax}[1]{\operatorname*{max{#1}}}
+\newcommand{\nmin}[1]{\operatorname*{min{#1}}}
+\newcommand{\maxt}{\nmax{2}}
+\newcommand{\mint}{\nmin{2}}
+\newcommand{\bfi}{{\bf i}}
+\newcommand{\diag}{{\mathrm{diag}}}
+\newcommand{\vect}{{\mathrm{vec}}}
+\newcommand{\rank}{{\mathrm{rank}}}
+\newcommand{\worst}{{\mathrm{worst}}}
+\newcommand{\st}{{\mathrm{subject\ to}}}
+\newcommand{\thmend}{\hspace*{\fill}~\QEDopen\par\endtrivlist\unskip}
+\newcommand{\myproof}[1]{\noindent\hspace{2em}{\itshape #1}}
+\newcommand{\ee}{{\sf E}}
+\newcommand{\nsum}{\hspace{-0.0mm}\sum\hspace{-0.0mm}}
+\newcommand{\lbn}{\par\medskip\noindent}
+\newcommand{\lb}{\par\medskip}
+\newcommand{\Int}{\int\limits}
+\newcommand{\ra}{\rangle}
+\newcommand{\MeijerG}[7]{G \begin{smallmatrix} #1 , #2 \\ #3 , #4 \end{smallmatrix} \left(  #7\middle\vert \begin{smallmatrix} #5 \\ #6 \end{smallmatrix}  \right) }
+%\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+%\renewcommand{\algorithmicensure}{\textbf{Output:}}
+\newcommand{\ds}{\displaystyle}
+\newcommand{\centerdia}[1]{\makebox[2in]{\includegraphics{#1}}}
+
+\newcommand{\icol}[1]{% inline column vector
+	\left[\begin{smallmatrix}#1\end{smallmatrix}\right]%
+}
+
+\newcommand{\irow}[1]{% inline column vector
+	\left[\begin{smallmatrix}#1\end{smallmatrix}\right]%
+}
+
+\newcommand\mycommfont[1]{\footnotesize\ttfamily\textcolor{blue}{#1}}
+\SetCommentSty{mycommfont}
+
+\captionsetup[subfloat]{captionskip=0pt}
+\captionsetup[table]{skip=-5pt}
+
+\setlength{\textfloatsep}{2pt} 
+
+\makeatletter
+%\g@addto@macro\normalsize{%
+\setlength\abovedisplayskip{0.2pt}
+\setlength\belowdisplayskip{0.2pt}
+\setlength\abovedisplayshortskip{0.2pt}
+\setlength\belowdisplayshortskip{0.2pt}
+\setlength{\textfloatsep}{0pt} 
+%}
+\makeatother
+
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+%\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+%\renewcommand{\algorithmicensure}{\textbf{Output:}}
