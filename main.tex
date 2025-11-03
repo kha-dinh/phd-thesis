@@ -1,4 +1,8 @@
+\let\TeXyear\year
 \documentclass[a4paper,11pt]{SKKU-PhD-Thesis}
+\let\setyear\year
+\let\year\TeXyear
+
 \usepackage{IEEEtrantools}
 \usepackage{pdfpages}
 \usepackage[a4paper]{geometry}
@@ -15,11 +19,11 @@
 
 % Highlight and stuffs
 \usepackage{soul}
-% \makeatletter 
-% \setbox\z@\hbox{\ttfamily\global\let\SOUL@tt\ttfamily}
-% \setbox\z@\hbox{\SOUL@tt-}
-% \SOUL@ttwidth\wd\z@
-% \makeatother
+\makeatletter 
+\setbox\z@\hbox{\ttfamily\global\let\SOUL@tt\ttfamily}
+\setbox\z@\hbox{\SOUL@tt-}
+\SOUL@ttwidth\wd\z@
+\makeatother
 
 % \usepackage[
 % style=ieee
@@ -122,8 +126,8 @@
 \author{Kha Dinh Duy}
 \department{Computer Science and Engineering}
 \title{Retrofitting Modern Operating System Security with Hardware Supports}
-\year{2023}
-\month{October}
+\setyear{2025}
+\month{November}
 \advisor{Hojoon Lee}
 \committeechair{Hyungjoon Koo}
 \firstmember{Hyungshick Kim}
@@ -242,13 +246,13 @@ I am in the process of designing and evaluating a novel design for OS-supported 
 
 \newpage
 \phantomsection \label{chap:Appendix}
-\addcontentsline{toc}{chapter}{Appendix}
-\include{ldt-MBL-0-appendix}
+% \addcontentsline{toc}{chapter}{Appendix}
+% \include{ldt-MBL-0-appendix}
 
 \newpage
 \phantomsection \label{chap:KrAbstract}
-\addcontentsline{toc}{chapter}{초록}%Korean Abstract
-\include{ldt-MBL-0-abstract-ko}
+% \addcontentsline{toc}{chapter}{초록}%Korean Abstract
+% \include{ldt-MBL-0-abstract-ko}
 \newpage
 
 \makesidecover
