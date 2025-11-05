@@ -1,0 +1,37 @@
+N,tmp_idx,val,idx
+Numeric Sort,0,26718,-0.3
+Numeric Sort,0,25592,-0.1
+Numeric Sort,0,6671,0.1
+Numeric Sort,0,625,0.3
+String Sort,1,25377,0.7
+String Sort,1,24430,0.9
+String Sort,1,6445,1.1
+String Sort,1,599,1.3
+Bitfield,2,25164,1.7
+Bitfield,2,24118,1.9
+Bitfield,2,6348,2.1
+Bitfield,2,593,2.3
+FP emulation,3,25098,2.7
+FP emulation,3,24080,2.9
+FP emulation,3,6311,3.1
+FP emulation,3,587,3.3
+Fourier,4,25007,3.7
+Fourier,4,24008,3.9
+Fourier,4,6329,4.1
+Fourier,4,585,4.3
+IDEA,5,25022,4.7
+IDEA,5,24018,4.9
+IDEA,5,6275,5.1
+IDEA,5,595,5.3
+Huffman,6,25059,5.7
+Huffman,6,24040,5.9
+Huffman,6,6275,6.1
+Huffman,6,593,6.3
+Neural Net,7,25038,6.7
+Neural Net,7,24056,6.9
+Neural Net,7,6021,7.1
+Neural Net,7,587,7.3
+LU Decomposition,8,25466,7.7
+LU Decomposition,8,24466,7.9
+LU Decomposition,8,5958,8.1
+LU Decomposition,8,597,8.3

@@ -1,0 +1,135 @@
+\section{Introduction}
+\label{sec:intro}
+Ensuring the confidentiality of computation in untrusted environments such as the cloud remains a daunting challenge even with the mature hardware-assisted \emph{TEE (Trusted Execution Environment)} architectures~\cite{sgx,kaplanamd,tdx}.
+% \hjcomm{Side-channel threat summary}{...}
+A plethora of attacks have demonstrated their effectiveness in undermining the confidentiality of the userspace enclaves (e.g., Intel SGX)~\cite{sgx-cache-attack,cache-attack-sgx,sgxstep,bulck2018nemesis,xu2015controlledchannel,hahnel2017highresolution,cachezoom,sgxspectre,foreshadow}.
+
+% While the execution state of the TEEs remain encrypted outside the protected domain, a plethora of side-channel attacks have aptly extracted sensitive information from TEE domains.
+% In this new \gls{cvm} model, untrusted software components are prohibited from accessing the \gls{cvm} memory and register contents through memory encryption, MMU-based isolation, bus access control, protected CPU state switches, or the combination of these mechanisms~\cite{kaplanamd,tdx,cca}.
+% , opening up new research challenges and also opportunities for design space explorations~\cite{adil2024veil,schwarz2024seven,narayanan2024vtpm,cocotpm,anna2023trustworthy,li2023bifrost}.
+
+\hdr{Shift towards CVMs}
+Meanwhile, a shift from process-based enclaves~\cite{costan2016intel,costan2016sanctum,keystone} such as Intel SGX towards \glspl{cvm} is anticipated with the current and upcoming hardware extensions.
+Intel's \gls{tdx}~\cite{tdx}, AMD's \gls{sev}~\cite{amd64,kaplanamd}, and ARM's \gls{cca}~\cite{cca} all adopt the virtual machine construct as TEE boundary.
+This means the OS kernel now resides within the trust boundary, unlike the previous userspace enclave design of Intel SGX~\cite{sgx}. 
+
+
+\hdr{Persisting side-channel threats in CVMs}
+Unfortunately, side-channel attacks continue to pose a significant threat to confidential computation even in the era of \glspl{cvm}.
+Controlled channel attacks that leverage \glspl{npf} on the \glspl{cvm} that can be observed in the untrusted hypervisor~\cite{xu2015controlledchannel} to monitor page-granular memory access patterns have been an
+essential component of exploits on AMD-SEV~\cite{li2022systematic,werner2019severest,morbitzer2018severed,li2021cipherleaks,heckler,wesee}.
+% The controlled channel enables a coarse-grained yet efficient way to profile \gls{cvm} memory accesses and has been an 
+Recent research also showed that certain architectural and microarchitectural side-channels are feasible on \glspl{cvm}.
+For instance, last-level cache attacks were shown to be feasible in AMD SEV(-SNP)~\cite{sevstep}, despite the per-ASID cache line isolation in place for virtual machines~\cite{li2021crossline}.
+Also, Ciphertext side-channel attacks~\cite{li2021cipherleaks,li2022systematic} were discovered, which exploit the weak AES-XEX encryption mode used for \gls{cvm} memory encryption that uses the \gls{hpa} as a tweak.
+% As a result, the same plaintext value placed on the same memory address will always yield the same ciphertext, potentially conceding sensitive information.
+
+
+\hdr{Obfuscated execution engines}
+Many previous works have proposed obfuscated execution engines for SGX to render the enclave execution more resilient against side-channel attacks through compiler transformations~\cite{ahmad2019obfuscuro,obelix,shinde2016preventing,zhang2020klotski}.
+Among them, Klotski~\cite{zhang2020klotski} sought practicality through periodic mini-page-granular (2KB) memory layout rerandomization.
+The approach focuses on mitigating the profiling stage of the side-channel secret extraction attack in which the sensitive code and data locations are pinpointed.
+Klotski seeks to be cost-effective, given that the fine-grained data extraction attacks can only proceed when the profiling stage is successful.
+
+
+\hdr{Termination on exit frequency threshold}
+Detecting potential side-channel attack attempts through \emph{exit detection} has been another pragmatic approach in mitigating side-channel attacks against SGX enclaves~\cite{oleksenko2018varys,shih2017tsgx,dejavu,fu2017sgxlapd}.
+Observing that most known practical side-channel attacks require frequent \gls{aex} to acquire necessary temporal resolution on the channel, Varys~\cite{oleksenko2018varys} sets a threshold for \gls{aex} rate and terminates the enclave if the observed exit rate exceeds the threshold.
+
+
+% Varys employs a compiler-based instrumentation to insert checkpoints that measure the \gls{aex} rate to enforce its threshold policy.
+
+% As we will discuss, benign workloads can have \hjcomm{vmexit first mentioned when?} VMExit rate spikes that even surpass the average rate during ongoing attacks.
+
+
+% Furthermore, Varys introduces a set of optimizations to further to the enclave's execution environments, such as asynchronous system call handling~\cite{arnautov2016scone} and limiting timer interrupts to minimize the amount of intentional/unintentional \gls{aex}.
+
+\hdr{Limitations of existing defenses}
+We point out that the policies mentioned above for pragmatic defense against side channels have limitations.
+The fixed-rate periodic rerandomization of previous work~\cite{zhang2020klotski} is inefficient, as the costly rerandomization is performed constantly regardless of ongoing attacks, especially when the exit frequency is a plausible measure for detecting ongoing attacks.
+Moreover, according to our empirical analysis, the termination policy on high exit frequency is \emph{not robust}, at least when applied to SEV-SNP CVMs.
+As such, such policies may experience false positives in benign workloads while carrying the risk of missing low exit rate attacks.
+As we will show through our paper, a design space exists for adaptive and robust obfuscation that can reliably protect trusted execution workloads.
+
+
+
+
+ % As we will show in this work, an ability to sense the adversary's temporal resolution allows an adaptive rate that minimizes overhead during benign execution with lowered rates.
+
+% However, performance overhead is not sufficiently limited, and the enclave program must be instrumented with \emph{software MMU} to be under Klotski's protection.
+% We point out the inefficiency of its \emph{fixed-rate} periodic rerandomization scheme.
+% As we will show in this work, an ability to sense the adversary's temporal resolution allows an adaptive rate that minimizes overhead during benign execution with lowered rates.
+% \limcomm{1)Can be shortened. 2) Maybe a more confident tone?}{
+% However, the policy is \emph{not robust}, at least when applied to the SEV-SNP CVM, as we show in this paper.
+% It may experience false positives in benign workloads while carrying the risk of missing low exit rate attacks.
+
+
+
+
+\hdr{Towards obfuscation of CVMs} Besides the efficiency (fixed-rate) and robustness (fixed threshold) limitations regarding the policies of obfuscation for SGX, the accumulated research faces a shift towards CVMs~\cite{adil2024veil,schwarz2024seven,narayanan2024vtpm,anna2023trustworthy,li2023bifrost}.
+To our knowledge, no previous works have discussed full-system obfuscation for a virtual machine.
+The shift implicates an incomparably larger execution unit to be obfuscated that includes an OS kernel.
+At the same time, CVMs open up a new design space for obfuscation engines with the highest degree of control (i.e., Ring 0) over the hardware.
+
+\hdr{Our proposal}
+This paper introduces \textbf{\thename}, a novel unikernel design that safeguards unmodified programs with the efficient rate-adaptive obfuscation scheme for SEV-SNP \glspl{cvm}.
+% \thename proposes a unikernel-based obfuscated execution design to achieve efficient and portable full-system obfuscated execution for \gls{cvm} workload deployment.
+% Binary-compatible
+Moreover, as an operating system, \thename is binary-compatible; it can run unmodified workloads compiled for the Unikraft unikernel.
+% Small memory footprint and full system
+The minimal memory footprint and complexity of unikernels render full-system obfuscation feasible, including the memory regions of the kernel itself.
+
+% Take advantage of unikernel to retrofit subsystems
+\thename efficiently retrofits the OS kernel subsystems for constant system rerandomization by exploiting the unique characteristics of unikernel, such as the user-kernel homogeneity and direct hardware access~\cite{belay2012dune,unikraft}.
+To maintain the system's resilience against side-channel attacks, \thename's \emph{scheduling subsystem} constantly monitors the temporal resolution of the untrusted host on the system and instructs the \emph{paging subsystem} to rerandomize system memory reactively.
+
+
+% \thename's rate-adaptive scheme scales directly with the adversary's temporal resolution on the CVM.
+\thename also makes substantial advancements in system memory obfuscation strategy with its novel rate-adaptive rerandomization scheme.
+\thename implements software synchronous timer ticks to break the dependency on the untrustworthy hypervisor timer interrupts.
+At each synchronous tick, \thename scheduler measures the occurrence of VMExit and executed instructions, or \emph{VMExit per executed instructions}, which directly represents the adversary's temporal resolution.
+Based on the \emph{measured} VMExit frequency that can be used to alert potential side-channel attacks, \thename scheduler commands its paging subsystem to regulate its rerandomization rate.
+\thename's design must overcome the challenges in designing a robust VMExit frequency measurement system \emph{inside} the CVM.
+
+\thename's paging subsystem is designed to perform full-system rerandomization, including user/kernel pages and the page tables.
+While applying rerandomization of the currently active regions of CVM memory, \thename's paging coherently integrates an ORAM-managed page pool that hides traces of page-ins and page-outs.
+
+We also comprehensively evaluated \thename to show its security and performance feasibility.
+Security evaluations against real attacks highlight the robustness of \thename's adaptive obfuscation and its resilience against attacks.
+The microbenchmark and real-world application benchmarks with NGINX and Redis demonstrate the practicality of \thename in terms of performance and also its ability to support unmodified programs.
+
+
+
+\vspace{0.2em}
+
+Lastly, we summarize the contributions of this paper as follows:
+
+\vspace{0.2em}
+
+\begin{itemize}
+    \setlength\itemsep{0.3em}
+    \item[-] We propose a unikernel-based design for an efficient obfuscation execution engine that achieves transparent and full-system obfuscation.
+
+    \item[-] We propose a novel rate-adaptive obfuscation scheme to address the inefficiency of fixed-rate rerandomization and robustness issues of threshold-based termination schemes.
+    % and demonstrate its robust implementation by tackling non-trivial challenges with a unique design.
+	% \item We thoroughly assessed the proposed approach through 
+    \item[-] We performed evaluations using microbenchmarks and real-world workloads to show its effectiveness.
+    \item[-] We open source \thename and all implementations involved in its evaluation for future research and adoption\footnote{Available at \url{https://github.com/sslab-skku/incognitos}}.
+\end{itemize}
+
+
+
+% Klotski~\cite{zhang2020klotski} argues that a practical attack must involve a preliminary stage of the attack that leverages a coarse-grained (i.e., page fault-based controlled channel) for profiling a wide range of memory addresses.
+% This is because the fine-grained side-channel attack primitives, such as the cache-based ones, require frequent enclave exits (e.g., single-stepping) to boost \emph{temporal resolution} to be feasible.
+% With the target sensitive code pinpointed in the preliminary stage, the adversary can then proceed to extract information with .
+% Klotski then proposes a periodic memory rerandomization as an efficient and practical solution.
+% Klotski employs a minipage-granular (2K pages) periodic page rerandomization scheme implemented through software MMU constructed from instrumenting program memory loads and stores.
+
+% Among obfuscated execution engines, Klotski~\cite{zhang2020klotski} sought practicality through a realistic reassessment of the side-channel attack model on SGX.
+% Klotski~\cite{zhang2020klotski} argues that a practical attack attack must involve a preliminary stage of the attack that leverages a coarse-grained (i.e., page fault-based controlled channel) for profiling a wide range of memory addresses.
+% This is because the fine-grained side-channel attack primitives, such as the cache-based ones, require frequent enclave exits (e.g., single-stepping) to boost \emph{temporal resolution} to be feasible.
+% With the target sensitive code pinpointed in the preliminary stage, the adversary can then proceed to extract information with .
+% Klotski then proposes a periodic memory rerandomization as an efficient and practical solution.
+% Klotski employs a minipage-granular (2K pages) periodic page rerandomization scheme implemented through software MMU constructed from instrumenting program memory loads and stores.
+% Klotski applies a \emph{fixed-rate} periodic rerandomization throughout enclave execution.
+% As we will show in this work, an ability to sense of the adversary's temporal resolution allows an adaptive rate that minimizes overhead during benign execution with lowered rates.

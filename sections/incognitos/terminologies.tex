@@ -1,0 +1,163 @@
+% \newcommand*{\thename}{\textsc{IncognitOS}\xspace}
+% Oblivious Unikernel
+% Unikfraft Oblivious Page Oblivious SEV CVM
+% ObliviUN 
+% \newcommand*{\obfusmem}{\textsc{ObfusMem}\xspace}
+% \newcommand*{\obfusmemch}{\textsc{ObfusMem-CH}\xspace}
+% \newcommand*{\obfuscipher}{\textsc{ObfusCipher}\xspace}
+
+
+\newacronym{mpk}{MPK}{Memory Protection Key}
+\newacronym{idt}{IDT}{Interrupt Descriptor Table}
+\newacronym{ovas}{OVAS}{ORAM-backed Virtual Address Space}
+\newacronym{cfg}{CFG}{Control Flow Graph}
+\newacronym{oee}{OEE}{OEE}
+% \newacronym{ir}{IR}{Intermediate Representation}
+% \newacronym{mmu}{MMU}{Memory Management Unit}
+% \newacronym{mir}{MIR}{Machine IR}
+% \newacronym{tee}{TEE}{Trusted Execution Environment}
+% \newacronym{csp}{CSP}{Cloud Service Provider}
+% \newacronym{sev}{SEV}{Secure Encrypted Virtualization}
+% \newacronym{tdx}{TDX}{Trust Domain Extensions}
+% \newacronym{cca}{CCA}{Confidential Compute Architecture}
+% \newacronym{sgx}{SGX}{Software Guard Extension}
+% \newacronym{vm}{VM}{Virtual Machine}
+% \newacronym{ghcb}{GHCB}{Guest-Host Control Block}
+\newacronym{msr}{MSR}{Model-Specific Register}
+% \newacronym{cvm}{CVM}{Confidential VM}
+\newacronym[plural=PTEs,firstplural=Page Table Entries]{pte}{PTE}{Page Table Entry}
+% \newacronym{tlb}{TLB}{Translation-Lookaside Buffer}
+\newacronym{pfn}{PFN}{Page Frame Number}
+\newacronym{tsc}{TSC}{Time Stamp Counter}
+% \newacronym{npf}{NPF}{Nested Page Fault}
+\newacronym{npfongpt}{NPF-on-GPT}{Nested Page Fault on GPT}
+% \newacronym{gpt}{GPT}{Guest Page Table}
+% \newacronym{pf}{PF}{Page Fault}
+\newacronym{simd}{SIMD}{Single Instruction Multiple Data}
+\newacronym{isr}{ISR}{Interrupt Service Routine}
+% \newacronym{gpf}{gPF}{Guest Page Fault}
+% \newacronym{npt}{NPT}{Nested Page Table}
+% \newacronym{seves}{SEV-ES}{SEV-Encrypted State}
+% \newacronym{asid}{ASID}{Address Space Identifier}
+% \newacronym{sevsnp}{SEV-SNP}{SEV-Secure Nested Paging}
+% \newacronym{vmcb}{VMCB}{\gls{vm} Control Block}
+% \newacronym{oram}{ORAM}{Oblivious RAM}
+% \newacronym{vmsa}{VMSA}{\gls{vm} Save Area}
+% \newacronym{rmp}{RMP}{Reverse Mapping Table}
+% \newacronym{gva}{gVA}{Guest Virtual Address}
+% \newacronym{gpa}{gPA}{Guest Physical Address}
+% \newacronym{gpt}{gPT}{Guest Page Table}
+\newacronym{hpt}{hPT}{Host Page Table}
+% \newacronym{hpa}{hPA}{Host Physical Address}
+% \newacronym{tcb}{TCB}{Trusted Computing Base}
+% \newacronym{sme}{SME}{Secure Memory Encryption}
+% \newacronym{sp}{SP}{Secure Processor}
+% \newacronym{vek}{VEK}{VM Encryption Key}
+\newacronym{irq}{IRQ}{Interrupt Request}
+\newacronym{tsx}{TSX}{Transactional Synchronization Extensions}
+\newacronym{smp}{SMP}{Symmetric Multiprocessing}
+% \newacronym{slat}{SLAT}{Second-level Address Translation}
+\newacronym{ume}{UME}{Universal Memory Engine}
+\newacronym{pamt}{PAMT}{Physical-Address-Metadata Table}
+\newacronym{uos}{UOS}{Unobservable Storage}
+\newacronym{posmap}{PosMap}{Position Map}
+\newacronym{pud}{PUD}{Page Upper Directory}
+\newacronym{pmd}{PMD}{Page Middle Directory}
+\newacronym{pgd}{PGD}{Page Global Directory}
+\newacronym{ptept}{PTEPT}{PTE Page Table}
+\newacronym{sept}{SEPT}{Secure Extended Page Table}
+\newacronym{apic}{APIC}{Advanced Programmable Interrupt Controller}
+\newacronym{pit}{PIT}{Programmable Interval Timer}
+
+% \newacronym{vma}{VMA}{Virtual Memory Area}
+\newacronym{opfh}{o-PFH}{Oblivious Page Fault Handler}
+
+\newacronym{npfgpt}{NPF-on-GPT-Walk}{Nested Page Faults on Guest Page Tables}
+
+\newacronym{pao}{PAO}{Page Access Obliviousness}
+
+
+\newacronym{ovma}{\textit{O}-VMA}{Oblivious Virtual Memory Area}
+\newcommand*{\apage}{\textit{A}-Page\xspace}
+\newacronym{apage}{\apage}{Active Page}
+\newacronym{asa}{\textit{A}-Area}{Active subpage area}
+\newacronym{pagepool}{\textit{O}-Pool}{ORAM-backed subpage pool}
+\newacronym{pager}{\textit{O}-Pager}{Oblivious Pager}
+
+\newacronym{gpfn}{GPFN}{Guest Physical Frame Number}
+
+\newacronym{aex}{AEX}{Asynchronous Enclave Exit}
+\newcommand*{\oone}{\textbf{O1}}
+\newcommand*{\otwo}{\textbf{O2}}
+\newcommand*{\othree}{\textbf{O3}}
+\newcommand*{\veriint}{\textsc{VeriInt}}
+
+
+\newcommand*{\chalfullsys}{\textbf{C1}}
+\newcommand*{\chaltimer}{\textbf{C2}}
+\newcommand*{\chaloverhead}{\textbf{C3}}
+
+\newcommand*{\optimer}{\textbf{O1}}
+\newcommand*{\opmmu}{\textbf{O2}}
+
+\newcommand*{\objbin}{\textbf{OBJ1}}
+\newcommand*{\objss}{\textbf{OBJ2}}
+
+\newcommand*{\tickrateavg}{\text{$R_{avg}(Tick)$}}
+\newcommand*{\tickratetarget}{\text{$R_{target}(Tick)$}}
+
+
+\newcommand{\actrg}[1]{$\mathcal{AR}_{#1}$\xspace}
+% \newcommand{\actrg}[2]{\ensuremath{AR_{\text{#1}}^{\text{#2}}}\xspace}
+
+% \newcommand{\activeregion}{$\mathcal{A}$\xspace}
+% \newcommand{\activecode}{$\mathcal{A}_{code}$\xspace}
+% \newcommand{\activedata}{$\mathcal{A}_{data}$\xspace}
+% \newcommand{\activept}{$\mathcal{A}_{PT}$\xspace}
+
+\newcommand{\nbench}{\texttt{nbench}\xspace}
+
+\newcommand{\confbaseline}[0]{\textsc{Baseline}\xspace}
+\newcommand{\confopaging}[0]{\textsc{+O-Paging}\xspace}
+\newcommand{\confsched}[0]{\textsc{+Sched}\xspace}
+\newcommand{\confadaptive}[0]{\textsc{+Adaptive}\xspace}
+\newcommand{\confnonadaptive}[0]{\textsc{+NonAdaptive}\xspace}
+
+\newcommand{\lnormal}[0]{L1\xspace}
+\newcommand{\lnginx}[0]{L2\xspace}
+\newcommand{\lredis}[0]{L3\xspace}
+\newcommand{\llenpf}[0]{L4\xspace}
+\newcommand{\lnpf}[0]{L5\xspace}
+\newcommand{\lss}[0]{L6\xspace}
+
+
+\newcommand{\cntvmexitasync}[0]{\ensuremath{\text{VMExit}_{\text{Async}}}\xspace}
+
+
+% Frequency macros
+\newcommand{\freq}[2]{\ensuremath{f_{\text{#1}}^{\text{#2}}}\xspace}
+\newcommand{\freqvmexit}[0]{\ensuremath{f_{\text{VMExit}}}\xspace}
+\newcommand{\freqvmexitof}[1]{\ensuremath{f_{\text{VMExit}}^{\text{#1}}}\xspace}
+\newcommand{\freqrr}{\ensuremath{f_{\text{ReRand}}}\xspace}
+% \newcommand{\freqrrof}[1]{\ensuremath{f_{\textit{\hspace{-0.1em}\scalebox{0.8}{ReRand}}}^{\text{\raisebox{0.2ex}{\scalebox{0.8}{#1}}}}}\xspace}
+\newcommand{\freqrrof}[1]{\ensuremath{f_{\text{ReRand}}^{\text{#1}}}\xspace}
+\newcommand{\freqrrofof}[2]{\ensuremath{f_{\text{#1}}^{\text{#2}}}\xspace}
+
+\newcommand{\freqsmp}{\ensuremath{f_{\text{Sample}}}\xspace}
+\newcommand{\freqsmpof}[1]{\ensuremath{f_{\text{Sample}}^{\text{#1}}}\xspace}
+
+% Period macros
+\newcommand{\periodvmexit}{\ensuremath{T_{\text{VMExit}}}\xspace}
+\newcommand{\periodvmexitof}[1]{\ensuremath{T_{\text{VMExit}}^{\text{#1}}}\xspace}
+\newcommand{\periodrr}{\ensuremath{T_{\text{ReRand}}}\xspace}
+\newcommand{\periodrrof}[1]{\ensuremath{T_{\text{ReRand}}^{\text{#1}}}\xspace}
+
+\newcommand{\rerandfunc}[0]{\ensuremath{\mathbb{F}_{\text{Alarm}}}\xspace}
+
+\newcommand{\reqtransparent}{\textbf{R1}\xspace}
+\newcommand{\reqsovereign}{\textbf{R2}\xspace}
+\newcommand{\reqrobustpolicy}{\textbf{R3}\xspace}
+\newcommand{\reqfullsystem}{\textbf{R4}\xspace}
+\newcommand{\falarmthreshold}{\textcolor{red}{XXX.XX (Please set me)}}
+
+\newcommand{\AR}[2]{$\mathcal{AR}_{#1}^{\raisebox{-0.20ex}{\scriptsize $\mathnormal{#2}$}}$}

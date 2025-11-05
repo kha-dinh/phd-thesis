@@ -3,14 +3,18 @@
 \let\setyear\year
 \let\year\TeXyear
 
+
+
 \usepackage{IEEEtrantools}
 \usepackage{pdfpages}
 \usepackage[a4paper]{geometry}
-\usepackage{multirow}
 \usepackage{rotating}
 \usepackage[breaklinks = true]{hyperref} % to use \phantomsection
 
-
+% \usepackage{enumitem}
+\usepackage{multirow}
+\usepackage{makecell} % makecell, thead
+\usepackage{nicematrix}
 % \usepackage[english]{babel}
 \usepackage{booktabs}
 \usepackage{threeparttable}
@@ -44,9 +48,10 @@
 %\usepackage{epstopdf}
 
 % *** MATH PACKAGES ***
-\usepackage[cmex10]{amsmath}
-\usepackage{amsfonts}
+% \usepackage[cmex10]{amsmath}
+% \usepackage{amsfonts}
 \usepackage{amsthm,amssymb}
+\usepackage{afterpage}
 \usepackage{amsmath}
 \usepackage{circledsteps} % ***NOT ACM***
 \usepackage{float}
@@ -131,8 +136,8 @@
 \advisor{Hojoon Lee}
 \committeechair{Hyungjoon Koo}
 \firstmember{Hyungshick Kim}
-\secondmember{}
-\thirdmember{}
+\secondmember{Sungjae Hwang}
+\thirdmember{Sooyong Cha}
 
 \newpage
 %%---------------------------------
@@ -150,9 +155,9 @@
 %\includepdf[pages=1]{131226-ThesisAproval.pdf}
 
 %%---------------------------------
-%\phantomsection \label{chap:Acknowledgement}
-%\addcontentsline{toc}{chapter}{Acknowledgements}
-%\include{ldt-MBL-acknowledgement}
+\phantomsection \label{chap:Acknowledgement}
+\addcontentsline{toc}{chapter}{Acknowledgements}
+\include{sections/acknowledgement}
 
 \newpage
 
@@ -191,29 +196,36 @@
 %\include{ldt-MBL-Pre-0-abstract}
 \makeabstracttitle
 
-Traditional \emph{operating systems (OSes)} often only provide coarse-grained security mechanisms for rudimentary protection, such as process isolation and system calls white-listing. Unfortunately, these mechanisms are insufficient in the modern world. Security threats are getting increasingly advanced, while application security requirements are also increasing. For instance, modern confidential computing systems must consider the threat of side-channel leakages and sophisticated physical attacks. Moreover, traditional security mechanisms such as process-based isolation entail performance and usability trade-offs. 
+
+Traditional \emph{operating systems (OSes)} often only provide coarse-grained security mechanisms for rudimentary protection, such as process isolation and system calls white-listing.
+Unfortunately, these mechanisms are insufficient in the modern world.
+Security threats are getting increasingly advanced, while application security requirements are also increasing. For instance, modern confidential computing systems must consider the threat of side-channel leakages and sophisticated physical attacks. Moreover, traditional security mechanisms such as process-based isolation entail performance and usability trade-offs.
 
 At the same time, hardware vendors constantly roll out modern hardware security features with the hope of tackling those problems. For example, Intel released Protection Keys for Userspace (PKU) to enable efficient page-granularity in-process memory isolation. Trusted Execution Environment (TEE) technologies create an environment shielded against potentially compromised system software. This trend creates two research questions. First, how to adapt operating system designs to the security constraints of new hardware features such as TEEs. Second, how modern hardware features can be retrofitted to implement OS security mechanisms.
-
 
 % Thus, a key question that modern operating systems must answer is how to effectively take advantage of modern hardware features to (1) provide a safe execution environment for applications robust against advanced threats and (2) introduce low-overhead primitives for implementing robust applications.
 
 This dissertation provides steps toward answering those questions. I first took a look at the emerging hardware of \gls{pim} and the newly introduced features \gls{pa} and \gls{mte} on modern ARM processors and see how they can be retrofitted into \gls{os} security primitives. Based on our observation, I devised two systems, \textsc{SE-PIM} and \textsc{Capacity}.
 I next study the security issues of modern hardware-supported confidential \gls{vm}.
-I am in the process of designing and evaluating a novel design for OS-supported side-channel defense mechanisms that take advantage of direct privileged hardware access provided by the unikernel. 
+I am in the process of designing and evaluating a novel design for OS-supported side-channel defense mechanisms that take advantage of direct privileged hardware access provided by the unikernel.
 
 
 
 
 
- 
+
 \textbf{Keywords:} Security, Operating System
+
+\newcommand{\hdr}[1]{\paragraph{#1.}\xspace{}}
+
 
 \include{sections/introduction}
 \include{sections/background}
-\include{sections/sepim}
+% \include{sections/sepim}
 \include{sections/capacity}
-\include{sections/oblivm}
+\include{sections/incognitos}
+
+% \include{sections/oblivm}
 
 %%--------------------------------------
 % Chapters.....
@@ -239,9 +251,9 @@ I am in the process of designing and evaluating a novel design for OS-supported 
 % Dirty hack lol
 \renewcommand{\bibname}{\hfil \hfil References}
 {
-\small
-% \printbibliography
-\bibliography{all}
+	\small
+	% \printbibliography
+	\bibliography{all}
 }
 
 \newpage
@@ -250,7 +262,7 @@ I am in the process of designing and evaluating a novel design for OS-supported 
 % \include{ldt-MBL-0-appendix}
 
 \newpage
-\phantomsection \label{chap:KrAbstract}
+% \phantomsection \label{chap:KrAbstract}
 % \addcontentsline{toc}{chapter}{초록}%Korean Abstract
 % \include{ldt-MBL-0-abstract-ko}
 \newpage

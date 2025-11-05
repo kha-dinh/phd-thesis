@@ -1,0 +1,313 @@
+
+\section{Discussion}
+
+This section provides additional discussion of \thename's security and also outlines worthwhile future work.
+
+\subsection{Security discussion}
+\label{sec:sec-analysis}
+\label{sec:sec-ana}
+\label{subsec:security-discussion}
+We further analyze \thename's security in the following aspects.
+
+\hdr{Security of \thename operations}
+Aside from the obfuscated user program and kernel, \thename's operations that achieve the obfuscation must leak no useful information to the adversary.
+Specifically, here we assess the security of the \gls{pf} handler and ORAM page pool.
+
+\thename's ORAM page pool includes careful design considerations such that it remains secure even under a powerful adversary's ongoing monitoring.
+As we explained, the ORAM's sensitive components, the stash and the position map, are implemented to leak no information.
+\thename's secure stash implementation (\cref{subsubsec:page-out}) protects the ORAM stash that the adversary can potentially identify and monitor.
+Also, \thename's integration of ORAM position map into the \gls{gpt} ensures position map pages are continuously randomized through \gls{gpt} rerandomization, rendering side-channel attacks extremely difficult.
+
+In addition, the \gls{pf} handler itself does not yield any useful information.
+An adversary monitoring the PF handler's access patterns can only observe three types of information: (1) obfuscated ORAM accesses during page-ins, (2) the \gls{gpt} levels where page-ins occur during the software \gls{gpt} walk, and (3) the type of page being paged-in inferred from the destination active region.
+While (2) could reveal proximity between \gls{gva} accesses (e.g., consecutive faults at {\tt 0xa{\underline{a}}000} and {\tt 0xa{\underline{b}}000} could generate distinguishable page-in patterns), \thename's \gls{gpt} rerandomization scheme prevents its exploitation. Regarding (3), it is already accessible to the hypervisor through the NPF-controlled channel, as established in \cref{subsec:memory-layout}, and thus does not compromise the \thename's security model.
+
+
+
+
+
+% \hdr{Stealthy attacks}
+\hdr{Potential even lower VMExit-rate attacks}
+Another possible concern is the existence of attacks with even lower VMExit rates that may evade \thename's threshold.
+
+Stealthy attacks are primarily discussed in the context of secret extraction, assuming that the program memory layout is known or profiled~\cite{wang2017leaky,bulk2017telling}.
+\thename and works on continuous rerandomization~\cite{brasser2019drsgx,zhang2020klotski,ahmad2019obfuscuro} can thwart the adversary's attempt on memory layout profiling that must precede the extraction phase.
+The difficulty of such profiling, not to mention constructing a precise stealthy attack, can be approximated through recent works on practical \gls{cvm} attack studies~\cite{wesee,heckler}.
+Heckler~\cite{heckler} reported that the authors had to collect more than $100,000$ traces of page accesses with non-deterministic success rates for profiling the target memory pages.
+Furthermore, even when pessimistically assuming that the adversary somehow achieved profiling within a single rerandomization window, \thename is evaluated to be effective in thwarting the reasonably modeled low-NPF extraction attack (\cref{subsec:jpeg-attack}),
+
+Generalization of such stealthy attacks or predicting future occurrences is difficult.
+This is because they are inherently specific to the target information in a specific program.
+The stealthiness of the attack, defined by the number of access traces required for data inference and the noise generated from the relevant computation, cannot be defined deterministically;
+the worst case may be a single page's activation that leaks the secret.
+However, we believe that the current VMExit threshold can counter a large class of stealthy attacks based on previous work~\cite{wang2017leaky,bulk2017telling}.
+Many of the previous stealthy attacks targeted SGX, and the equivalent VMExit rate of similar attacks (if possible) on SEV-SNP is not known.
+However, these so-called stealthy attacks still require fairly high enclave exit periods (e.g., every 184--482 cycle~\cite{wang2017leaky}).
+% Assuming that their instantiations on \glspl{cvm} exhibit comparable VMExit rates, we anticipate these attacks to be covered by \thename's established threshold.
+To address future stealthy attacks, \thename's configurable policy can be adjusted to strike a balance between security and performance across various scenarios.
+
+% Still, we argue that such attacks are exceedingly difficult under \thename's protection due to the provided resilience against \emph{profiling} attacks (\cref{subsec:related-work:attacks}).
+% Still, previous work had to engage non-trivial exit periods, e.g., 184$\sim$482 cycles~\cite{wang2017leaky}.
+
+
+
+% \textcolor{blue}{
+% Nevertheless, \thename's approach of impairing the adversary's temporal resolution mitigates a wide range of side-channel attacks.
+% In particular, side-channel attacks that exploit fine-grained side channels such as cache~\cite{sevstep} and ciphertext~\cite{li2021cipherleaks,li2022systematic,rakin2022deepsteal} are almost exclusively secret extraction phase attacks.
+% }
+
+
+% \textcolor{blue}{
+% \hdr{Potential even lower VMExit-rate attacks}
+% Another concern is that a side-channel attacker limiting the VMExit rate (i.e., executing \emph{stealthy attacks}~\cite{bulk2017telling,wang2017leaky}) might circumvent \thename's rate-adaptive rerandomization scheme.
+% }
+
+% \textcolor{blue}{
+% First, stealthy attacks are primarily discussed in the context of \emph{secret extraction} (\cref{subsec:related-work:attacks}), assuming a known program memory layout.
+% \thename and works on continuous rerandomization~\cite{brasser2019drsgx,zhang2020klotski,ahmad2019obfuscuro} challenge this assumption. 
+% Thus, to pinpoint the target pages, an attacker must undergo a \emph{profiling} phase (\cref{subsec:profiling-attack} and \cref{subsec:related-work:attacks}), which inherently requires high VMExit rates and/or long collection time.
+% Recent practical \gls{cvm} attack studies~\cite{wesee,heckler} demonstrated the difficulty--Heckler~\cite{heckler} required more than $100,000$ profiling traces with non-deterministic success rates.
+% }
+
+
+% \textcolor{blue}{
+% Nevertheless, \thename's approach of impairing the adversary's temporal resolution mitigates a wide range of side-channel attacks.
+% In particular, side-channel attacks that exploit fine-grained side channels  cache~\cite{sevstep} and ciphertext~\cite{li2021cipherleaks,li2022systematic,rakin2022deepsteal} are almost exclusively secret extraction phase attacks.
+% Also, \thename is evaluated to be effective in thwarting the reasonably modeled low-NPF extraction attack (\cref{subsec:jpeg-attack}), even when pessimistically assuming that the adversary somehow achieved profiling within a single rerandomization window.
+% }
+% We expect that the configurable policy will allow striking a balance between security and performance in many scenarios.
+
+
+% Moreover, the evaluations clearly illustrated the performance and security trade-off in the rerandomization rates.
+
+% \hjcomm{WIP}{\thename's configurable policy and its performance and rerandomization rate trade-off}
+% For attacks that can succeed with even lower temporal resolutions, the parameters to \thename's policy can be tightened to improve security.
+
+\hdr{Active region size and SEV ciphertext security}
+\label{subsec:ar-size}
+Besides the tested attacks, \thename's rerandomization scheme renders exploitation of SEV's deterministic ciphertext issue~\cite{li2021cipherleaks} rather difficult.
+As explained in \cref{subsubsec:active-regions}, \thename consciously maintains large (32MB = 8,192 slots) active regions to obtain entropy.
+Even though \thename always chooses a random slot for new pages during page-ins or rerandomization, the entropy is limited.
+However, monitoring constantly rerandomized 8,192 pages for appearances of identical ciphertexts would be a daunting task.
+
+We also considered alternative designs, but concluded that our current scheme is sufficient and most practical.
+For instance, compiler and binary instrumentation for applying \emph{xor} encryption to each sensitive memory load and store has been proposed~\cite{cipherfix,obelix}, but show significant overheads and are unlikely to be viable for full-system protection.
+Another deterministically secure way would be never to reuse a physical page for all pages during rerandomization, but it would be too resource-intensive for the host system.
+
+
+\subsection{Future work}
+We regard the following extensions to be worthwhile future work that can further improve \thename.
+
+\hdr{Multi-core support}
+The current prototype only supports single-core computation, which is sufficient to support existing unikernel workloads.
+Supporting a full \gls{smp} kernel remains a challenge, as Unikraft's \gls{smp} implementation is still under active development~\cite{unikraft-smp}.
+A consideration for \thename that must accompany the incorporation of multi-core support is the multi-core \thename's VMExit sampling issue. Since the \gls{vmsa} is maintained per core, \thename's scheduler must aggregate VMExit occurrences from \emph{all} cores to accurately gauge the \gls{cvm}'s VMExit rate.
+
+
+
+\hdr{Improving unikernel's internal security}
+% The threat model of our work and works on CVMs[13,14,15] assumes that the in-CVM components are trustworthy.
+The single address space design and missing software attack mitigations are often discussed as the potential security weakness of unikernels~\cite{intra-unikernel}.
+While the issue is orthogonal to our threat model, we expect that \thename will also benefit from future security improvements to Unikraft.
+In fact, Unikraft’s community is actively improving its security with defenses such as page table isolation, shadow stack, and CFI~\cite{unikraft-security}.
+Besides, researchers also investigated lightweight isolation mechanisms like \glspl{mpk} in unikernels~\cite{lefeuvre2022flexos,intra-unikernel,sartakov2021cubicleos}.
+
+% Exploration of how \thename integrates with these security mechanisms would be an interesting avenue for future research.
+% These can be integrated into \thename as future work thanks to its userspace-transparent protection.
+
+
+\iffalse
+	\new{
+		\hdr{Adapting \thename to other architectures}
+		While \thename currently targets SEV-SNP \glspl{cvm}, it can also improve the side-channel attack resilience of other TEE architectures.
+		For instance, we expect SGX enclaves to benefit from our work, but we leave it as future work.
+		In the case of Intel TDX, we found that in its current specification, even without direct \gls{npt} access, the hypervisor could still perform \gls{npf} controlled-channel attacks through the \emph{page blocking} mechanism~\cite{tdx}.
+		However, Intel TDX introduces a minimum of 1,000 CVM cycles between each VMExit and adds random variance to the cycles, reducing the temporal resolution of side-channel attacks.
+		This suggests that our solution could be effective with a relaxed tick rate.
+		% \khacomm{added}{
+		% Still, we could not find evidence in available TDX specifications~\cite{tdx,intel-tdx-survey} and implementations~\cite{tdx-kernel} that the save area in the VMCS (TDX's equivalent of the VMSA) could be mapped into the CVM address space for VMExit sampling, so further investigation is required. 
+		% }
+	}
+
+\fi
+\iffalse
+	\textcolor{blue}{
+		\hdr{Applicability to commodity kernels}
+		\thename's core design choice of using unikernel renders not only efficient obfuscation possible but also makes manual efforts manageable.
+		For instance, the large codebase of commodity kernels such as Linux would make it challenging to identify pages for inevitable disclosures (\cref{subsec:memory-layout}) and kernel routines where atomicity should be maintained (\cref{subsec:tick-tramp-impl}).
+		We anticipate kernel-tailored automatic program analyses such as \cite{ksplit} will be useful in such scenarios.
+	}
+\fi
+% Given the kernel’s complexities, manual effort is inevitable regardless of the kernel. During the implementation of IncognitOS, we leveraged our internal expertise to identify the functions where atomicity should be preserved, e.g., kernel initialization and in-memory file system access routines. The rest of the kernel were instrumented automatically using the compiler. Static program analysis might also be considered to handle more complex kernels. However, similar difficulties apply to all techniques, including the compiler-based ones.
+
+
+% \hjcomm{need examples}{As an extreme case, XXXX attack is shown to extract YYYYY with only 3 \glspl{npf}.}
+% There has been a class of so-called \emph{stealthy} attacks on SGX enclaves~\cite{bulk2017telling} that avoid triggering page faults and only monitor \texttt{access}, \texttt{dirty} bits in the page table.
+% Theoretically, these attacks could also be adapted for \glspl{cvm}, while we expect their VMExit rates to remain much higher than those of the benign workloads~\cite{bulk2017telling}.
+
+\iffalse
+	\hdr{Generalizability}
+	While \thename currently targets SEV-SNP CVMs, it can also improve side-channel attack resilience to other TEE architectures.
+	For instance, we expect SGX enclaves to benefit from our work, but we leave it as future work.
+	In the case of Intel TDX, we found that in its current specification, even without direct \gls{npt} access, the hypervisor could still perform \gls{npf} controlled-channel attacks through the \emph{page blocking} mechanism~\cite{tdx}.
+	However, Intel TDX introduces a minimum of 1,000 CVM cycles between each VMExit and adds random variance to the cycles, reducing the temporal resolution of side-channel attacks.
+	This suggests that our solution could be effective with a relaxed tick rate.
+	\khacomm{added}{
+		Still, we could not find evidence in available TDX specifications~\cite{tdx,intel-tdx-survey} and implementations~\cite{tdx-kernel} that the save area in the VMCS (TDX's equivalent of the VMSA) could be mapped into the CVM address space for VMExit sampling, so further investigation is required.
+	}
+\fi
+% In addition, TDX provides a minimum of 1,000 CVM execution cycles between each hypervisor-induced VMExit, thereby reducing the temporal resolution of single-stepping attacks.
+% Also, it adds random variance to the minimum cycles each time to add noise to the side-channel attack launched on top of single-stepping.
+% Thus, \thename may offer the same level of security as its SEV implementation with a relaxed tick rate.
+
+
+
+
+% Another deterministically secure way would be never to reuse a physical page for all pages during rerandomization, but it would be too resource-intensive for the host system.
+% Therefore, if more entropy for page placement is required, increasing the size of the active regions is an effective option.
+
+% Still, the scheme shows non-negligible overhead for selected sensitive data protection and is unlikely to be viable for full-system obfuscation.
+
+% \key{We considered alternative designs but concluded that our current scheme is sufficient and most practical.}
+% While static binary instrumentation using xor encryption exists, it incurs significant overhead and isn't feasible for full-system obfuscation.
+% Another approach—never reusing physical pages during rerandomization—would be too resource-intensive for the host system.
+% If additional entropy is needed against SEV-SNP ciphertext weakness, increasing active region size is a more practical solution.
+
+
+% Another approach—never reusing physical pages during rerandomization—would be too resource-intensive for the host system. 
+% The method would be overly demanding to the host system, as a single CVM would require allocation and deallocation of pages that span a wide host memory address space.
+
+
+
+
+\iffalse
+	\subsection{Effectiveness of rate-adaptive rerandomization}
+
+	\newcommand{\attwindow}[0]{\text{$W_{attack}$}\xspace}
+	\subsubsection{Attack window impairment property}
+	\key{
+		We first define the concept of \emph{attack window} \attwindow, based on the observation that most attacks have a minimum length of samples that must be accumulated to be useful.
+	}
+	For example, to fully identify page locations containing the function of interest in the OpenSSH applications using the \gls{npf} controlled-channel attack on SEV-SNP, the Heckler attack~\cite{heckler} must collect at least $22,440$ memory access traces over \gls{cvm} 392 launches and only achieve an accuracy of $44.71$.
+	\key{
+		Note that tracking kernel and userspace page accesses makes the attack window for \gls{cvm} profiling significantly longer than the same attack on Intel SGX~\cite{xu2015controlledchannel}.
+	}
+	As another example, the \texttt{Prime+Probe} attack against L2 cache on AMD SEV~\cite{sevstep} requires tracing access to the AES T-table from 70 XTS decryption operations using single-stepping (\cref{sec:background:side-channels}), which requires at least $5,600$ cache access traces (70 $\times$ 80 accesses to the T-table per decryption).
+	This does not count for the profiling stage to identify the location of the AES T-table.
+
+	Assuming that collecting the access traces to meet the window requires the attacker to maintain the VMExit rate for the whole period of attack, we may define \attwindow in terms of instruction execution as follows:
+	\begin{equation*}
+		\attwindow = \periodvmexit \times S
+	\end{equation*}
+	% In this equation, $T$ is the \emph{temporal resolution} of the attack, which we define as the period between each attacker's sample (i.e., instructions/exit as shown in \cref{subsec:empirical-analysis}).
+	In this equation, \periodvmexit (described in \cref{subsec:empirical-analysis}) can also be seen as the \emph{temporal resolution} for the attack, and $S$ is the minimum sample to be collected for the attack to reach its goal, e.g., obtaining the AES encryption key.
+	With the \periodvmexit that we empirically measured in \autoref{tab:attack-exit-rates} (\lnpf for profiling and \lss for single-stepping), the attack windows for the previously mentioned attacks would amount to
+	$\ensuremath{W_{\text{Attack}}^{\text{CVMProfiling}} = 6.03\times22,440 = 135,313}$ and
+	$\ensuremath{W_{\text{Attack}}^{\text{KeyExtraction}} = 1.11\times 5,600 = 6,216}$, respectively.
+	Note that these are over-approximations, and the actual \attwindow may be longer, as some VMExits might yield no useful sample, e.g., single stepping over non-memory instructions.
+
+
+	\key{
+		\thename's dynamic \freqrr{} adjustment strategy impairs both factors of \attwindow, ensuring that it is very likely for the attack attempt to be disrupted by a rerandomization or lead to \gls{cvm} termination.
+	}
+	That is, higher \periodvmexit{} (or lower \freqvmexit{}) would promptly increase the measured \freqvmexit.
+	Higher $S$ would also increase the likeliness of encountering a rerandomization since an elevated VMExit rate must be maintained throughout the sample collection.
+	\thename choice a window size of $W=100$ quickly maximizes the perceived exit rate after $100$ ticks execution (about $4000$ instruction execution with \thename's achieved tick rate of $0.025$), which means that the mentioned attacks are all disrupted before they yield fruitful results.
+	More particularly, rerandomizations disrupt the sample collection process in two ways: (1) it makes the collected data unusable up to the rerandomization point, and (2) it introduces significant noise, even for an attacker in optimal conditions (refer to the empirical evaluations in \cref{subsec:profiling-attack}).
+
+	% The effect of rerandomization on the attack attempt is demonstrated through our security evaluations \cref{subsec:sec-eval}.
+	\subsubsection{Disruption of chain of attack}
+	Recall that practical attacks must be conducted in phases ($W_{Attack} = W_{Attack}^{Profiling} + W_{Attack}^{Extraction}$), as we discussed in \cref{sec:background:side-channels}.
+	As a single round of rerandomization shuffle, the entire \gls{cvm} \gls{gpa} memory layout, any profile, i.e., location of sensitive pages that the attacker may have gotten, is rendered obsolete.
+	Thus, the attack must repeat the entire attack chain from the beginning.
+	However, without making adjustments, this repeated attempt would face the same heightened levels of rerandomization.
+
+	\subsubsection{Active attacks against adaptive rerandomization}
+	The attacker may launch additional measures to overcome \thename's adaptive rerandomization scheme.
+	% However, 
+
+	First, they might reduce the attack window $W$ by reducing \periodvmexit or $S$.
+	Reducing $S$ is often infeasible.
+	\khacomm{What about repeating the in multiple runs, each extracts parts of the secret?}{}
+	For NPF attacks, they may increase \periodvmexit, i.e., expanding the attack window.
+	This must somehow overcome \freqrrof{Normal}.
+	Reducing \periodvmexit for fine-grained is very challenging because the fine-grained side-channel is noisy and requires high temporal resolution for precision.
+
+	Second, they may try to undermine the effect of rerandomization by tracking the location of sensitive pages after each round of randomization.
+	Brute-forcing is a feasible solution, but the chance of success is very low, with the success probability of $1/K^r$ where $K$ is the application's working set during the period and $r$ is the rounds of rerandomization scheduled during \attwindow.
+	The attacker may acquire more side-channel samples to aid in tracking randomized pages, e.g., through frequency analysis. However, this would increase $S$ and the likelihood of randomization.
+
+
+
+
+	% Collecting the access trace to meet \attwindow resolution requirement inevitably requires a heightened rate of VMExit (\autoref{tab:attack-exit-rates}), leading to an accelerated rate of memory rerandomization according to the rate-adaptive obfuscation.
+
+
+	\subsubsection{Discussion: stealthy attacks}
+	There has been a class of so-called \emph{stealthy} attacks on SGX enclaves that avoid triggering \glspl{pf} through the controlled channel attack and only monitor \texttt{access}, \texttt{dirty} bits in the page table.
+	These attacks theoretically could also be adapted for \glspl{cvm}.
+
+	However, their VMExit rates would remain high because even passive attacks require frequent enclave interruptions~\cite{bulk2017telling}.
+\fi
+\iffalse
+	\subsection{Active region size and SEV ciphertext security}
+	\label{subsec:ar-size}
+
+	As explained in \cref{subsubsec:active-regions}, \thename consciously maintains large (32MB = 8,192 slots) active regions to mitigate the deterministic ciphertext issue in SEV-SNP~\cite{li2021cipherleaks}.
+	While \thename always chooses a random slot for new pages during page-ins or rerandomization, the entropy may be limited.
+	\hjcomm{Discuss}{However, the pages begin with initially randomized slots during CVM boot and are also constantly rerandomized.
+		Moreover, monitoring 32MB of memory for appearances of identical ciphertexts would be a daunting task for the adversary.
+	}
+
+	\key{We considered alternative designs but concluded that our current scheme is sufficient and most practical.}
+	For instance, static binary instrumentation for applying \emph{xor} encryption to each sensitive memory load and store has been proposed~\cite{cipherfix}.
+	However, the approach already shows non-negligible overhead for selected sensitive data and is unlikely to be viable for full-system obfuscation.
+	Another deterministically secure way would be never to reuse a physical page for all pages during rerandomization.
+	The method would be overly demanding to the host system, as a single CVM would require allocation and deallocation of pages that span a wide host memory address space.
+	Therefore, if more entropy against the SEV-SNP ciphertext weakness is required, increasing the size of the active regions can be considered as an effective option.
+\fi
+
+% Alternative defenses against the ciphertext side-channels are not ideal.
+% The first is to introduce random masking of whole-page memory to ensure that every page written produces a different ciphertext.
+% However, this requires application modifications to unmask the memory content~\cite{cipherfix}, which would incur significant overheads and potentially break binary compatibility.
+% The second option is to enforce every active region slot to be used exactly once (i.e., infinite-size active region), which is unrealistic.
+% Nevertheless, the ciphertext side-channel issue is specific to SEV-SNP due to its lack of read protection to encrypted memory.
+
+
+
+% The size of the active region, i.e., the number of slots, affects the security and memory consumption trade-off.
+% Due to the weak memory encryption design in SEV-SNP, two distinct values placed on the identical \gls{gpa} yield different ciphertexts~\cite{li2021cipherleaks}.
+% , so increasing entropy through increased active region size reduces the chance of the plaintext-ciphertext correlation exposure on a page.
+
+% Our implementation currently uses 8,192 slots (32MB) of memory for each type of scratchpad, but even larger sizes of active regions might be used.
+
+\iffalse
+	\hdr{Hypervisor-observable actions}
+	There are certain operations that the hypervisor can observe and we cannot do anything about.
+	First, even when \gls{apage} boundary provides unobservability of the subpage memory accesses, the hypervisor can still extract (1) the type of access (read/write/execute) and (2) which privilege level did the \gls{npf} came from.
+	For (1), we deem that it is extremely hard to obtain useful information.
+	Moreover, it is also very hard to distinguish between \thename's paging activity and the application's memory accesses.
+	As for (2), thanks to the unikernel design that does not have privilege separation, all memory accesses of the unikernel application originates from the same privilege level.
+
+	Second of them is I/O operations.
+	Since the application performs I/O to intentionally interact with the outside, we left them out of \thename protection's scope.
+\fi
+
+\iffalse
+	This section showcases the security provided by \thename's adaptive obfuscation approach against the reproduction of real-world \gls{cvm} attacks.
+
+	\hdr{Practical attack phases}
+	Based on a close inspection of the attack methodology employed by accumulated side-channel attacks and exploits on \gls{cvm}~\cite{}, we identify two primary attack phases, \emph{profiling} and \emph{extraction}.
+	The profiling phase aims to identify sensitive code and data pages that, when accessed, either (1) indicate the execution of a vulnerable code section or (2) leak program secrets.
+	This phase typically leverages the high-bandwidth \gls{npf} controlled channel to collect the execution trace for the whole address space efficiently.
+	The extraction phase starts after the sensitive page locations are pinpointed to extract memory accesses dependent on the secret data.
+	Since the attack target is narrowed, attacks can leverage memory access extraction techniques with higher costs, such as cache and ciphertext side-channels (\cref{sec:background:side-channels}).
+
+
+	\key{
+		As we will soon show, \thename provides tangible security against each attack phase by detecting the presence of attack (abnormally high VMExit rate) and performing reactive randomization.
+	}
+	Its page-level adaptive obfuscation scheme disrupts the attack chain at the profiling phase by randomizing the \gls{gva}-to-\gls{gpa} layout at an elevated rate.
+	Even if an attacker bypasses the profiling stage, \thename's rate-adaptive randomization introduces significant noise to extraction attempts.
+	Also, each round of randomization forces attackers back to the profiling phase, as the previously gathered information about the \gls{gva}-to-\gls{gpa} now becomes obsolete.
+\fi

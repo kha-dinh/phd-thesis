@@ -2,7 +2,7 @@
 \section{Domain Switching and Authentication}
 \label{sec:design:impers}
 \keypoint{
-\thename's API design allows the introduction of flexible compartmentalization  boundaries to existing software through in-place annotations.
+	\thename's API design allows the introduction of flexible compartmentalization  boundaries to existing software through in-place annotations.
 }
 However, such a design must be robust against  \emph{domain impersonation} (\srimpers).
 % \keypoint{
@@ -50,7 +50,7 @@ In both cases, after successful authentication, \thename securely places its cri
 
 
 
-\textbf{Secure domain switching.}
+\hdr{Secure domain switching.}
 \label{sec:design:libcapac}
 \label{sec:design:switch-auth} % \hdr{Bootstraping}
 The program enters a domain through the API \texttt{capac\_enter} (\autoref{tab:apis}) that internally invokes an \texttt{ioctl} syscall to the reference monitor.
@@ -59,13 +59,13 @@ The reference monitor then switches the currently activating \key{DB} to that of
 	\thename protects the domain switches from impersonation by authenticating domain entry points with \key{G}.
 }
 Before a domain switching request, the call gate signs the domain ID argument in \texttt{capac\_enter(domID, mod)} with a \texttt{pacga} instruction, then passes the signed argument to \thename reference monitor.
-Since there is no dedicated authentication instruction that uses \key{G}, the reference monitor uses \texttt{pacga} to generate the valid argument with the domain ID and compare it with the argument from the call gate. Domain entry is granted if the two values match.  
+Since there is no dedicated authentication instruction that uses \key{G}, the reference monitor uses \texttt{pacga} to generate the valid argument with the domain ID and compare it with the argument from the call gate. Domain entry is granted if the two values match.
 After the entry is granted, the call gate loads the per-instance modifier into a reserved floating-point register (\texttt{ModReg}), which is to be used by our instrumentation for pointer authentication demonstrated in \cref{sec:instrumentation}.
 Finally, the call gate clears the token-containing register to prevent the leaking of the entry token.
-\texttt{capac\_enter} is implemented as the following call gate, which is to be inlined to the domain switching sites:
+The implementation of \texttt{capac\_enter} is shown in \autoref{capacity:entry}, which is to be inlined to the domain switching sites.
 
-% \begin{listing}[h]
-\begin{minted}{c}
+\begin{listing}[h]
+	\begin{minted}{c}
     PACGA(token, target_id, 0)
     if(!ioctl(capac_fd, CAPAC_ENTER, token, modifier)) 
         exit();
@@ -73,9 +73,9 @@ Finally, the call gate clears the token-containing register to prevent the leaki
     asm volatile("fmov ModReg, %[mod]" ::[mod] "r"(modifier) :);  
     // Clear entry token from register
 \end{minted}
-% \caption{\thename domain entry gate}
-    
-% \end{listing}
+	\caption{\thename domain entry gate}\label{capacity:entry}
+
+\end{listing}
 
 \keypoint{
 	\thename endows authenticity to the entry points by preventing attackers from diverting the control flow into arbitrary instructions with \gls{cfi} and ensuring that the instruction \texttt{pacga} is absent within the process but the domain entry sites.
@@ -99,7 +99,7 @@ Also, since ARM is a RISC architecture, we can generally rule out the issue of u
 % \end{figure}
 \textbf{Authenticated domain ID retrieval.}
 \thename enables a trustworthy runtime domain ID fetching procedure.
-This avoids hardcoding \gls{mte} tags into functions that require memory tagging since these functions might be used in confused deputy attacks to tag arbitrary memory regions. 
+This avoids hardcoding \gls{mte} tags into functions that require memory tagging since these functions might be used in confused deputy attacks to tag arbitrary memory regions.
 Moreover, fetching the domain ID at runtime allows a \thename-protected function to be called from multiple domains.
 The procedure is also imperative in runtime domain memory and pointer tagging in \thename's instrumentation, as we will explain in \cref{sec:design:instrumentation}.
 \thename's private heap memory allocator, \texttt{capac\_malloc()}, also uses the procedure to authenticate the callee's domain ID and tag the allocated memory.
@@ -180,7 +180,7 @@ The tag mask is stored in a reserved floating-point register (\texttt{TagReg}), 
 
 
 
- 
+
 
 % \chcomment{why we need cryptographic}
 

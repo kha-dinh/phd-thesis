@@ -1,8 +1,6 @@
 % !TeX root = ../main.tex
 
-\section{Overview}
-\label{sec:capability}
-\label{sec:overview}
+\section{Overview} \label{sec:capability} \label{sec:capacity:overview}
 
 \begin{figure*}[t]
 	\centering
@@ -10,20 +8,20 @@
 	% \includegraphics[width=0.9\textwidth]{images/capacity_overview_new.pdf}
 	% \vspace{-1em}
 	\caption{Overview of \thename's in-process domains and life-cycle objects protection. }
-	\label{fig:overview}
+	\label{fig:capacity:overview}
 \end{figure*}
 
-\autoref{fig:overview} illustrates an overview of \thename.
+\autoref{fig:capacity:overview} illustrates an overview of \thename.
 % \thename establishes intra-process isolation of file and memory objects through capability-based access control principles.
-\thename's design demonstrates a comprehensive capability model for file and memory objects access control that can be applied to commodity ARM systems that support \gls{pa} and \gls{mte}. 
+\thename's design demonstrates a comprehensive capability model for file and memory objects access control that can be applied to commodity ARM systems that support \gls{pa} and \gls{mte}.
 % The design coherently incorporates these hardware security features of the recent and upcoming ARM architecture, whose principles and directions exhibit the characteristics of capability. 
-\thename's primary objective is to guarantee each domain's exclusive access rights to the sensitive domain-private objects. 
-It associates each domain, called \emph{a \thename domain}, with a unique \gls{pa} cryptographic key and \emph{switches} the currently activated key using an in-kernel reference monitor before entering a domain. 
+\thename's primary objective is to guarantee each domain's exclusive access rights to the sensitive domain-private objects.
+It associates each domain, called \emph{a \thename domain}, with a unique \gls{pa} cryptographic key and \emph{switches} the currently activated key using an in-kernel reference monitor before entering a domain.
 % \thename then signs the object references with the per-domain keys and authenticates the domain on use, turning them into \emph{unforgable}, \emph{non-reusable} capability tokens.
 
-Consider the common pattern of sensitive object use shown in \autoref{fig:overview} (Domain B).
-First, a file-system \emph{path reference} (\texttt{"/etc/key.pem"}) is used as an argument to the \texttt{open()} \gls{syscall}. 
-A \emph{file descriptor} to the file object is then obtained. 
+Consider the common pattern of sensitive object use shown in \autoref{fig:capacity:overview} (Domain B).
+First, a file-system \emph{path reference} (\texttt{"/etc/key.pem"}) is used as an argument to the \texttt{open()} \gls{syscall}.
+A \emph{file descriptor} to the file object is then obtained.
 Finally, the object is loaded into a memory region (e.g., with the \texttt{read()} \gls{syscall}) so the program can interact with it through \emph{pointers} (\texttt{0x00004bfff}...).
 In \thename, the creation and usage of three types of resource references are \emph{completely mediated} with a coherent \pamte-based authentication, provided by (1) a lightweight in-kernel reference monitor that efficiently validates path and file descriptor (\fd) references in \gls{syscall} arguments, and (2) \pamte-assisted tagged memory allocation and pointer authentication instrumentation that isolate domain-private memory and their references.
 
@@ -33,7 +31,7 @@ This section provides a high-level overview of \thename's capability model and i
 \subsection{Threat model}
 \label{sec:design:threat-model}
 
-We assume that the domains are mutually distrusting. 
+We assume that the domains are mutually distrusting.
 The program's vulnerabilities can potentially grant adversaries with arbitrary memory manipulation and control-flow subversion primitives, compromising an \thename domain or the \emph{ambient} domain (the rest of the program code not inside \thename domains).
 Even so, a compromised domain must not access other domains' private objects.
 We assume that the processor and the kernel are trusted and that modern OS security measures, such as the W{$\oplus$}X policy and ASLR, are in place.
@@ -71,9 +69,9 @@ Upholding the security requirements, therefore, is a challenge that must be addr
 % \keypoint{
 % 	As shown in \autoref{fig:overview}, \thename's flavor of capability combines domain-based security and object capabilities.
 % }
-In \thename's capability model, the subjects are subgraphs of program execution that interact with sensitive objects called \emph{\thename domains}. 
+In \thename's capability model, the subjects are subgraphs of program execution that interact with sensitive objects called \emph{\thename domains}.
 Program code that does not belong to a domain is called the \emph{ambient} domain.
-\thename identifies and authenticates each domain with a unique \gls{pa} key, called the \emph{domain key}. 
+\thename identifies and authenticates each domain with a unique \gls{pa} key, called the \emph{domain key}.
 Each domain is also associated with an \gls{mte} tag for the tagging of the domain's private memory.
 We use \key{DB} among the kernel-managed \gls{pa} keys as the domain key.
 \key{DA} is the \emph{ambient key} used to sign and authenticate resources accessible by the entire program.
@@ -86,12 +84,12 @@ Domain switching is performed with the help of a lightweight in-kernel reference
 Upon entering a domain, the userspace program updates its current \gls{mte} tag and requests the reference monitor to switch the currently activating domain authentication key to that of the target domain.
 A \emph{per-instance} \gls{pa} modifier is also maintained in both kernel and userspace to identify \emph{instances} of a domain invocation.
 \texttt{capac\_exit()} restores the domain key, \gls{mte} tag and modifier to those of the ambient domain.
-We do not support the nesting of domains in the current prototype. 
+We do not support the nesting of domains in the current prototype.
 % Additionally, \thename can be introduced to flexible isolation boundaries due to its entry gate design, while schemes that employ modifier-based contexts, such as HAKC, require static program and resource partitioning.
 
 \begin{figure}[t]
-    \centering
-    \includegraphics[width=0.95\columnwidth]{figures/capacity/capacity-ref-new.pdf}
+	\centering
+	\includegraphics[width=0.95\columnwidth]{figures/capacity/capacity-ref-new.pdf}
 	\caption{\thename's reference encapsulation of pointers and file descriptors with cryptographic authentication code (AC).}
 	\label{fig:ref-encapsulation}
 \end{figure}
@@ -108,7 +106,7 @@ We introduce the \emph{ambient objects}, non-private and accessible from all dom
 All references to ambient objects are to be signed and authenticated with \key{DA}.
 The ambient memory objects are given a \tagnum{Dom} of $0$, which makes all untagged memory pointers ambient memory references, and only the deliberately tagged pointers become references to domain-private memory.
 To facilitate multi-domain interactions, \thename also supports the \emph{delegation} of references.
-When a reference delegation request is received, \thename first authenticates the reference to prevent delegation of non-owned resources (\srimper), then \emph{re-signed} it with the target's domain key and instance modifier. 
+When a reference delegation request is received, \thename first authenticates the reference to prevent delegation of non-owned resources (\srimper), then \emph{re-signed} it with the target's domain key and instance modifier.
 Especially for memory reference delegation, \thename compares the pointee memory's tag with the pointer's tag before recoloring both to the target domain's memory.
 
 \begin{listing}[t]
@@ -120,35 +118,34 @@ Especially for memory reference delegation, \thename compares the pointee memory
 \begin{table*}[t]
 	\small
 	\centering
-	\begin{tabularx}{.95\textwidth}{lXX}
+	\begin{tabularx}{.98\textwidth}{lXX}
 		\toprule
-		 & \thead{API \& Compiler Annotation}                                      & \thead{Description}                                                                                        \\
+		                                                                       & \thead{API \& Compiler Annotation}                              & \thead{Description}                                                                        \\
 		\midrule
-		\multirow{6}{*}[-0.5em]{\thead{\begin{sideways}API\end{sideways}}} & \texttt{capac\_init(configurations)}                            & Initializes \thename facilities, assigns \cpath to domains, enables syscall authentication       \\
-  \cline{2-3}
-		 & \texttt{capac\_enter(target\_id, mod)}/\texttt{capac\_exit()}  & Enters the target domain/Exits to the ambient domain                                                       \\
-		 
-  \cline{2-3}
-   & \texttt{capac\_limit\_fd(fd, cap\_mask)}                       & Limit the capabilities of an \fd                                                                           \\
-   
-  \cline{2-3}
-		 & \texttt{capac\_delegate\_fd(fd, target\_id, mod, cap\_mask)}   & Limits the capabilities and delegate an \fd to the target domain                                           \\
-   
-  \cline{2-3}
-		 & \texttt{capac\_malloc(size)}/\texttt{capac\_free(ptr)}         & Allocates/frees memory tagged with the currently active domain                                             \\
-   
-  \cline{2-3}
-		 & \texttt{capac\_delegate\_ptr(ptr\_loc, size, target\_dom, mod)} & Delegates an in-memory pointer to \texttt{target\_dom} and also re-colors the memory\\
+		\multirow{6}{*}[-0.5em]{\thead{\begin{sideways}API\end{sideways}}}     & \texttt{capac\_init(configurations)}                            & Initializes \thename facilities, assigns \cpath to domains, enables syscall authentication \\
+		\cline{2-3}
+		                                                                       & \texttt{capac\_enter(target\_id, mod)}/\texttt{capac\_exit()}   & Enters the target domain/Exits to the ambient domain                                       \\
+
+		\cline{2-3}
+		                                                                       & \texttt{capac\_limit\_fd(fd, cap\_mask)}                        & Limit the capabilities of an \fd                                                           \\
+
+		\cline{2-3}
+		                                                                       & \texttt{capac\_delegate\_fd(fd, target\_id, mod, cap\_mask)}    & Limits the capabilities and delegate an \fd to the target domain                           \\
+
+		\cline{2-3}
+		                                                                       & \texttt{capac\_malloc(size)}/\texttt{capac\_free(ptr)}          & Allocates/frees memory tagged with the currently active domain                             \\
+
+		\cline{2-3}
+		                                                                       & \texttt{capac\_delegate\_ptr(ptr\_loc, size, target\_dom, mod)} & Delegates an in-memory pointer to \texttt{target\_dom} and also re-colors the memory       \\
 		\midrule
-		\multirow{1}{*}[0em]{\thead{\begin{sideways}Annotation\end{sideways}}} & \texttt{DOM\_PRIV\_FUNC}                                       & Tags function’s stack frame with the currently executing domain’s tag (\tagnum{Dom})                       \\
-		
-  \cline{2-3}
-   & \texttt{DOM\_PRIV}                                             & Marks a \emph{source} domain-private pointer for taint analysis.\\
-		 % & \texttt{AMBIENT}                                               & Marks a \emph{source} ambient pointer. Taint analysis will untaint derived pointers.                       \\
+		\multirow{1}{*}[0em]{\thead{\begin{sideways}Annotation\end{sideways}}} & \texttt{DOM\_PRIV\_FUNC}                                        & Tags function’s stack frame with the currently executing domain’s tag (\tagnum{Dom})       \\
+
+		\cline{2-3}
+		                                                                       & \texttt{DOM\_PRIV}                                              & Marks a \emph{source} domain-private pointer for taint analysis.                           \\
+		% & \texttt{AMBIENT}                                               & Marks a \emph{source} ambient pointer. Taint analysis will untaint derived pointers.                       \\
 		\bottomrule
 	\end{tabularx}
-	\caption{\thename APIs and program annotations}
-	\label{tab:apis}
+	\caption{\thename APIs and program annotations}\label{tab:apis}
 \end{table*}
 
 
@@ -163,7 +160,7 @@ Especially for memory reference delegation, \thename compares the pointee memory
 
 
 \keypoint{
-    A programmer interacts with \thename through a set of well-defined APIs provided by the runtime library and program \emph{annotations} that direct the program instrumentation, shown in \autoref{tab:apis}.
+	A programmer interacts with \thename through a set of well-defined APIs provided by the runtime library and program \emph{annotations} that direct the program instrumentation, shown in \autoref{tab:apis}.
 }
 We demonstrate the programmer's perspective when retrofits intra-process capabilities into programs through a quintessential example of secret import and uses in \autoref{fig:code-example}.
 % In the example, the program loads a file that contains the secret key into memory and uses it to perform encryption.
@@ -173,18 +170,18 @@ We demonstrate the programmer's perspective when retrofits intra-process capabil
 The programmer first conceptually defines in-program domains (\eg, \texttt{DOM\_CRYPTO}) within the program with respect to the domain-private resources.
 The subprogram interval is enclosed by \texttt{capac\_enter()} and \texttt{capac\_exit()} (lines $4$ and  $7$), and each interval is paired with a domain key.
 % The domain entry additionally takes an instance-specific modifier as the second argument.
-In the example, \texttt{ctx->id} contains the unique ID for the encryption context, which is set as the currently activated \gls{pa} modifier for \texttt{DOM\_CRYPTO}. 
+In the example, \texttt{ctx->id} contains the unique ID for the encryption context, which is set as the currently activated \gls{pa} modifier for \texttt{DOM\_CRYPTO}.
 A domain can span a few function calls, as shown in the example.
 The domain entrance cannot be nested; however, \thename is designed to support the sharing of functions between domains.
 
 
 The programmer then identifies domain-private objects and their references.
 In the case of file(-like) objects, a list of domain-to-file mappings is provided as an argument to \texttt{capac\_init()} (line $1$) to notify the reference monitor of the domain ownership of file resources.
-Afterward, the reference monitor automatically authenticates any path and \fd references in the \gls{syscall} arguments (lines $11$, $12$, $14$) and issues \fds signed with their owner domain when \fds are created. 
+Afterward, the reference monitor automatically authenticates any path and \fd references in the \gls{syscall} arguments (lines $11$, $12$, $14$) and issues \fds signed with their owner domain when \fds are created.
 For memory objects, the programmer must mark the domain-private region containing the object and its domain-private pointer references.
 To allocate domain-private memory, the programmer either changes their allocation site to use \texttt{capac\_malloc} (line $13$), which allocates memory tagged with the domain's tag and returns a tagged pointer, or uses \texttt{DOM\_PRIV\_FUNC} (line $17$) to direct the instrumentation to isolate the function's stack frame.
 On \texttt{DOM\_PRIV\_FUNC}-annotated functions, the function is instrumented such that the stack frame is \emph{tagged} with the currently executing domain's tag number and reverted upon function return.
-Then, the programmer applies \texttt{DOM\_PRIV} (line $18$) to the \emph{source} domain-private pointer. 
+Then, the programmer applies \texttt{DOM\_PRIV} (line $18$) to the \emph{source} domain-private pointer.
 From then on, the pointer is \emph{taint-tracked} to mark all derived references to the object within the function.
 \thename then instruments \gls{pa}-based signing/authentication with the domain key of tracked pointers, including the member variables (\eg, \texttt{ctx->secret\_key}) (lines 13, 14, 21).
 

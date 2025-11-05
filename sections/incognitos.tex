@@ -1,0 +1,50 @@
+% !TeX root = ../main.tex
+\chapter{Taming modern threats against hardware TEEs using the OS}
+
+\emph{* The content of this chapter were published in Proceedings of the 2023 ACM SIGSAC Conference on Computer and Communications Security (CCS '23). Association for Computing Machinery, New York, NY, USA, 874-888.}
+\\
+
+\input{sections/incognitos/terminologies}
+
+\renewcommand{\thename}{\incognitos}
+
+\renewcommand{\key}[1]{#1}
+\section{Abstract}
+
+Recent works have repeatedly proven the practicality of side-channel attacks in undermining the confidentiality guarantees of Trusted Execution Environments such as Intel SGX.
+Meanwhile, the trusted execution in the cloud is witnessing a trend shift towards confidential virtual machines (CVMs).
+Unfortunately, several side-channel attacks have survived the shift and are feasible even for CVMs, along with the new attacks discovered on the CVM architectures.
+Previous works have explored defensive measures for securing userspace enclaves (i.e., Intel SGX) against side-channel attacks.
+However, the design space for a CVM-based obfuscation execution engine is largely unexplored.
+
+This paper proposes a unikernel design named \thename to provide full-system obfuscation for CVM-based cloud workloads.
+\thename fully embraces unikernel principles such as minimized TCB and direct hardware access to render full-system obfuscation feasible.
+\thename retrofits two key OS components, the scheduler and memory management, to implement a novel adaptive obfuscation scheme.
+\thename's scheduling is designed to be self-sovereign from the timer interrupts from the untrusted hypervisor with its synchronous tick delivery.
+This allows \thename to reliably monitor the frequency of the hypervisor's possession of execution control (i.e., VMExits) and adjust the frequency of memory rerandomization performed by the paging subsystem, which transparently performs memory rerandomization through direct MMU access.
+The resulting \thename design makes a case for a self-obfuscating unikernel as a secure CVM deployment strategy while further advancing the obfuscation technique compared to previous works.
+Evaluation results demonstrate \thename's resilience against CVM attacks and show that its adaptive obfuscation scheme enables practical performance for real-world programs.
+
+% \pagenumbering{arabic}
+\label{chap:incognitos}
+
+
+
+\input{sections/incognitos/intro}
+\input{sections/incognitos/background}
+\input{sections/incognitos/threat-model}
+\input{sections/incognitos/overview}
+\input{sections/incognitos/scheduling}
+\input{sections/incognitos/paging}
+\input{sections/incognitos/evaluation}
+\input{sections/incognitos/security-analysis}
+\input{sections/incognitos/related-work}
+
+
+
+\section{Conclusion}
+This paper introduced \thename, a unikernel design for full-system \gls{cvm} obfuscation that proposes a side-channel defense strategy adapted to the attacker's attack attempts.
+We explained the design of \thename that retrofits the kernel scheduling and paging subsystems.
+The scheduling subsystem enables robust VMExit rate measurement and adaptive policy enforcement.
+The paging subsystem enforces memory rerandomization through hardware MMU access and remains transparent to unmodified applications.
+We performed thorough evaluations of \thename security and performance, demonstrating its robustness, resilience against real-world attacks, and efficiency through adaptive rerandomization rate adjustment.

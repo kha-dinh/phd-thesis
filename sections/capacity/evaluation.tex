@@ -42,7 +42,7 @@ Also, this overhead is imposed only on the \thename-enabled processes.
 
 
 \hdr{\libcapac APIs latencies}
-The overhead of \texttt{capac\_malloc()} and \texttt{capac\_free()} originates from domain authentication and \gls{mte}-based memory tagging. 
+The overhead of \texttt{capac\_malloc()} and \texttt{capac\_free()} originates from domain authentication and \gls{mte}-based memory tagging.
 Measuring the latency of domain private memory allocation and free on blocks of $1$KB, \texttt{capac\_malloc()} and \texttt{capac\_free()} reported approximately $114.6\%$ and $154.4\%$ .
 \texttt{capac\_enter} and \texttt{capac\_exit}, \texttt{capac\_delegate\_ptr}, \texttt{capac\_delegate\_fd} and \texttt{capac\_limit\_fd} are simple \texttt{ioctl} calls to the in-kernel reference monitor, where only \texttt{capac\_limit\_fd} does not requires the key switching.
 Their latencies are on par with general syscalls.
@@ -86,8 +86,8 @@ On average, \thename's instrumentation incurs $11.37\%$ performance degradation 
 
 % \vspace{-1em}
 \subsection{Adapting \thename to real-world programs}
-We exemplify \thename's capability domains by adapting it to several open-source applications studied by previous isolation frameworks~\cite{erim,shreds,ptrsplit}. 
-These applications include OpenSSH's \texttt{ssh} utility~\cite{openssh}, \texttt{wget} file download utility~\cite{wget}, and NGINX webserver~\cite{nginx} compiled along the TLS library LibreSSL~\cite{libressl}. 
+We exemplify \thename's capability domains by adapting it to several open-source applications studied by previous isolation frameworks~\cite{erim,shreds,ptrsplit}.
+These applications include OpenSSH's \texttt{ssh} utility~\cite{openssh}, \texttt{wget} file download utility~\cite{wget}, and NGINX webserver~\cite{nginx} compiled along the TLS library LibreSSL~\cite{libressl}.
 Representative code examples of our modifications can be found in the appendix of the extended version of this paper~\cite{capacity-extended}.
 % Different from other compartmentalization frameworks~\cite{erim,jenny,shreds,ptrsplit,hakc}, on top of memory isolation, \thename also enables the coherent in-process isolation of system resources, such as file descriptors of private files and sockets.
 The applications are also compiled with the \thename-instrumented \emph{musl} libc~\cite{musl} adapted to handle signed pointers in system call arguments.
@@ -103,11 +103,11 @@ The applications are also compiled with the \thename-instrumented \emph{musl} li
 
 \hdr{OpenSSH's ssh (v9.3p1)}
 % The \texttt{ssh} utility uses a private key from the file system to establish a secure session with the remote host. 
-We demonstrate \thename's program secrets protection throughout their life-cycles with \texttt{ssh}.    
+We demonstrate \thename's program secrets protection throughout their life-cycles with \texttt{ssh}.
 We compile OpenSSH to use its built-in crypto library and use \thename to isolate the private key of \texttt{ssh}.
 We introduce a new domain, \textsc{Privkey}, with exclusive access to the private key file and its in-memory buffer.
 This domain spans from when the private key is loaded from the file system until after the login operation succeeds.
- % Unlike previous systems \cite{shreds,ptrsplit}, \thename also protects the path and file descriptor of the private key.
+% Unlike previous systems \cite{shreds,ptrsplit}, \thename also protects the path and file descriptor of the private key.
 % To achieve this, 
 We then assign the static private key to the domain, allocate the private key buffer (\texttt{struct sshkey}) in private memory, annotate its pointers with \texttt{DOM\_PRIV}, and finally wrap functions that access the private key within domain entry gates.
 These changes require about $50$ LoC changes over 13 functions across 5 files.
@@ -122,13 +122,13 @@ These changes require about $50$ LoC changes over 13 functions across 5 files.
 		\centering
 		% \vspace{-1em}
 		\subcaption{Single-threaded}
-		 \vspace{-1em}
+		\vspace{-1em}
 	\end{minipage}%
 	\begin{minipage}[t]{.49\linewidth}
 		\centering
 		% \vspace{-1em}
 		\subcaption{Multi-threaded (8 Threads)}
-		 \vspace{-1em}
+		\vspace{-1em}
 	\end{minipage}
 	\caption{\textsc{Baseline} webserver vs. \thename-enabled webserver throughput benchmark performed with local \texttt{ab} client.
 		% The \texttt{Baseline} is unmodified NGINX, whereas the \thename-enabled webserver runs with \thename reference monitor, \libcapac, and instrumented software components. 
@@ -140,11 +140,11 @@ These changes require about $50$ LoC changes over 13 functions across 5 files.
 \hdr{\texttt{wget}  (v1.21.2)}
 % We port \texttt{wget} 
 We use \thename to isolate the file received from the internet in \texttt{wget} to demonstrate least-privilege compartmentalization.
-We create a domain called \textsc{FileDownload} with exclusive access to the downloaded buffer and the output file path/\fd. 
-We then modify the initialization of \texttt{wget} to assign the output file access to \textsc{FileDownload}, and use \texttt{cap\_limit\_fd} to revoke all other attributes from the file's \fd except \texttt{CAP\_WRITE}. 
+We create a domain called \textsc{FileDownload} with exclusive access to the downloaded buffer and the output file path/\fd.
+We then modify the initialization of \texttt{wget} to assign the output file access to \textsc{FileDownload}, and use \texttt{cap\_limit\_fd} to revoke all other attributes from the file's \fd except \texttt{CAP\_WRITE}.
 This ensures that the domain has write-only access to the output \fd \footnote{While \texttt{wget} already make the file handle write-only, \thename enables more fine-grained in-process access control that supports read and write domains.}.
-The domain encapsulates the function \texttt{retrieve\_url}, which fetches the requested file from a URL into a \texttt{capac\_malloc}-allocated buffer before writing into the output file's \fd. 
-We also annotate pointers variables that point to the downloaded file in memory with \texttt{CAPAC\_VAR}. 
+The domain encapsulates the function \texttt{retrieve\_url}, which fetches the requested file from a URL into a \texttt{capac\_malloc}-allocated buffer before writing into the output file's \fd.
+We also annotate pointers variables that point to the downloaded file in memory with \texttt{CAPAC\_VAR}.
 The total modifications to \texttt{wget} is about $30$ LoC.
 
 
@@ -165,7 +165,7 @@ The total modifications to \texttt{wget} is about $30$ LoC.
 
 
 \hdr{NGINX (v1.23.0) + LibreSSL (v3.5.3)}
-We use the NGINX webserver and its crypto library, LibreSSL, to demonstrate the multi-domain interaction of \thename. 
+We use the NGINX webserver and its crypto library, LibreSSL, to demonstrate the multi-domain interaction of \thename.
 We create three domains in the webserver, namely \domhs, \domses, and \domconn to isolate the server private key, session keys, and connection sockets with the least privilege principle in mind.
 \autoref{tbl:porting-app} displays a summary of the webserver domains and their isolated resources.
 We modified $223$ LoC in LibreSSL and $114$ LoC in NGINX.
@@ -184,7 +184,7 @@ We modified $223$ LoC in LibreSSL and $114$ LoC in NGINX.
 
 
 % \deleted{
-	% In \thename's design, this means that all object references that can point to the private key in its life-cycle are signed and authenticated with \domhs's domain key instead of the ambient key.
+% In \thename's design, this means that all object references that can point to the private key in its life-cycle are signed and authenticated with \domhs's domain key instead of the ambient key.
 % }
 % Hence, the context must be inside \domhs to pass the authentication and interact with private key objects.
 % The private key protection is bootstrapped by \texttt{capac\_init()} that requests the kernel to bind the private key's file-system path to its owner domain during process initialization.
@@ -196,7 +196,7 @@ We modified $223$ LoC in LibreSSL and $114$ LoC in NGINX.
 % Additionally, the private key-containing structure (\texttt{struct EVP\_PKEY}) is placed in the domain-tagged memory with \texttt{capac\_malloc()}/, and its pointers are applied with \texttt{DOM\_PRIV}.
 % \texttt{DOM\_PRIV} is also applied to the \texttt{struct* EVP\_PKEY} arguments of functions that interact with the now-in-memory private key.
 \domses protects session keys by hosting $17$ functions,  mostly located inside LibreSSL's AES-GCM implementation.
-We generate a unique instance ID and use it as the modifier for each session since a session's resources are mostly temporary and can be isolated. 
+We generate a unique instance ID and use it as the modifier for each session since a session's resources are mostly temporary and can be isolated.
 % Since the session key is generated anew on each connection through SSL handshaking, a connection-generated modifier isolates the SSL key's pointer, ensuring can only decrypt messages for a specific connection.
 As \domhs execution finishes, it produces a TLS session key, which is to be \emph{delegated} to the corresponding \domses instance using the API \texttt{capac\_delegate\_ptr} (\autoref{tab:apis}).
 % After delegation, the session key is in \domses's domain-private memory, and the domain is received a domain-privated pointer to the object (\texttt{struct* aead\_aes\_gcm\_ctx}).
@@ -209,7 +209,7 @@ When a function performs complex cryptographic operations, we use \texttt{DOM\_P
 Finally, \domconn manages the webserver's sockets.
 We wrap the functions that handle sockets inside its domain switches of \domconn, such that when the server requests its \emph{server socket} \fd using \texttt{sys\_socket}, the returned \fd is domain-private.
 On client connection requests, \domconn invokes \texttt{sys\_accept4} with the server socket as the input and retrieves a \emph{client} socket \fd.
-\domconn then delegate the returned \emph{client} socket \fd to \domhs, using \texttt{capac\_delegate\_fd}. 
+\domconn then delegate the returned \emph{client} socket \fd to \domhs, using \texttt{capac\_delegate\_fd}.
 After TLS handshaking, \domhs again delegates the socket \fd to \domses.
 Notably, \texttt{CAP\_SOCKET} attribute is enabled by default when socket \fds are created, segregating socket and non-socket \fds in syscalls without the user's intervention.
 
@@ -236,19 +236,19 @@ Notably, \texttt{CAP\_SOCKET} attribute is enabled by default when socket \fds a
 
 
 \begin{table}[t]
-    \centering
-% \footnotesize
-\small
-\begin{tabular}{lccc}
-\toprule
-       \thead{Program} &\thead{Baseline (ms)} &\thead{w/ \thename (ms)}&\thead{Overhead (\%)}  \\
-        \midrule
-     \texttt{ssh}&$347.35$ & $348.62$  & $0.37$ \\
- \rowcolor[gray]{0.925}    \texttt{wget}&  $17.12$ & $18.14$&$5.95$ \\
-     \bottomrule
-\end{tabular}
-    \caption{\thename overheads on  \texttt{ssh} and \texttt{wget}.}
-    \label{tbl:sshwget}
+	\centering
+	% \footnotesize
+	\small
+	\begin{tabular}{lccc}
+		\toprule
+		\thead{Program}                         & \thead{Baseline (ms)} & \thead{w/ \thename (ms)} & \thead{Overhead (\%)} \\
+		\midrule
+		\texttt{ssh}                            & $347.35$              & $348.62$                 & $0.37$                \\
+		\rowcolor[gray]{0.925}    \texttt{wget} & $17.12$               & $18.14$                  & $5.95$                \\
+		\bottomrule
+	\end{tabular}
+	\caption{\thename overheads on  \texttt{ssh} and \texttt{wget}.}
+	\label{tbl:sshwget}
 \end{table}
 
 
@@ -268,14 +268,15 @@ To accurately profile the source of \thename's performance overhead, we inserted
 % % \vspace{-3mm}
 % \end{wrapfigure}
 % \hdr{Performance overheads}
-\hdr{\texttt{ssh} and \texttt{wget}} 
+\hdr{\texttt{ssh} and \texttt{wget}}
 For \texttt{ssh}, we measure the average overhead of connecting to a local server $10,000$ times and compare it against the unmodified version.
 We evaluate the protected \texttt{wget} by timing the average overhead in latency when requesting a 1MB file from a local http webserver $10,000$ times compared to the baseline.
-\autoref{tbl:sshwget} displays the \thename-incured performance overheads in \texttt{ssh} and \texttt{wget}, which shows only minimal slowdown for both applications. 
-
+\autoref{tbl:sshwget} displays the \thename-incured performance overheads in \texttt{ssh} and \texttt{wget}, which shows only minimal slowdown for both applications.
 \begin{table*}[t]
+
 	\centering
 	\footnotesize
+	\setlength\tabcolsep{2pt}
 	\input{figures/capacity/eval-nginx}
 \end{table*}
 

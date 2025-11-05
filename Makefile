@@ -40,11 +40,11 @@ all: $(PROJNAME).pdf
 PDFLATEX_OPT="xelatex -synctex=1 -interaction=nonstopmode -file-line-error"
 
 $(PROJNAME).pdf: main.tex
-	latexmk  --jobname=$(PROJNAME) -pdf \
+	latexmk -f  --jobname=$(PROJNAME) -pdf \
 	-pdflatex=$(PDFLATEX_OPT) -use-make $<
 
 watch: main.tex
-	latexmk  -pvc --jobname=$(PROJNAME) -pdf \
+	latexmk -f -pvc --jobname=$(PROJNAME) -pdf \
 	-pdflatex=$(PDFLATEX_OPT) -use-make $<
 
 cleanall:
@@ -52,6 +52,7 @@ cleanall:
 	*.fls *.log *.out
 
 clean:
+	latexmk -C main.tex
 	rm -rf *.aux *.bbl *.blg *.fdb_latexmk  \
 	*.fls *.log *.out *.synctex.gz
 

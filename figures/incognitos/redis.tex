@@ -1,0 +1,89 @@
+% \setlength\tabcolsep{4pt}
+%  \begin{NiceTabular}{@{}clrrrrrr}[corners]
+%  % \cmidrule(){2-3} 
+%  \CodeBefore
+%  \rowlistcolors{3}{,gray!20}[cols=2-8]
+% % \rowcolors[gray]{2}{0.8}{}[cols=2-3,restart]
+% \Body
+% \toprule
+%     &\Block{2-1}{\thead{Max DB\\size\\(MB)}}& \Block{1-2}{\confbaseline} & \Block{1-4}{\confadaptive} &&& \\ 
+%       \cmidrule(rl){3-4}
+%       \cmidrule(rl){5-8}
+%     && \thead{Throughput\\(req/s)} & \thead{CPU\\util. (\%)} & \thead{Relative th.\\(\%)} & \thead{\#RR} & \thead{\#PF} & \thead{CPU\\util. (\%)}\\
+%      \midrule
+%     \Block{4-1}<\rotate>{\thead{\texttt{LPUSH}}}
+%     &x&x&X&X&X&x&x\\
+%     &x&x&X&X&X&x&x\\
+%     &x&x&X&X&X&x&x\\
+%     &x&x&X&X&X&x&x\\
+%     \midrule
+%     \Block{4-1}<\rotate>{\thead{\texttt{GET}}}
+%     &x&X&X&X&x&x&x\\
+%     &x&X&X&X&x&x&x\\
+%     &x&X&X&X&x&x&x\\
+%     &x&X&X&X&x&x&x\\
+     
+%         \bottomrule
+%     \end{NiceTabular}
+
+
+\newcolumntype{R}{>{\raggedleft\arraybackslash}X}
+% Shrink vertical
+\renewcommand{\arraystretch}{.85}
+% Shrink horizontal
+% \setlength\tabcolsep{5.5pt}
+\setlength\tabcolsep{4pt}
+ \begin{NiceTabularX}{\columnwidth}{@{}cccrRRrRRr}[corners]
+ % \cmidrule(){2-3} 
+ \CodeBefore
+ \rowlistcolors{4}{gray!20,}[cols=3-10]
+% \rowcolors[gray]{2}{0.8}{}[cols=2-3,restart]
+\Body
+\toprule
+    &\Block{3-2}{\thead{Max mem. sz \\\& Payload sz}} && \Block{3-1}{\thead{Unmodified\\Redis\\throughput\\(req/s)}} & \Block{1-6}{\thead{With adaptive rerandomization}} &&& \\ 
+    \cmidrule(rl){5-10}
+    &&&& \Block{1-3}{$A=512$} &&& \Block{1-3}{$A=1024$} &&\\ 
+    
+      \cmidrule(rl){5-7}
+      \cmidrule(rl){8-10}
+      % \cmidrule(rl){4-7}
+    &&&& \thead{Ovh.\\($\times$)} & \thead{\#RR} & \thead{\#PF}  & \thead{Ovh.\\($\times$)} & \thead{\#RR} & \thead{\#PF}  \\
+     \midrule
+     % &&\\
+    \Block{4-1}<\rotate>{\thead{\texttt{LPUSH}}}
+    & \Block{2-1}{8MB}  & 4KB&
+        2930.83 & 3.35 & 205 & 110K & 2.62 & 205 & 83K \\ 
+    && 8KB&
+        1337.79 & 2.85 & 402 & 144K & 2.23 & 401 & 121K \\ 
+    &\Block{2-1}{64MB}  & 4KB&
+        2949.85 & 3.52 & 206 & 111K & 2.76 & 206 & 83K \\ 
+    && 8KB&
+        1336.18 & 2.95 & 401 & 147K & 2.31 & 403 & 122K \\ 
+        \midrule
+    \Block{4-1}<\rotate>{\thead{\texttt{GET}}}
+    & \Block{2-1}{8MB}  & 4KB&
+        6863.42 & 3.89 & 200 & 38K & 2.56 & 200 & 32K \\ 
+    & & 8KB&
+        6297.23 & 3.36 & 201 & 38K & 2.33 & 200 & 31K \\ 
+    & \Block{2-1}{64MB}  & 4KB&
+        7087.17 & 3.44 & 201 & 38K & 2.77 & 200 & 32K \\ 
+    & & 8KB&
+        6715.92 & 3.91 & 200 & 40K & 2.65 & 200 & 33K \\
+    \midrule
+    &\Block{1-2}{\textbf{GEOMEAN}}&&
+        ~ & 3.39 & ~ & ~ & 2.52 & ~ & ~ \\[-.6em]
+         
+%     \midrule
+%     \Block{4-1}<\rotate>{\thead{{Concurr.}}} & 1K
+%     & 156.66 & 3.84 & 34 & 236K & 1.26 & 45 & 17K \\ 
+%         ~ & 2K & 154.95 & 2.42 & 47 & 119K & 1.26 & 45 & 18K \\ 
+%         ~ & 4K & 152.30 & 2.32 & 48 & 114K & 1.28 & 49 & 19K \\ 
+%         ~ & 8K & 153.89 & 3.35 & 42 & 205K & 1.26 & 43 & 16K \\ 
+%     \midrule
+% &    &    \textbf{GEOMEAN} & ~ & 3.95 & ~ & ~ & 1.27 & ~ & ~ \\ 
+    % \Block{4-1}<\rotate>{\thead{Single}}\\
+
+    % \Block{4-1}<\rotate>{\thead{Concur.}}\\
+     
+        \bottomrule
+    \end{NiceTabularX}

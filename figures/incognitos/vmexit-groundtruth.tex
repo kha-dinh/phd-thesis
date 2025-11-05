@@ -1,0 +1,103 @@
+
+\definecolor{level1}{rgb}{1, 0.98, 0.95}    % Very Light Transparent Yellow
+\definecolor{level2}{rgb}{1.0, 0.97, 0.90}    % Light Transparent Yellow
+\definecolor{level3}{rgb}{1.0, 0.96, 0.85}    % Soft Transparent Orange
+\definecolor{level4}{rgb}{1.0, 0.9, 0.8}      % Muted Transparent Orange
+\definecolor{level5}{rgb}{0.98, 0.8, 0.8}    % Light Transparent Coral
+\definecolor{level6}{rgb}{0.96, 0.7, 0.8}     % Very Soft Transparent Red
+
+% \definecolor{level1}{rgb}{0.8, 1.0, 0.9}      % Very Light Green
+% \definecolor{level2}{rgb}{0.9, 1.0, 0.85}    % Light Yellow-Green
+% \definecolor{level3}{rgb}{1.0, 1.0, 0.8}      % Light Yellow
+% \definecolor{level4}{rgb}{1.0, 0.9, 0.8}      % Light Orange
+% \definecolor{level5}{rgb}{1.0, 0.8, 0.8}      % Light Pink-Red
+% \definecolor{level6}{rgb}{1.0, 0.7, 0.7}      % Light Red
+
+
+\renewcommand{\arraystretch}{.4}
+\setlength\extrarowheight{9pt}
+% \renewcommand{\arraystretch}{.85}
+\setlength\tabcolsep{2pt}
+\begin{NiceTabular}{l!{}p{8cm}!{}r!{}r!{}r}
+	\CodeBefore
+	\rowcolor{level1} 3  % GMean 0.0009
+	\rowcolor{level2} 4  % GMean 0.0016
+	\rowcolor{level3} 5  % GMean 0.0019
+	\rowcolor{level4} 6  % GMean 0.0811
+	\rowcolor{level5} 7  % GMean 0.1658
+	\rowcolor{level6} 8  % GMean 0.8974
+	% \rowlistcolors{3}{,gray!20}[cols=3-6]c
+	% \rowcolors[gray]{2}{0.8}{}[cols=2-3,restart]
+	\Body
+	\toprule
+	\Block{2-1}{\thead{ID}} & \Block{2-1}{\thead{Workloads / Attacks }}                     & \Block{1-3}{\thead{VMExit Frequency                \\ (exits/instruction)}} \\
+	\cmidrule(lr){3-5}
+	                        &                                                               & GeoMean                             & GSD   & Max  \\
+	\midrule
+	% \lnormal &  nbench benchmark set &  0.0009 & 2.37 &  0.0003&  9.04\\
+	% \lnginx  &  NGINX intensive workload  &   0.0016 & 10.77& 0.0002& 7.54\\
+	% \lredis  &  Redis intensive workload &  0.0019 & 7.54& 0.0003& 2.81\\
+	\lnormal                & \nbench benchmark suite                                       & 0.0009                              & 2.37  & 0.06 \\
+	\lnginx                 & NGINX (1000 requests, 8 concur. conn., 4KB file)              & 0.0016                              & 10.77 & 0.13 \\
+	\lredis                 & Redis (1000 requests, 50 concur. conn., 4KB payload)          & 0.0019                              & 7.54  & 0.13 \\
+	% L4  &  \color{red}{False positive case} &  xxx.xx  & x.xx& 3573.39 & 0.36 \\
+	\midrule
+
+	\llenpf                 & Low-exit NPF attack~\cite{xu2015controlledchannel}            & 0.0811                              & 2.84  & 0.5  \\
+	\lnpf                   & NPF-based profiling~\cite{heckler,werner2019severest,sevstep} & 0.1658                              & 2.80  & 0.5  \\
+	\lss                    & Single-stepping~\cite{sevstep}                                & 0.8973                              & 1.58  & 1.0  \\
+
+	% \llenpf  & Low-exit NPF attack~\cite{xu2015controlledchannel} &      0.0811& 2.84& 0.0811& 2.84\\
+	% \lnpf    & NPF-based profiling~\cite{heckler,werner2019severest,sevstep} &    0.1658& 2.80& 0.1658& 2.80 \\
+	% \lss     & Single-stepping~\cite{sevstep} & 0.8974& 1.58& 0.8973& 1.58
+
+	% S6     &Normal execution (nbench) &  0.001 &  0.000& 0.000&$0.000$\\
+	\bottomrule
+\end{NiceTabular}
+
+
+
+% \definecolor{level1}{rgb}{1.0, 0.98, 0.8}    % Very Light Yellow
+% \definecolor{level2}{rgb}{1.0, 0.95, 0.7}    % Light Yellow
+% \definecolor{level3}{rgb}{1.0, 0.85, 0.55}   % Light Orange
+% \definecolor{level4}{rgb}{1.0, 0.7, 0.4}     % Soft Orange
+% \definecolor{level5}{rgb}{0.94, 0.5, 0.4}    % Light Coral
+% \definecolor{level6}{rgb}{0.9, 0.3, 0.3}     % Dark Red
+
+% % \definecolor{level1}{rgb}{1.0, 0.97, 0.74}  % Pale Yellow
+% % \definecolor{level2}{rgb}{1.0, 0.9, 0.7}    % Light Peach
+% % \definecolor{level3}{rgb}{1.0, 0.8, 0.6}    % Soft Orange
+% % \definecolor{level4}{rgb}{1.0, 0.75, 0.5}    % Muted Orange
+% % \definecolor{level5}{rgb}{0.94, 0.6, 0.5}   % Light Coral
+% % \definecolor{level6}{rgb}{0.9, 0.4, 0.4}    % Soft Red
+
+
+%  % \rowlistcolors{3}{,gray!20}[cols=3-6]
+% % \rowcolors[gray]{2}{0.8}{}[cols=2-3,restart]
+
+% \renewcommand{\arraystretch}{.85}
+% \setlength\tabcolsep{4pt}
+% \begin{NiceTabular}{llrrrr}
+%   \CodeBefore
+%    %   Apply background colors based on GMean value trends
+%   \rowcolor{level1} 3  % GMean 0.0009
+%   \rowcolor{level2} 4  % GMean 0.0016
+%   \rowcolor{level3} 5  % GMean 0.0019
+%   \rowcolor{level4} 6  % GMean 0.0811
+%   \rowcolor{level5} 7  % GMean 0.1658
+%   \rowcolor{level6} 8  % GMean 0.8974
+%   \Body
+%   \toprule
+%   \Block{2-1}{\thead{ID}}&\Block{2-1}{\thead{Workloads / Attacks}} & \multicolumn{2}{c}{\thead{Sync $+$ Async\\VMExit rate\\(isns/exits)}} & \multicolumn{2}{c}{\thead{ASync\\VMExit rate\\(isns/exits)}} \\
+%   \cmidrule(lr){3-4} \cmidrule(lr){5-6}
+%   & & GMean & GSD & GMean &GSD  \\
+%   \midrule
+%   \lnormal & nbench benchmark &  0.0009&2.37&0.0003&9.04\\
+%   \lnginx & NGINX (intensive workload)  &  0.0016&10.77&0.0002&7.54\\
+%   \lredis & Redis (intensive workload) & 0.0019&7.54&0.0003&2.81\\
+%   \midrule
+%   \llenpf &Low-exit NPF attack~\cite{xu2015controlledchannel} &     0.0811&2.84&0.0811&2.84\\
+%   \lnpf &NPF-based profiling~\cite{heckler,werner2019severest,sevstep} &   0.1658&2.80&0.1658&2.80 \\
+%   \lss &Single-stepping~\cite{sevstep} &0.8974&1.58&0.8973&1.58 \\
+%   \bottomrule
+% \end{NiceTabular}

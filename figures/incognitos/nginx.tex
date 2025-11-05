@@ -1,0 +1,45 @@
+
+
+\newcolumntype{R}{>{\raggedleft\arraybackslash}X}
+
+% Shrink vertical
+\renewcommand{\arraystretch}{.85}
+% Shrink horizontal
+% \setlength\tabcolsep{5.5pt}
+% \setlength\tabcolsep{4pt}
+ \begin{NiceTabularX}{\columnwidth}{@{}ccrRRRRRR}[corners]
+ % \cmidrule(){2-3} 
+ \CodeBefore
+ \rowlistcolors{4}{gray!20,}[cols=2-9]
+% \rowcolors[gray]{2}{0.8}{}[cols=2-3,restart]
+\Body
+\toprule
+    &\Block{3-1}{\thead{Requested\\file size}}& \Block{3-1}{\thead{Unmodified \\NGINX\\throughput\\(req./s)}} & \Block{1-6}{\thead{With adaptive rerandomization}} &&& \\ 
+    \cmidrule(rl){4-9}
+    &&& \Block{1-3}{$A=512$} &&& \Block{1-3}{$A=1024$} &&\\ 
+    
+      \cmidrule(rl){4-6}
+      \cmidrule(rl){7-9}
+      % \cmidrule(rl){4-7}
+    && & \thead{Ovh.\\($\times$)} & \thead{\#RR} & \thead{\#PF}  & \thead{Ovh.\\($\times$)} & \thead{\#RR} & \thead{\#PF}  \\
+     \midrule
+     % &&\\
+    \Block{4-1}<\rotate>{\thead{{Sequen.}}} 
+      & 1KB & 150.14 & 5.45 & 55 & 403K & 1.31 & 61 & 23K \\ 
+        ~ & 2KB & 147.73 & 5.38 & 57 & 403K & 1.32 & 62 & 24K \\ 
+        ~ & 4KB & 145.08 & 5.30 & 53 & 403K & 1.26 & 49 & 19K \\ 
+        ~ & 8KB & 143.57 & 5.24 & 45 & 401K & 1.23 & 45 & 17K \\ 
+    \midrule
+    \Block{4-1}<\rotate>{\thead{{Concurr.}}} 
+    &  1KB & 156.66 & 3.84 & 34 & 236K & 1.26 & 45 & 17K \\ 
+        ~ & 2KB & 154.95 & 2.42 & 47 & 119K & 1.26 & 45 & 18K \\ 
+        ~ & 4KB & 152.30 & 2.32 & 48 & 114K & 1.28 & 49 & 19K \\ 
+        ~ & 8KB & 153.89 & 3.35 & 42 & 205K & 1.26 & 43 & 16K \\ 
+    \midrule
+    &    \textbf{GEOMEAN} & ~ & 3.95 & ~ & ~ & 1.27 & ~ & ~ \\[-.6em]
+    % \Block{4-1}<\rotate>{\thead{Single}}\\
+
+    % \Block{4-1}<\rotate>{\thead{Concur.}}\\
+     
+        \bottomrule
+    \end{NiceTabularX}

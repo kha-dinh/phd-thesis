@@ -1,0 +1,44 @@
+% !TeX root = ../main.tex
+% \setlength{\tabcolsep}{4pt}
+
+\begin{tabularx}{\textwidth}{X X X X}
+
+\toprule
+\bf Security Check
+& \bf Operation
+& \bf Adversary Capability
+& \bf Objective
+\\\bottomrule
+
+
+VMExit rate measurement
+& Sample VMSA to check VMExit occurrence since last scheduler tick
+& Single-stepping through very frequent interrupt injection
+& Single-stepping detection for adaptive memory reshuffling
+\\\midrule
+
+
+Huge page mapping validation
+& Validate RMP for huge page mapping 
+& Unauthorized huge page smashing
+& Prevention of 4K-granular controlled-channel attack.
+\\\midrule
+
+
+ORAM-based CVM page reshuffling
+& Reshuffle CVM physical pages backed by ORAM
+& Controlled-channel attacks, cache side-channel attacks
+& Complete relocation of CVM pages
+% \\\midrule
+% MCP$_{Imm}$
+% & SHA\textcolor{red}{check}{256} hash
+% & Data-only attacks~\cite{xx,yy,zz}
+% & \makecell[l]{Register-only data updates \\ In-memory data integrity}
+\\\bottomrule
+% PC-security~\cite{raccoon,constantine,dove}
+% & Oblivious/Linear code execution
+% & Code access pattern, execution time
+% & Cache, execution time
+% \\\bottomrule
+
+\end{tabularx}

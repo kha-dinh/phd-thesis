@@ -1,0 +1,313 @@
+\section{Scheduling for Rate-Adaptive Policy}
+\label{sec:scheduling}
+
+
+In this section, we explain the design of \thename's scheduler.
+\thename implements a static binary instrumentation tool (\reqtransparent) to plant synchronous ticks in \emph{each basic block} program executables and achieve self-sovereign scheduling (\reqsovereign).
+Each synchronous scheduler tick must detect the occurrence of the VMExit and count executed instructions to calculate the VMExit frequency (\cref{subsec:vmexit-rate-data-acquisition}).
+We found that constructing a robust VMExit frequency sampling system (\reqrobustpolicy) is a daunting challenge.
+We make careful design decisions to make the system as robust as possible (\cref{subsec:tick-placement-strat}).
+With the synchronous ticks implemented (\cref{subsec:tick-tramp-impl}), \thename finally constructs a high-level policy atop (\cref{subsec:rerand-policy}).
+
+
+\subsection{Data acquisition at ticks}
+\label{subsec:vmexit-rate-data-acquisition}
+% \key{\themame inserts its synchronous ticks into each basic block of the instrumented user program executable.}
+Each synchronous tick invocation checks and reports to the scheduler 1) the VMExit occurrence since the last tick and 2) the number of executed instructions since the previous tick.
+% \limcomm{Hard to understand}
+% {that its parent basic block has been reached to the scheduler, and the scheduler accumulates the basic block's instruction count.}
+These two key data for VMExit frequency measurement are collected through the following devices:
+
+% Prev version
+% \subsubsection{\jycomm{Isn't this VMSA? not VMCB?}{VMCB} mapping for VMExit detection }
+% \key{\thename leverages the unforgeable VMExit occurrence information in \gls{vmsa} to establish a primitive for in-CVM sampling of VMExits.}
+% Whenever there is a VMExit from the guest to the host, the processor automatically updates the \gls{vmsa} with the information about the exit.
+% Specifically, \texttt{vmsa.exit\_code} is replaced with the reason for exit (e.g., \texttt{0x400} for a \gls{npf}).
+% Our close inspection of the AMD SEV-SNP specification and KVM's implementation confirms that VMExit occurrences in the \gls{vmsa} are not forgeable: the \gls{vmsa} must be mapped as \gls{cvm}-private, preventing any illegal write accesses~\cite{amd64}.
+% \hjcomm{How does this work and how to ensure relocation and write integrity?}{\thename creates a CVM-private mapping of its VMSA into the CVM \gls{gva} space to measure VMExit occurrence.}
+% Hence, \thename can check the field for the occurrence of a VMExit at a tick, then clear it for the subsequent check in the upcoming scheduled tick.
+
+\hdr{VMSA mapping for VMExit detection}
+\thename leverages the unforgeable VMExit occurrence information recorded in the \gls{vmsa} (\cref{sec:bg:amdsev}) to establish a primitive for in-CVM sampling of VMExits.
+While the initial \gls{vmsa} of the boot vCPU (initialized by the hypervisor) is not accessible by the \gls{cvm}, we found that the secondary vCPU, i.e., \emph{application processors (APs)}, can access their \gls{vmsa} since the \gls{vmsa} is initialized by the \gls{cvm} itself~\cite{amd64}.
+Thus, during \gls{cvm} boot, \thename ensures that the \gls{vmsa} page is securely mapped into the guest address space.
+% When a VMExit occurs, transitioning from guest execution to host, the processor automatically updates the \gls{vmsa} with exit information.
+% Specifically,  the \texttt{vmsa.exit\_code} field is set as the exit reason for the current VMexit, e.g., 0x400 for \gls{npf}.
+% Our examination of the AMD SEV-SNP specification~\cite{amd64} and the KVM implementation confirms that this recording is unavoidable as it takes place at the hardware level without the intervention of the hypervisor.
+% and can be leveraged by the VM for monitoring purposes. 
+% \limcomm{Doesn't link to the previous sentence. }{*}
+% \limcomm{Swap to sentences? Explain VMSA first, and explain our VMSA mapping design considerations}{<->}
+% Thus, \thename initializes a new \gls{vmsa} during boot and requests the hypervisor to create an AP using this \gls{vmsa} (using the \texttt{AP\_CREATEXXXX} hypercall).
+% Our examination of the AMD SEV-SNP specification~\cite{amd64} and the KVM implementation confirms that VMExit occurrences recorded in the \gls{vmsa} are unforgeable as they take place at the hardware level.
+% The \gls{cvm}'s  \gls{vmsa} page is considered private and is subjected to \gls{rmp} checks on their accesses (\cref{sec:bg:amdsev}). 
+\gls{rmp} checks ensure the integrity of the \gls{vmsa} by preventing tampering: the host cannot forge \gls{hpa} to \gls{gpa} mappings or perform unauthorized write accesses to \gls{cvm}'s private memory.
+
+
+% Thus, upon boot, the \gls{cvm} reinitializes a new \gls{vmsa} for each AP, using a page within its mapped \gls{gpa} range.
+% Thus, the \gls{cvm} reinitializes a new \gls{vmsa} for each AP, using a page within its mapped \gls{gpa} range.
+% The initial VMSA of BSP is not mapped into the guest's \gls{gpa} space, rendering it inaccessible to the guest.
+% This setup enables the guest to access its own \gls{vmsa} area once the APs are created.
+% It was confirmed that upon a VMExit, the correct exit reason is logged in  \texttt{vmsa.exit\_code} field and any value written by the guest to this field persists until a new VMExit occurs.
+% Hence, \thename can check the field for the occurrence of a VMExit at a tick, then clear it for the subsequent check in the upcoming scheduled tick.
+
+
+
+
+% Integrity of VMSA
+% Integrity of Mapping
+% Should we mention analogue approach?(Confirmed on ubuntu guest)
+% Just say we confirmed it(don't mention implemented)
+
+\hdr{Instructions executed as passage of time}
+\key{Each tick delivers the instructions count of its parent basic block to the scheduler, thereby allowing the scheduler to accumulate the total number of instructions executed in between ticks.}
+% \new{We adopt a methodology that resembles that of Varys~\cite{oleksenko2018varys} to our binary instrumentation.} 
+The instruction count of each basic block is precalculated during static instrumentation and stored in the executable (explained in detail in \cref{subsec:tick-tramp-impl}).
+\thename utilizes the executed instructions count to measure the passage of time for security and robustness reasons (\reqsovereign, \reqrobustpolicy).
+While SEV-SNP provides SecureTSC~\cite{amd64} that allows secure acquisition of the current time, the usage of \emph{absolute time} to measure the VMExit rate would be insecure.
+For instance, the hypervisor can intentionally delay the scheduling of a \gls{cvm} to provide a misleading VMExit count per second.
+% For this reason, \thename chooses to calculate the VMExit frequency with respect to the instructions executed, i.e., VMExits/isns to achieve 
+
+% This is another reason why \thename's synchronous ticks must be inserted into each basic block, such that the pre-calculated instruction count of the basic block is delivered to the scheduler for accumulation.
+
+
+
+
+% is the value in between the minimal attack (\llenpf) and the upper bound VMExit rates for the \gls{cvm} workloads (\lnginx and \lredis).
+% \textcolor{red}{Explain what is the target $f$ here.}
+
+% \subsubsection{Optimization with synchronous VMExit counting}
+% \key{Having full control over the system as a unikernel, \thename is fully aware of the exact code locations that make synchronous VMExit calls (i.e., \texttt{vmgexit}) for I/O purposes in kernel code .}
+% \thename exempts such \texttt{vmgexit} instruction execution from VMExit count measurement by modifying the wrapper macros for the instruction.
+% Only taking the asynchronous VMExits \textcolor{red}{(\autoref{tab:attack-exit-rates})} into account further separates the benign workloads from malicious side-channel attacks.
+
+\subsection{Tick placement strategy}
+\label{subsec:tick-placement-strat}
+% We found that \thename scheduler's tick placement must satisfy two requirements to support reliable VMExit sampling.
+\thename's tick placement adopts two key rules to maximize the robustness of VMexit frequency sampling (\reqrobustpolicy): the Nyquist sampling frequency and per basic block ticks for maximum loop coverage.
+
+% as \emph{twice} the frequency of the measured target VMExit frequency level
+\hdr{Nyquist Sampling frequency}
+\label{subsec:tick-requirements}
+We define the required \emph{sampling rate} according to the \emph{Nyquist Theorem}~\cite{nyquist},  based on the observation that our VMExit frequency measurement is essentially a signal sampling problem where the value of \texttt{vmsa.exit\_code} over time forms a \emph{square wave signal}.
+% We observe that 
+Following the Nyquist sampling theorem, the required sampling rate for accurately measuring a signal whose frequency is $f_{\text{sampled}}$ must be at least $2\times f_{\text{sampled}}$, and therefore:
+% \vspace{-0.5em}
+{
+% \
+\normalsize
+\begin{equation*}
+	\freq{Tick}{Req} \geq \freqvmexitof{Target} \times 2.
+	% RateVMExit_i = \frac{{\sum\limits_{t=i-W}^i CntAsyncVMExit_t}}  {{\sum\limits_{t=i-W}^i CntInstExec_t}}.
+\end{equation*}
+}
+
+\freqvmexitof{Target} must be a value between the frequency levels of benign workloads and attacks, such that \thename can apply an adaptive rerandomization rate with minimized false-positive cases reliably.
+
+From our empirical analysis (\autoref{tab:attack-exit-rates}), we know the average \freqvmexitof{} of the highest benign workload and lowest attack \freqvmexitof{} to be $0.00164$ (\lnginx) and $0.081103$ (\llenpf).
+Hence, \thename sets its target frequency to be \emph{two} times the frequency of benign execution, $\freqvmexitof{Target} = 2 \times 0.00164 = 0.00328$.
+Thus, the required, or Nyquist, \freq{Tick}{Req}, must be at least twice that amount, $0.00656$, or once every $152$ instruction execution.
+
+% $\freqvmexitof{Target} = 2 \times 0.00164 = 0.00328$.
+% sampling frequency must be larger than $2 \times 0.00164 = 0.00328$ to distinguish the two.
+% \khacomm{target = 2 times normal, requirement = 2 times that}{}
+
+% \hjcomm{what's target}{As we will explain, we found that per basic block tick placement achieves more than sufficient $f_{\text{tick}}$ in real-world programs.}
+
+\hdr{Loop coverage}
+Apart from achieving the Nyquist frequency, we found incomplete \emph{loop coverage} with ticks to be the most prominent threat to robustness during implementation.
+Given that accurately identifying loops in binary is a known hard problem~\cite{e9patch}, we resort to a per-basic-block tick placement scheme as mentioned, which also contributes to achieving the required sampling frequency.
+
+
+
+
+
+
+% \thename places one tick per each basic block to 1) check VMExit occurrence 2) report every time the basic block is executed, such that the executed instruction count can be updated.
+% Per basic block tick also allows \thename not to miss loop executions that may hinder the robustness of \thename's scheduling.
+
+
+
+
+
+% We found that this tick placement scheme, when applied to real-world programs, yields more than sufficient samplign rates.
+% For instance, tick to instructions ratio was calculated to be \textcolor{red}{$0.02XX$} for the NGINX executable and \textcolor{red}{0.0XXX} for Redis.
+% This means that \thename can reliable measure up to \textcolor{red}{\emph{0.01XX}} of VMExit frequency in NGINX, a range that is enough to clearly distinguish the \emph{average} frequencies of normal workload execution and the even the lowest frequency attack.
+
+
+
+
+
+% Given that accurately identifying loops in binary is a known hard problem~\cite{e9patch}, we opt for placing at least one tick in each basic block.
+% We found ensuring exactly one tick per basic block already achieves the
+% Yet, \thename adapts an optimization similar to the one proposed to reduce the instrumentation points while avoiding missing potential loops  \cite{oleksenko2018varys}: A binary basic block that does not contain (1) jumps to itself, and (2) indirect control flow transfers may have its instrumentation eliminated.
+
+
+
+% Also, per-basic block ticks allow reliable calculation of the number of instructions executed since the last tick.
+% \key{
+% For the kernel, since deploying a unikernel already requires recompilation, we utilize the compiler's built-in instrumentation option for a portable solution~(GCC's \texttt{-finstrument-functions}).
+% \textcolor{red}{Synchronous tick executions are inserted at the entrance and exit of user-facing functions, such as system call handlers and implementations of POSIX functions}.
+% }
+
+
+
+\subsection{Tick and trampoline implementation}
+\label{subsec:tick-tramp-impl}
+% \thename employs static binary instrumentation to insert synchronous ticks into the user program code to achieve self-sovereign scheduling (\reqsovereign) and transparent obfuscation (\reqtransparent).
+\thename's binary instrumentation tool is based on the \texttt{e9patch} binary rewriting framework~\cite{e9patch}.
+The tool instruments an unmodified dynamically-linked Unikraft binary to insert synchronous ticks and trampolines for \thename scheduler invocation.
+
+\label{subsubsec:sync-ticks}
+\hdr{Synchronous ticks}
+\thename synchronous ticks are placed in each basic block of the user program to invoke its matching \emph{trampolines}, and eventually, the scheduler function.
+An \thename synchronous tick is a 5-byte relative jump instruction (\texttt{jmp rel32}) to a unique trampoline that is paired with the tick.
+The instrumentation tool iterates over each basic block, selecting one instruction within a basic block to be replaced with an \thename tick.
+Due to the non-intrusive nature of jumps and the generally longer byte sequences of x86 instructions, finding a 5-byte sequence in a basic block is not challenging.
+However, basic blocks can exist without such suitable instructions.
+In such cases, the tool opts for the fallback strategy that revolves around \emph{instructions punning}~\cite{e9patch,instruction-punning}.
+This design choice of employing jump-based ticks takes full advantage of the unikernel design.
+Due to the lack of the user-kernel barrier in \thename, the \emph{trampoline} of the jumps is only a few cycles away.
+
+\hdr{Trampolines} For each tick inserted, the tool also generates a unique trampoline (e.g., \texttt{trampoline\_UUID} for \texttt{tick\_UUID}.)
+Each generated trampoline performs three operations: 1) executes the overwritten instructions that had been relocated to the trampoline body during instrumentation, 2) loads the hardcoded \emph{instruction count} of the source basic block
+into the argument register then finally 3) calls \thename's scheduler function (\texttt{incog\_sched()}).
+
+\label{subsubsec:sched-func}
+\hdr{Scheduler function}
+On receiving the control, the scheduler first inspects the \texttt{vmsa.exit\_code} field of the VMSA to sample the occurrence of a VMExit since the last tick.
+\texttt{incog\_sched()} always sets the field to a special value that it can recognize (i.e., \texttt{0xFFF}); the change of the value since the last tick indicates a VMExit occurrence.
+The instruction counts forwarded by the trampoline and the detection of VMExits are consumed by the scheduler's rate-adaptive policy (\cref{subsec:rerand-policy}).
+% The \texttt{incog\_sched()} \limcomm{how? by storing it somewhere?}{accumulates the instruction count} delivered as an argument to track instruction executed between ticks.
+% Note that the \emph{synchronous} VMExit flag maintained the \thename's own code is consulted at this moment to exempt the confirmed VMExit occurrence from being if the flag is set.
+% for sliding window-based VMExit rate measurement and to adjust the rerandomization rate dynamically.
+
+
+\hdr{Kernel tick placement}
+Unlike user program executables, placing ticks in kernel code is performed through compiler instrumentation and manual effort.
+The unikernel's small code base allows us to identify and avoid problematic cases manually.
+For instance, ticks should not be inserted into the trampolines and scheduler functions, and a handful of kernel functions that require atomicity must be excluded.
+
+
+% We also instrument functions used in the kernel networking stack (\texttt{liblwip}~\cite{liblwip}).
+% This approach avoids the complexities associated with binary instrumentation on kernel code~\cite{kernel-binary} and facilitates tick execution throughout the entire system.
+
+
+\subsection{Rate-adaptive rerandomization policy}
+\label{sec:scheduling:services}
+\label{sec:scheduling:policies}
+\label{subsec:rerand-policy}
+
+Based on the tick delivery and VMExit measurement explained thus far, \thename constructs a higher-level policy (\reqrobustpolicy) that schedules \emph{when} the paging subsystem must perform rerandomization.
+
+
+\hdr{Achieved sampling capability}
+Using the described synchronous tick instrumentation and kernel tick placement strategies, we found that the evaluation targets provide a reliable measurement of \freqvmexit.
+In particular, we use the previously described measurement framework to obtain the distance between ticks and calculate the tick rate for the evaluation targets (\nbench, NGINX, and Redis).
+The average (geometric mean) tick rate for the \nbench suite, NGINX, and Redis was measured to be $0.023$, $0.028$, and $0.037$, respectively.
+Based on the previously defined requirement, at its worst tick rate (the \nbench suite), the \thename is capable of achieving $3.51$ times \freq{Tick}{Req}.
+% \thename should be able to reliably measure the VMExit rate up to $0.0115$ (half the lowest tick rate of \nbench), or \periodvmexit{} of $87$ instructions.
+% This is more than 5 times lower than the \periodvmexit for \lredis and \lnginx.
+% or 20$\times$ if only \textbf{Sync}  rates ($3573.39$ and $5218.74$) are considered.
+% \hjcomm{WIP}{Based on this requirement, \thename ensures that}
+
+
+
+
+\label{subsec:sliding-window}
+\hdr{Sliding window measurement scheme}
+We use a sliding window~\cite{deeprest,sliding-window} to reliably calculate the current trend in VMExit frequency (i.e., \freqvmexitof{}), based on samples of detected VMExits and instruction counts.
+% For efficiency, \thename computes \freqvmexitof{} terms of tick executions instead of using a fixed time window, e.g., 1000 instruction.
+Given a monotonically increasing tick number $t$, we define a sliding window as a collection of $W$ latest samples of ($\text{VMExit}_t$, \#$\text{InstExec}_t$) delivered by the scheduler.
+\thename computes \freqvmexitof{t} at the current tick $t$ as follows:
+% \vspace{-0.3em}
+{\small
+\begin{equation*}
+	\scalebox{1.3}{\freqvmexitof{t}} = \scalebox{0.9}{\ensuremath{\frac{{\sum\limits_{i=t-W}^t \text{VMExit}_i}}  {{\sum\limits_{i=t-W}^t \# \text{InstExec}_i}} \\ \text{, where } \text{VMExit}_i \in \{0, 1\}}}
+	% RateVMExit_i = \frac{{\sum\limits_{t=i-W}^i CntAsyncVMExit_t}}  {{\sum\limits_{t=i-W}^i CntInstExec_t}}.
+\end{equation*}
+
+}
+% \vspace{-0.5em}
+This enables efficient computation of VMExit frequency using two size-$W$ ring buffers that track VMExit and InstExec samples.
+Running sums are maintained by adding new values and subtracting expired ones, avoiding iteration over tick samples.
+
+% This enables the efficient computation of the \freqvmexitof{t} using running sums maintained with ring buffers, eliminating the need to iterate over the samples of each tick.
+% We utilize two ring buffers of size \( W \) to store samples of VMExit$_t$ and InstExec$_t$.
+% {We subtract the oldest values from the running sums on each scheduler invocation, add the new values, and append the current sample to the buffers.}
+
+
+
+\begin{table}[t]
+	\centering
+	\footnotesize
+	\renewcommand{\arraystretch}{.100}
+	\setlength\tabcolsep{2pt}
+	\input{figures/incognitos/policy-params}
+	\caption{Configurable parameters to policy}
+	\label{tab:policy-params}
+\end{table}
+
+\hdr{Policy formulation}
+\label{subsubsec:policy-formulation}
+{A high-level rerandomization frequency regulation policy can now be constructed based on the robust VMExit frequency measurements from the current sliding window.}
+\autoref{tab:policy-params} explains the configurable parameters of the policy.
+Below is the policy at a glance:
+
+{
+\small
+\begin{gather*}
+	% \setlength{\jot}{10pt}
+	\scalebox{1.3}{\freqrrof{t}} =
+	\begin{cases}
+		\freqrrof{Normal}             & \textit{if }  \freqvmexitof{t} < \freqvmexitof{Alarm} \\[8pt]
+		\rerandfunc(\freqvmexitof{t}) & \textit{otherwise}                                    %\\
+		%  \text{\bfseries if } 
+		% & \text{\bfseries else }  
+	\end{cases}
+	% \\
+	% where \rerandfunc(\freqvmexitof{t}) = {\freqvmexitof{t}}^2 \times \alpha  
+\end{gather*}
+\begin{center}
+	\vspace{-0.5ex}
+	where \rerandfunc(\freqvmexitof{t}) = ${\freqvmexitof{t}}^2 \times \alpha$
+\end{center}
+
+%  \begin{multline*}
+%       \scalebox{1.3}{\freqrrof{t}} =
+%       \begin{cases}
+% 			% RateRR_{adapt} = ExitRate_i ^ 2  &\text{if } RateVMExit_i \neq 0 \\
+% 		 \text{\bfseries if } \freqvmexitof{t} > \freqvmexitof{Alarm} & \text{\bfseries then }  \rerandfunc(\freqvmexitof{t})   \\
+% 		& \text{\bfseries else }  \freqrrof{Normal}
+% 		\end{cases}
+%  \end{multline*}
+% \begin{center} 
+% where \rerandfunc(\freqvmexitof{t}) = ${\freqvmexitof{t}}^2 \times \alpha$  
+% \end{center}
+
+}
+
+\thename maintains a relaxed rerandomization rate of \freqrrof{Normal} when the measured VMExit frequency is below the threshold frequency \freqvmexitof{Alarm}.
+However, when the threshold exceeds the threshold, the policy enters an \emph{alarmed rerandomization state}.
+The rerandomization frequency during the alarmed state (\freqrrof{Alarm}) is regulated through the function \rerandfunc.
+Currently, we use a simple quadratic function for \rerandfunc that allows the \freqrrof{Alarm} upward curve to maximize when attack frequencies are measured.
+% Alternatively, a linear scaling function may be used.
+Also, \thename allows an optional termination policy to abruptly terminate the CVM after a \emph{grace period} ($G$).
+% after $G$ sliding windows of the grace period.
+If VMExit frequencies higher than the threshold \freqvmexitof{Alarm} are observed for $G$ consecutive windows, CVM termination proceeds.
+A value of $0$ for $G$ signifies that the termination policy is disabled.
+
+
+
+% \limcomm{The following explanation of \emph{grace period termination} is not flow well with previous sentences, since it is not directly related to the above equation. Also, hard to understand.}{}
+
+
+\label{subsec:policy-parameters}
+\hdr{Rationale for default parameters}
+As to the concrete parameters we use for evaluation, we set the \freqvmexitof{Alarm} to be $0.003$ as mentioned (Nyquist frequency of 2$\times$ benign workload frequency).
+This threshold renders the low-exit NPF attack (\llenpf) infeasible due to constant randomization, and only occasional benign high-VMExit execution suffers as a side effect.
+Also, we used the values $1/10$K, $1/100$K, $1/500$K, $1/1$M, $1/2$M for \freqrrof{Normal}.
+The rationale behind the general range is that \thename's rate can be substantially lower than the previous work's fixed rerandomization rates (e.g., every 1K \emph{memory accesses}~\cite{zhang2020klotski}).
+% The unit from the previous work, every N memory access, and \thename's unit of every N instruction executed are different.
+Hence, we assume one memory access per 10 instructions (1/10K) and relax the number in multiple steps.
+Additionally, we used $W=100$ and $G=1000$, which we empirically found optimal for promptly detecting VMExit rate changes during workloads and attacks.
+% $G$ is chosen to be 1000, which did not trigger terminations across the evaluation targets.

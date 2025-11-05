@@ -1,0 +1,74 @@
+
+\begin{adjustbox}{angle=90}
+	\begin{threeparttable}
+    \begin{NiceTabular}{@{}>{\it }lll*{15}r@{}}[corners]
+			% \cmidrule(){2-3} 
+			\CodeBefore
+			\rowlistcolors{4}{gray!8, }[cols=1-18]
+			% \rowcolors[gray]{2}{0.8}{}[cols=2-3,restart]
+			\Body
+			\toprule
+			\Block{3-1}{\thead{Bench.}} & \Block{2-2}{\thead{ReRand.                                                                                                                                                                         \\Disabled}}& &\Block{1-15}{\thead{Static Rerandomization}} &&&&&&&&&&&&&&\\
+			\cmidrule(rl){4-18}
+			% \cmidrule(rl){9-14}
+			% \cmidrule(rl){15-17}
+
+			~                           & ~                          & ~    &
+			\Block{1-3}{\thead{$\freqrrof{Static}=$1/10K}}
+			                            &                            &      & \Block{1-3}{\thead{$\freqrrof{Static}=$1/100K}}
+			                            &                            &      & \Block{1-3}{\thead{$\freqrrof{Static}=$1/500K}}
+			                            &                            &      & \Block{1-3}{\thead{$\freqrrof{Static}=$1/1M}}
+			                            &                            &      & \Block{1-3}{\thead{$\freqrrof{Static}=$1/2M}}                                                                                                                  \\
+			\cmidrule(rl){2-3}
+			\cmidrule(rl){4-6}
+			\cmidrule(rl){7-9}
+			\cmidrule(rl){10-12}
+			\cmidrule(rl){13-15}
+			\cmidrule(rl){16-18}
+			% \cmidrule(rl){8-11}
+			% \cmidrule(rl){12-15}
+			% \cmidrule(rl){4-7}
+			% \cmidrule(rl){3-4}
+			% \cmidrule(rl){5-6}
+			% \cmidrule(rl){7-8}
+			% \cmidrule(rl){9-11}
+			% \cmidrule(rl){12-14}
+			% \cmidrule(rl){15-17}
+			~                           & \thead{Ovh.                                                                                                                                                                                        \\($\times$)} & \thead{\#Tick}
+			                            & \thead{Ovh.                                                                                                                                                                                        \\($\times$)} & \thead{\#RR} & \thead{\#PF}
+			                            & \thead{Ovh.                                                                                                                                                                                        \\($\times$)} & \thead{\#RR} & \thead{\#PF}
+			                            & \thead{Ovh.                                                                                                                                                                                        \\($\times$)} & \thead{\#RR} & \thead{\#PF}
+			                            & \thead{Ovh.                                                                                                                                                                                        \\($\times$)} & \thead{\#RR} & \thead{\#PF}
+			                            & \thead{Ovh.                                                                                                                                                                                        \\($\times$)} & \thead{\#RR} & \thead{\#PF}
+			\\
+			\midrule
+			NumSort                     & 3.29                       & 326M & 381.40                                          & 55K  & 5036.2  & 41.05  & 58K & 4537.6  & 14.60 & 44K & 2545.6 & 8.85  & 44K & 2099.6 & 7.92  & 33K & 1172.6 \\
+			StrSort                     & 3.24                       & 313M & 327.93                                          & 55K  & 4591.8  & 39.12  & 49K & 3635    & 11.57 & 37K & 2450.6 & 8.09  & 29K & 1752.2 & 6.31  & 22K & 1122.6 \\
+			Bitfield                    & 6.74                       & 411M & 186.96                                          & 53K  & 17216.6 & 30.30  & 38K & 10092.8 & 16.56 & 24K & 3643.4 & 13.96 & 20K & 2161.4 & 12.33 & 15K & 1218.6 \\
+			EmFloat                     & 3.43                       & 291M & 477.88                                          & 113K & 11553.4 & 71.28  & 54K & 3989.8  & 19.41 & 40K & 2578.2 & 12.86 & 34K & 1914   & 9.46  & 28K & 1286.4 \\
+			Fourier                     & 5.40                       & 289M & 1726.60                                         & 76K  & 3189.4  & 217.53 & 52K & 1758.4  & 53.16 & 44K & 1375   & 30.26 & 39K & 1199.2 & 18.64 & 32K & 973.6  \\
+			Assign                      & 1.75                       & 179M & 182.40                                          & 55K  & 2598.2  & 20.44  & 53K & 2236.4  & 6.24  & 36K & 1404.2 & 4.25  & 27K & 1035   & 3.07  & 19K & 704.8  \\
+			IDEA                        & 5.28                       & 327M & 434.82                                          & 90K  & 14955.8 & 46.40  & 54K & 8378.2  & 17.78 & 33K & 4189   & 12.58 & 24K & 2962   & 9.59  & 16K & 1944.8 \\
+			Huffman                     & 3.63                       & 289M & 130.09                                          & 61K  & 10246.2 & 18.94  & 43K & 6149.8  & 8.15  & 25K & 2705.8 & 6.30  & 16K & 1742.4 & 5.33  & 10K & 1024.8 \\
+			NNET                        & 2.25                       & 186M & 1106.01                                         & 111K & 4830.6  & 110.57 & 56K & 2431    & 24.84 & 45K & 1945.8 & 13.94 & 41K & 1741.6 & 8.24  & 35K & 1464.4 \\
+			LU Dec.                     & 7.44                       & 354M & 1541.90                                         & 52K  & 2558.2  & 203.94 & 50K & 1885.8  & 53.91 & 44K & 1418.4 & 34.12 & 42K & 1118.6 & 24.02 & 40K & 794.4  \\
+			% GEOMEAN&3.87&449.87&&&56.04&&&17.96&&&12.01&&&8.97&&\\
+			% StrSort&3.85&469M&3339.44&11K&31K (29\%)&76K (71\%)&8.33&11K&17K (22\%)&58K (78\%)&5.13&991&7K (20\%)&28K (80\%)\\
+			% Bitfield&9.61&585M&1375.22&49K&37K (38\%)&61K (62\%)&9.80&49K&27K (69\%)&12K (31\%)&10.88&858&10K (70\%)&4K (30\%)\\
+			% EmFloat&3.80&454M&1943.78&90K&118K (41\%)&171K (59\%)&7.69&90K&33K (50\%)&33K (50\%)&4.93&443&8K (62\%)&5K (38\%)\\
+			% Fourier&6.44&449M&9196.11&16K&95K (50\%)&95K (50\%)&14.36&16K&35K (43\%)&46K (57\%)&7.35&441&4K (36\%)&8K (64\%)\\
+			% Assign&2.40&125M&868.66&26K&195K (85\%)&33K (15\%)&2.63&26K&37K (73\%)&13K (27\%)&3.18&2K&22K (73\%)&8K (27\%)\\
+			% IDEA&6.08&223M&2853.28&74K&91K (35\%)&166K (65\%)&7.72&74K&21K (49\%)&21K (51\%)&7.14&479&2K (42\%)&2K (58\%)\\
+			% Huffman&4.02&362M&799.09&51K&109K (63\%)&64K (37\%)&3.77&51K&20K (72\%)&8K (28\%)&5.03&2K&8K (69\%)&3K (31\%)\\
+			% NNET&2.78&272M&4583.57&45K&189K (45\%)&227K (55\%)&6.64&45K&36K (43\%)&47K (57\%)&2.85&316&3K (35\%)&5K (65\%)\\
+			% LU Dec.&8.08&505M&6604.33&12K&83K (83\%)&17K (17\%)&19.81&12K&71K (81\%)&16K (19\%)&9.53&2K&67K (79\%)&18K (21\%)\\
+			\midrule
+			GeoMeaBn                    & 3.87                       &      & 449.87                                          &      &         & 56.04  &     &         & 17.96 &     &        & 12.01 &     &        & 8.97  &     &        \\
+			% GEOMEAN&4.65&&2494.71&&&&7.56&&&&5.58&&&\\
+			\bottomrule
+		\end{NiceTabular}
+		\centering
+		\caption{Performance overheads \textbf{\emph{Ovh.}} of different \thename configurations, compared against unmodified \nbench execution.
+			Average number of executed synchronous ticks (\textbf{\emph{\#Tick}}), page faults (\emph{\textbf{\#PF}}) and rate-adaptive rerandomizations (\emph{\textbf{\#RR}}) for each benchmark iteration are also reported. Number of synchronous ticks remains mostly constant across settings.}\label{tab:nbench}
+	\end{threeparttable}
+\end{adjustbox}

@@ -1,0 +1,22 @@
+\begin{threeparttable}
+    \centering
+    \small
+
+    \newcolumntype{Y}{>{\centering\arraybackslash}X}
+    \begin{tabularx}{.98\textwidth}{lYYYYYc}
+        \toprule
+          & \thead{Controlled\\Channel}  & \thead{Shielded\\MMU access} & \thead{Huge page\\support} & \thead{Mapping\\integrity} & \thead{Mapping\\validation} & \thead{Invalidate page on \\smash/merge} \\
+          \midrule
+         Intel SGX & PF & \xmark & \xmark & EPCM & \texttt{EACCEPT} & - \\
+          \midrule
+         AMD SEV  &NPF & \checkmark & 2MB & RMP & \texttt{PVALIDATE} & Only merge  \\
+         Intel TDX  &NPF & \checkmark & 2MB, 1GB & PAMT & \texttt{TDG.MEM.PAGE.ACCEPT} , \texttt{TDG.MEM.PAGE.ATTR.WR} & -\\
+         ARM CCA  &NPF & \checkmark & 2MB, 1GB& RMM stage2 translation table & RMM integrity check\\
+         \bottomrule
+    \end{tabularx}
+    \caption{Comparision between Intel SGX and AMD SEV, Intel TDX, and ARM CCA \gls{cvm} architectures.}
+   % \begin{tablenotes}
+   %  \end{tablenotes} 
+    \label{tab:tee-comparision}
+    
+\end{threeparttable}

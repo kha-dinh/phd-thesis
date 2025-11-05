@@ -18,20 +18,20 @@
 %%----------------
 \renewcommand{\bibname}{References}
 \newcommand*{\TitleFont}{%
-      \fontsize{24}{24}%
-      \selectfont\bfseries}
+	\fontsize{24}{24}%
+	\selectfont\bfseries}
 \newcommand*{\subTitleFont}{%
-      \fontsize{18}{18}%
-      \selectfont}
+	\fontsize{18}{18}%
+	\selectfont}
 \newcommand*{\subsubTitleFont}{%
-      \fontsize{16}{16}%
-      \selectfont}
+	\fontsize{16}{16}%
+	\selectfont}
 \newcommand*{\SectionFont}{%
-      \fontsize{14}{14}%
-      \selectfont}
+	\fontsize{14}{14}%
+	\selectfont}
 \newcommand*{\SubSectionFont}{%
-      \fontsize{12}{12}%
-      \selectfont}
+	\fontsize{12}{12}%
+	\selectfont}
 
 
 %\usepackage[T1]{fontenc}
@@ -60,35 +60,35 @@
 \def\thirdmember#1{\def\@thirdmember{#1}}
 
 \newcommand{\makecover}{
-\thispagestyle{empty}
-{\centering \subTitleFont Ph.D. Dissertation\vfill}
-{\centering \TitleFont \@title \vfill}
-{\centering \subTitleFont \@author \vfill}
-{\centering \subTitleFont Department of \@department\\
-The Graduate School\\
-Sungkyunkwan University\\}
-\newpage
-\thispagestyle{empty}~
+	\thispagestyle{empty}
+	{\centering \subTitleFont Ph.D. Dissertation\vfill}
+	{\centering \TitleFont \@title \vfill}
+	{\centering \subTitleFont \@author \vfill}
+	{\centering \subTitleFont Department of \@department\\
+		The Graduate School\\
+		Sungkyunkwan University\\}
+	\newpage
+	\thispagestyle{empty}~
 }
 
 \newcommand{\makeinsidecover}{
-\thispagestyle{empty}
-{\centering \subTitleFont Ph.D. Dissertation\vfill}
-{\centering \TitleFont \@title\vfill}
-{\centering \subTitleFont \@author\vfill}
-{\centering \subTitleFont Department of \@department\\
-	The Graduate School\\
-	Sungkyunkwan University\\}
-\newpage
+	\thispagestyle{empty}
+	{\centering \subTitleFont Ph.D. Dissertation\vfill}
+	{\centering \TitleFont \@title\vfill}
+	{\centering \subTitleFont \@author\vfill}
+	{\centering \subTitleFont Department of \@department\\
+		The Graduate School\\
+		Sungkyunkwan University\\}
+	\newpage
 }
 
 \newcommand{\makesubmissionform}{
 \thispagestyle{empty}~
 {\centering \TitleFont \@title\vfill}
 {\centering \subTitleFont \@author\vfill}
-{\centering \subsubTitleFont 
+{\centering \subsubTitleFont
 A Ph.D. Dissertation Submitted to the Department of  \@department{} and the\\
-Graduate School of Sungkyunkwan University in partial fulfillment of 
+Graduate School of Sungkyunkwan University in partial fulfillment of
 the requirements for the\\
 degree of Ph.D. in Engineering\vfill}
 {\centering \subsubTitleFont \@month{} \@year\vfill}
@@ -99,68 +99,68 @@ Major Advisor\\
 \newpage
 }
 \newcommand{\makecertification}{
-\thispagestyle{empty}
-{\centering \subTitleFont This certifies that the Ph.D. Dissertation of \\
-\@author\ is approved.\vfill}
-\begin{minipage}{0.35\linewidth}
-~
-\end{minipage}
-\begin{minipage}{0.65\linewidth}
-% Somehow only hphantom works here
-{\SectionFont \hphantom{CCCCCCC}\textcolor{gray}{심사위원장 signature}\vspace{-.8em}}
-\par\rule{\textwidth}{1pt} \\
-{\hphantom{CCC}\raggedright \SubSectionFont Committee Chair: \@committeechair \\~\\ \vspace{-.5em}}
-{\SectionFont \hphantom{CCCCCCC}\textcolor{gray}{심사위원 1 signature}\vspace{-.8em}}
-\par\rule{\textwidth}{1pt} \\
-{\hphantom{CCC}\raggedright \SubSectionFont Committee Member 1: \@firstmember\\~\\\vspace{-.5em}}
-{\SectionFont \hphantom{CCCCCCC}\textcolor{gray}{심사위원 2 signature}\vspace{-.8em}}
-\par\rule{\textwidth}{1pt} \\
-{\hphantom{CCC}\raggedright \SubSectionFont Committee Member 2: \@secondmember \\~\\\vspace{-.5em}}
-{\SectionFont \hphantom{CCCCCCC}\textcolor{gray}{심사위원 3 signature}\vspace{-.8em}}
-\par\rule{\textwidth}{1pt} \\
-{\hphantom{CCC}\raggedright \SubSectionFont Committee Member 3: \\~\\\vspace{-.5em}}
-{\SectionFont \hphantom{CCCCCCC}\textcolor{gray}{지도교수 signature}\vspace{-.8em}}
-\par\rule{\textwidth}{1pt} \\
-{\hphantom{CCC}\raggedright \SubSectionFont Major Advisor: \@advisor \\~\\}
-\end{minipage}
-\vfill
-{\centering \subTitleFont The Graduate School\\
-Sungkyunkwan University\\
-\@month{} \@year\\}
+	\thispagestyle{empty}
+	{\centering \subTitleFont This certifies that the Ph.D. Dissertation of \\
+		\@author\ is approved.\vfill}
+	\begin{minipage}{0.35\linewidth}
+		~
+	\end{minipage}
+	\begin{minipage}{0.65\linewidth}
+		% Somehow only hphantom works here
+		{\SectionFont \hphantom{CCCCCCC}\textcolor{gray}{심사위원장 signature}\vspace{-.8em}}
+		\par\rule{\textwidth}{1pt} \\
+		{\hphantom{CCC}\raggedright \SubSectionFont Committee Chair: \@committeechair \\~\\ \vspace{-.5em}}
+		{\SectionFont \hphantom{CCCCCCC}\textcolor{gray}{심사위원 1 signature}\vspace{-.8em}}
+		\par\rule{\textwidth}{1pt} \\
+		{\hphantom{CCC}\raggedright \SubSectionFont Committee Member 1: \@firstmember\\~\\\vspace{-.5em}}
+		{\SectionFont \hphantom{CCCCCCC}\textcolor{gray}{심사위원 2 signature}\vspace{-.8em}}
+		\par\rule{\textwidth}{1pt} \\
+		{\hphantom{CCC}\raggedright \SubSectionFont Committee Member 2: \@secondmember \\~\\\vspace{-.5em}}
+		{\SectionFont \hphantom{CCCCCCC}\textcolor{gray}{심사위원 3 signature}\vspace{-.8em}}
+		\par\rule{\textwidth}{1pt} \\
+		{\hphantom{CCC}\raggedright \SubSectionFont Committee Member 3: \@thirdmember \\~\\\vspace{-.5em}}
+		{\SectionFont \hphantom{CCCCCCC}\textcolor{gray}{지도교수 signature}\vspace{-.8em}}
+		\par\rule{\textwidth}{1pt} \\
+		{\hphantom{CCC}\raggedright \SubSectionFont Major Advisor: \@advisor \\~\\}
+	\end{minipage}
+	\vfill
+	{\centering \subTitleFont The Graduate School\\
+		Sungkyunkwan University\\
+		\@month{} \@year\\}
 }
 
 \newcommand{\makesidecover}{
-\newgeometry{top=10mm,bottom=10mm}
-\thispagestyle{empty}
+	\newgeometry{top=10mm,bottom=10mm}
+	\thispagestyle{empty}
 
-\begin{minipage}{\linewidth}
-	\centering
-	\rotatebox{-90}{Ph.D. Dissertation}
-\end{minipage}
-\vfill
-\begin{minipage}{\linewidth}
-\centering
-\rotatebox{-90}{\@title}
-\end{minipage}
-\vfill
-\begin{minipage}{\linewidth}
-\centering
-\rotatebox{-90}{\@year}
-\end{minipage}
-\vfill
-\begin{minipage}{\linewidth}
-\centering
-\rotatebox{-90}{\@author}
-\end{minipage}
-\vfill
-\restoregeometry
+	\begin{minipage}{\linewidth}
+		\centering
+		\rotatebox{-90}{Ph.D. Dissertation}
+	\end{minipage}
+	\vfill
+	\begin{minipage}{\linewidth}
+		\centering
+		\rotatebox{-90}{\@title}
+	\end{minipage}
+	\vfill
+	\begin{minipage}{\linewidth}
+		\centering
+		\rotatebox{-90}{\@year}
+	\end{minipage}
+	\vfill
+	\begin{minipage}{\linewidth}
+		\centering
+		\rotatebox{-90}{\@author}
+	\end{minipage}
+	\vfill
+	\restoregeometry
 }
 
 \newcommand{\makeabstracttitle}{
-\phantomsection %\label{chap:Abstract}
-\addcontentsline{toc}{chapter}{Abstract}
-\chapter*{Abstract}\label{chap:Abstract}
-{\centering \subTitleFont \@title\\~\\}
+	\phantomsection %\label{chap:Abstract}
+	\addcontentsline{toc}{chapter}{Abstract}
+	\chapter*{Abstract}\label{chap:Abstract}
+	{\centering \subTitleFont \@title\\~\\}
 }
 
 % Set paper size and margins
@@ -175,7 +175,7 @@ Sungkyunkwan University\\
 \let\oldfootnote\footnote
 \renewcommand{\footnote}[1]{\oldfootnote{\fontsize{9}{9}\selectfont#1}}
 
-        
+
 
 
 % \fallbackchar{-}
@@ -183,33 +183,43 @@ Sungkyunkwan University\\
 
 % \newunicodechar{^^^^007e}{{\JapSubstFont\symbol{"007e}}}
 \setmainfont{HMJ}[
-    Mapping=tex-text,
-    AutoFakeSlant=0.3,AutoFakeBold=1, % There are no no italic and bold faces so we fake them LOL
-    Path=./,
-    Extension = .ttf,
-    UprightFont=korean.h2mjsm,
-    % BoldFont=*-Bold,
-    % ItalicFont=*-Italic,
-    % BoldItalicFont=*-BoldItalic
-    ]
-
+	Mapping=tex-text,
+	AutoFakeSlant=0.3,AutoFakeBold=1, % There are no no italic and bold faces so we fake them LOL
+	Path=./,
+	Extension = .ttf,
+	UprightFont=korean.h2mjsm,
+	% BoldFont=*-Bold,
+	% ItalicFont=*-Italic,
+	% BoldItalicFont=*-BoldItalic
+]
+%
+% \newunicodechar{^^^^2013}{{\emojifont\symbol{"260E}}} % ☎️
 % \iffontchar \font  "2e3a
 % \iffontchar\font "2e3a \else {%
 % \newunicodechar{^^^^2e3a}{—\,—}%
 % } \fi
 % \newfontfamily\fallbackfont{cmunrm.ttf}
+\newfontfamily\fallbackfont{Noto Serif CJK KR}
 % \DeclareTextFontCommand{\textfallback}{\fallbackfont}
-% \newcommand{\fallbackchar}[2][\textfallback]{%
-%     \newunicodechar{#2}{#1{#2}}%
-% }
-
+\newcommand{\fallbackchar}[2][\textfallback]{%
+	\newunicodechar{#2}{#1{#2}}%
+}
+%
 % \fallbackchar{‐}
 % \fallbackchar{⸺}
 % \newunicodechar{^^^^2010}{testtest}
 % \newunicodechar{^^^^2010}{testset}
 % \newunicodechar{^^^^2011}{testset}
 % \newunicodechar{^^^^2012}{testset}
-% \newunicodechar{^^^^2013}{\textfallback{\char"2013}}
+% \newunicodechar{X}{{\fallbackfont{X}}}
+\newunicodechar{^^^^2013}{{\fallbackfont{^^^^2013}}}
+\newunicodechar{^^^^2014}{{\fallbackfont{^^^^2014}}}
+% \newunicodechar{^^^^FFFD}{{\fallbackfont{^^^^FFFD}}}
+\newunicodechar{^^^^0306}{{\fallbackfont{^^^^0306}}}
+\newunicodechar{^^^^0161}{{\fallbackfont{^^^^0161}}}
+\newunicodechar{^^^^0103}{{\fallbackfont{^^^^0103}}}
+\newunicodechar{^^^^2022}{{\fallbackfont{^^^^2022}}}
+% % \newunicodechar{^^^^2013}{\textfallback{\char"2013}}
 % \newunicodechar{^^^^2014}{testset}
 % \newunicodechar{^^^^2015}{testset}
 
@@ -238,7 +248,7 @@ Sungkyunkwan University\\
 \setlength\parskip{0pt}%0.25in}
 
 
-   
+
 
 
 % switch to double spacing
@@ -268,61 +278,61 @@ Sungkyunkwan University\\
 
 
 \titleformat{\section}
-  {\bfseries\fontsize{14}{14}\selectfont}
-  {\thesection}
-  {10pt}
-  {\vspace{1em}}
-  
-\titleformat{\subsection}
-  {\normalfont}
-  {\thesubsection}
-  {10pt}
-  {\vspace{1em}}
+{\bfseries\fontsize{14}{14}\selectfont}
+{\thesection}
+{10pt}
+{\vspace{1em}}
 
-  
+\titleformat{\subsection}
+{\normalfont}
+{\thesubsection}
+{10pt}
+{\vspace{1em}}
+
+
 \titleformat{\subsubsection}[runin]
-  {\bfseries\normalsize\selectfont}
-  {\thesubsubsection}
-  {10pt}
-  {}
+{\bfseries\normalsize\selectfont}
+{\thesubsubsection}
+{10pt}
+{}
 
 %   \titleformat{\subsubsection}
 % {\normalfont\normalsize\bfseries}{\thesubsubsection}{1em}{}
- 
-  
+
+
 \titleformat{name=\section,numberless}
-  {\bfseries\fontsize{14}{14}\selectfont}
-  {\thesection}
-  {10pt}
-  {\vspace{1em}}
+{\bfseries\fontsize{14}{14}\selectfont}
+{\thesection}
+{10pt}
+{\vspace{1em}}
 
 \renewcommand\thesection{\arabic{section}.}
 \renewcommand\thesubsection{\Alph{subsection}.}
 \renewcommand\thesubsubsection{\Alph{subsection}.\arabic{subsubsection}.}
-  
+
 \def\@makechapterhead#1{%
-  \vspace*{0\p@}%
-  {\parindent \z@ 
-        % \raggedright
-        \centering
-        \reset@font\fontsize{16pt}{16pt}\selectfont\bfseries
-        {Chapter \thechapter{}. \uppercase{#1} \\~\\}   % #1 is the chapter title
-        \par\nobreak
-    \vskip 0\p@
-  }}
+	\vspace*{0\p@}%
+	{\parindent \z@
+		% \raggedright
+		\centering
+		\reset@font\fontsize{16pt}{16pt}\selectfont\bfseries
+		{Chapter \thechapter{}. \uppercase{#1} \\~\\}   % #1 is the chapter title
+		\par\nobreak
+		\vskip 0\p@
+	}}
 
 % For reference chapter
 \def\@makeschapterhead#1{%
-  \vspace*{0\p@}%
-  {\parindent \z@ 
-        \raggedright
-        \reset@font\fontsize{16pt}{16pt}\selectfont\bfseries
-        {#1}%\qquad\hphantom{\thechapter{}}\  \quad #1}
-        \par\nobreak
-        \vspace{1em}
-    \vskip 0\p@
-  }}
-  
+	\vspace*{0\p@}%
+	{\parindent \z@
+		\raggedright
+		\reset@font\fontsize{16pt}{16pt}\selectfont\bfseries
+		{#1}%\qquad\hphantom{\thechapter{}}\  \quad #1}
+		\par\nobreak
+		\vspace{1em}
+		\vskip 0\p@
+	}}
+
 %% Numbered chapter heading style:
 %
 %\renewcommand{\@makechapterhead}[1]{%
@@ -355,4 +365,4 @@ Sungkyunkwan University\\
 \endinput
 
 
-      
+

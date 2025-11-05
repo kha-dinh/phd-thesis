@@ -1,0 +1,76 @@
+\section{Discussion}
+\label{sec:discussion}
+This section discusses the applicability of \thename's unikernel-based oblivious paging scheme on other \gls{cvm} architectures like Intel TDX and ARM CCA and provides an analysis of \thename security guarantees.
+
+
+% \subsection{Applicability to other \gls{cvm}}
+\label{sec:discussion:cvms}
+
+% \hdr{Prtoection mechanisms }
+% While Intel TDX's implementation is different, the core principle of guest VM protection is akin to SEV-SNP.
+% TDX platforms provide nested paging-based memory management, allowing direct MMU access to guests.
+% TDX provides transparent encryption and guarantees the integrity of GPA to HPA mapping with PAMT, similar to SEV-SNP's RMP table.
+% Also, TDX requires guest TD to accept(\texttt{TDG.MEM.PAGE.ACCEPT}) and track pages.
+
+\iffalse
+\hdr{Controlled-channel threats on Intel TDX and ARM CCA}
+Our analysis of the publically available specifications for Intel \gls{tdx}~\cite{tdx,intel-tdx-survey} and ARM \gls{cca}~\cite{cca} indicates that while ARM \gls{cca} is free from controlled-channels attacks, Intel \gls{tdx} remains vulnerable.
+ARM \gls{cca} currently supports only restricted dynamic memory management: once a \gls{cvm} page is unmapped, \gls{cca} discards its content and mapping, preventing re-mapping~\cite{cca}.
+This approach mitigates \gls{npf} controlled-channel attacks but results in less flexible memory management.
+Intel \gls{tdx} prevents direct \gls{npt} manipulation, but the hypervisor could still intercept memory accesses through the \emph{page blocking} mechanism~\cite{tdx}.
+\fi
+
+
+\hdr{Applicatibity to other architectures}
+\thename's security policies have been developed for AMD SEV-SNP.
+However, they can be generalized to other TEE architectures.
+For instance, we expect SGX enclaves to also benefit from our work, but we leave it as future work.
+In the case of Intel \gls{tdx},  we found that in its current specification, even without direct \gls{npt} access, the hypervisor could still perform \gls{npf} controlled-channel attacks through the \emph{page blocking} mechanism~\cite{tdx}.
+In addition, \gls{tdx} provides a minimum of 1,000 CVM execution cycles between each hypervisor-induced VMExit, thereby reducing the temporal resolution of single-stepping attacks.
+Also, it adds random variance to the minimum cycles each time to add noise to the side-channel attack launched on top of single-stepping.
+Thus, \thename may offer the same level of security as its SEV implementation with a relaxed tick rate.
+
+
+% However, such a management scheme severely limits the hypervisor's ability to manage memory. 
+% Thus, in the current
+% CCA does not support deallocating preallocated guest VM pages, lacking flexible memory management.
+% It only supports lazy allocation of guest pages on the fly.
+% The host can destroy the pages and reclaim them; however, it cannot repopulate them with previous data; only the terrorized page can do this.
+% 
+% Every allocated guest page is managed within \gls{rmm}, revealing no trace of page faults to the host.
+% However, CCA, mostly being enforced with firmware, can change to support these features in the future.
+
+
+% \hdr{Avaiability of \thename's building blocks on other CVMs}
+% \thename leverages huge mappings and direct memory access
+% % Also, both platforms allow huge page mapping up to 1GB pages~\cite{}.
+% Both \gls{tdx} and \gls{cca} support huge page mappings and provide allowing direct MMU access to \glsps{cvm}.
+% Moreover, both platforms provide a secure timer source to implement \thename's validation scheme.
+% % (But CCA doesn't support it currently)
+% We expect that \thename can be adapted to any \gls{cvm} platform without major design changes.
+
+\hdr{Trusted timer interrupt}
+Our binary instrumentation to achieving self-sovereignty may be replaced with preemptive scheduling if a trusted source of timer interrupts exists.
+AMD Secure AVIC specification \cite{secureavic} secure guest's \gls{apic} states and prevents the hypervisor from injecting unexpected interrupts into \glspl{cvm}.
+Unfortunately, while this shows potential in securing interruptions, the current Secure AVIC specification still requires the hardware timer (LAPIC) to be emulated by the untrusted hypervisor~\cite{secureavic}.
+% Thus, it is a future research direction to enable a trusted source of timer that respects deadline constraints for \gls{cvm}.
+
+\hdr{\textcolor{red}{Kill discussion}}
+
+
+% **Note TDX have single stepping protection + continous faulting GPA protection for NPF attacks**
+
+% \hdr{Security of bounded leakage}
+% While we employ the strictest bounded leakage $n=1$ in our evaluation, in practice, this value might be relaxed to reduces the performance overheads.
+
+% This is because on \gls{sevsnp}, once a page is smashed, its merging requires 
+
+% \subsection{Limitations}
+
+
+
+% \hdr{Binary rewriting}
+% \thename inherits limitations of binary rewriting tools.
+% \thename employs probe-based binary rewrite to avoid complications with control flow recovery and relocation, two major issues with binary rewriting~\cite{e9patch}.
+% However, most rewriting tools also depend on correct program disassembly, which may be challenging in certain cases, for instance, data embedded within code.
+% Thus, \thename may

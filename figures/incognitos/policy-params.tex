@@ -1,0 +1,16 @@
+
+    \begin{NiceTabular}{>{\centering\arraybackslash}p{2cm}p{10cm}}
+    \toprule
+    \thead{} &\thead{Description}\\
+        \toprule
+        $W$ & Number of samples in single sliding window  \\
+        \midrule
+        \freqvmexitof{Alarm} & Frequency threshold to trigger alarmed rerandomization state   \\
+        \midrule
+        \freqrrof{Normal} & Frequency of rerandomization during \emph{un}alarmed state   \\
+        \midrule
+        \raisebox{-1.2ex}{\hspace{0.3em}\rerandfunc}  & Function that determines rerandomization frequency \freqrrof{Alarm} with  current measured \freqvmexit as input during alarmed state   \\
+        \midrule
+        \raisebox{-1.4ex}{$G$} & Grace period constant where termination happens after $G$ consecutive sliding windows measurements above \freqvmexitof{Alarm}   \\
+        \bottomrule
+    \end{NiceTabular}

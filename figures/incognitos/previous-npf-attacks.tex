@@ -1,0 +1,38 @@
+\begin{table}[t]
+    \small
+    \centering
+    \begin{tabularx}{\columnwidth}{@{}lX@{}}
+    \toprule
+         \thead{Attack}& \thead{Leaked Pattern}  \\
+         \midrule
+         \cite{hetzelt2017security,werner2019severest}& System calls \\
+         Se\cite{werner2019severest} & Application structure\\
+         \cite{morbitzer2018severed,li2019exploiting,wilke2020sevurity,radev2020exploiting,li2021cipherleaks,li2022systematic} & Data accesses during critical window\\
+         \cite{li2022systematic} & Function called during critical window \\
+         \cite{li2022systematic}& Context switches\\
+         \bottomrule
+    \end{tabularx}
+    \caption{Previously proposed attacks on SEV that requires the NPF controlled-channel}
+    \label{tab:npf-attack}
+\end{table}
+% \begin{table}[t]
+%     \small
+%     \centering
+%     \begin{tabularx}{\columnwidth}{@{}lccX@{}}
+%     \toprule
+%          \thead{Attack}& \multicolumn{2}{c}{\thead{Leaked Access Pattern}} &\thead{Implication} \\
+%          & \thead{Code}  & \thead{Data}& \\ 
+%          \midrule
+%          \cite{hetzelt2017security,werner2019severest}&\\
+%          \cite{werner2019severest} &\\
+%          \cite{morbitzer2018severed,li2019exploiting,wilke2020sevurity,radev2020exploiting,li2021cipherleaks,li2022systematic} & \\ 
+%          \cite{li2022systematic} & \\
+%          \cite{li2022systematic}& \\
+%          SEVerest~\cite{werner2019severest}& & &\\
+%          Li et al.~\cite{li2019exploiting}&x&x& Build enc./dec. oracle \\
+%          Li et al.~\cite{li2022systematic}& \\
+%          \bottomrule
+%     \end{tabularx}
+%     \caption{Previously proposed attacks on SEV that requires the NPF controlled-channel}
+%     \label{tab:npf-attack}
+% \end{table}

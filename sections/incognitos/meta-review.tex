@@ -1,0 +1,35 @@
+\newpage % The Meta-Review should at least start on a new column
+\glsresetall
+
+% Use \appendices and not \appendix due to IEEEtran.cls quirks
+\appendices % if not used earlier
+
+
+\nobalance
+\section{Meta-Review}
+
+The following meta-review was prepared by the program committee for the 2025 IEEE Symposium on Security and Privacy (S\&P) as part of the review process as detailed in the call for papers.
+
+\subsection{Summary}
+
+This paper presents \thename, a system that obfuscates (at specific learned intervals) the memory of a \gls{cvm}. The system leverages \gls{oram}. The challenge is leveraging \gls{oram} in a practical fashion to entire VM executions. To solve these, the paper leverages a unikernel design (based on Unikraft) and an adaptive exit-rate-based algorithm. The system incurs 2-4 times overhead during execution of real-world programs.
+
+
+
+\subsection{Scientific Contributions}
+\begin{itemize}
+\item Provides a valuable step forward in an established field
+\item Creates a new tool to enable future science
+\item Establishes a new research direction
+\end{itemize}
+
+\subsection{Reasons for Acceptance}
+\begin{enumerate}
+\item Side-channels remain a problem for \glspl{cvm}. The reviewers appreciated how the paper positioned itself in the domain of side-channel mitigations for existing TEEs like SGX, especially ones that have leveraged \gls{oram}. The system designed by \thename helps advance our understanding of \gls{oram}'s application into whole VM TEEs.
+\item The system designed in this paper can help other researchers develop ORAM-specific mitigations for \glspl{cvm}.
+\end{enumerate}
+
+\subsection{Noteworthy Concerns} % Exclude if your meta-review does not have noteworthy concerns
+%\begin{enumerate} % Enumerate environment is not necessary if there is only one
+The paper leaves core features (including multi-threading support and defense against other side-channels like cache) as part of future work or out-of-scope.
+% \end{enumerate}

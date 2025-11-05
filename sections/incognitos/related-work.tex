@@ -1,0 +1,167 @@
+\section{Additional Related work}
+% \new{
+We now examine related work on side-channel attacks concerning \gls{sevsnp} \glspl{cvm}, along with side-channel mitigation approaches that were not discussed in
+\cref{sec:background:mitigations}.
+% }
+% We describe the side-channel defense landscape in this section, focusing on the paging-based \emph{side-channel}~\cite{xu2015controlledchannel} and the recent side-channel~\cite{li2021cipherleaks,li2022systematic}, since they are the most immediate threat to \glspl{cvm}.
+
+% \{Side-channel mitigations}
+% \thename is a system that aims to \emph{prevent} controlled-channel attacks from leaking sensitive information
+% In this subsection, we discuss other control-channel mitigation schemes that were proposed previously, including solutions for Intel SGX.
+% We choose not to mention approaches that relies
+
+
+
+% \thename takes 
+
+% \thename builds atop these work with an adaptive obfuscation scheme.
+% Moreover, it covers full system memory accesses and does not require compiler instrumentation.
+
+% The runtime libraries \emph{intercepts} the memory access, perform obfuscated memory accesses, and then finally \emph{translate} the memory.
+% Due to the similarities between instrumentation and the real hardware MMU, these approaches are sometimes referred to as \emph{software-based MMU} schemes.
+% to the runtime libraries right before an application's memory access.
+% Raccon ~\cite{rane2015raccoon} \cite{borrello2021constantine}
+% \cite{zhang2020klotski}
+% \cite{orenbach2019cosmix}
+% \cite{obelix}
+
+
+% There have been proposals for obfuscated execution systems to protect SGX enclaves~\cite{ahmad2019obfuscuro,zhang2020klotski}.
+
+% Obfuscuro and Klotski implemented obfuscated execution engines for SGX programs. Obfuscuro employs a side-channel re
+
+% Unlike Obfuscuro and Klotski, \thename relies on the page fault handling capability.
+
+
+\iffalse
+	\hdr{Secure monitor for paging of \glspl{cvm}}
+	Industries and academia have explored moving certain sensitive hypervisor operations (e.g., maintenance of a \gls{cvm}'s) to be performed by a privileged \emph{secure monitor} that implements security policies.
+	As described in \cref{sec:discussion:cvms}, ARM CCA and Intel TDX require hypervisor paging to be delegated to a hardware-isolated secure monitor.
+	For  \gls{sevsnp}, Qin et al. \cite{qin2020understanding} proposed a \gls{npf} prevention scheme that leverages a \emph{nested kernel}~\cite{dautenhahn2015nested} design to introduce a privileged monitor that executes alongside the hypervisor in host ring-0.
+	This approach requires intrusive modifications to the host hypervisor.
+	% which is impractical for cloud computing scenarios that efficient lifting and shifting of workloads~\cite{ge2022hecate}.
+
+	A challenge with monitor-based defenses is to define a security policy that does not hamper the hypervisor's existing capabilities.
+	Strict policies like preventing \gls{cvm}'s memory pages from being unmapped would severely limit the flexibility in memory management and thus are undesirable.
+	As a consequence, we expect that primitives that enable controlled-channel attacks will eventually emerge as with the case of \emph{page blocking} mechanism of Intel \gls{tdx}~\cref{sec:discussion:cvms}.
+\fi
+
+\subsection{Side-channel attacks on SEV-SNP}
+\label{subsec:related-work:attacks}
+% Previous attacks on SEV-protected CVMs that utilize side channels (\cref{sec:background:side-channels}) as a key component of their strategy.
+The use of side-channel in previous attacks can be categorized into two main types: (1) identifying sensitive pages or function executions as a preliminary step before initiating more targeted attacks~\cite{li2021cipherleaks,li2022systematic,li2019exploiting,cachewarp,sevstep,werner2019severest,morbitzer2018severed,heckler,wesee}, and (2) extracting secrets from the CVM's memory accesses that depend on sensitive information ~\cite{li2021cipherleaks,li2022systematic,sevstep,ciphersteal}.
+While most of the SEV-specific vulnerabilities are already addressed in the latest version of SEV-SNP, e.g., \cite{li2021cipherleaks,cachewarp,li2019exploiting,werner2019severest,morbitzer2018severed}, their side-channel components remain difficult to mitigate.
+\iffalse
+	\thename's adaptive rerandomization scheme targets the \emph{temporal reslution} of the attacks, rendering future attacks much more challenging.
+\fi
+
+\subsubsection{Profiling using controlled channel}
+\label{sec:relatedwork:profiling}
+All existing attacks on SEV and its extensions require a \emph{profiling} phase with the coarse-grained \gls{npf} controlled channel (\cref{sec:background:controlled-channel}) to infer locations of sensitive code/data pages within the guest's \gls{gpa} space.
+Profiling attacks often undermine KASLR through statistical analysis~\cite{heckler,wesee,morbitzer2018severed,li2022systematic} or by matching page access patterns with known ones~\cite{li2019exploiting,wilke2020sevurity}.
+\iffalse
+	We found that most of these attacks necessitate the accumulation of page access traces that reach a specific critical mass, e.g., $22,400$ \gls{cvm} memory accesses since boot~\cite{heckler}, or all page accesses and their instruction counts during an HTTPS request~\cite{li2022systematic}.
+	As shown in our evaluations (\cref{subsec:profiling-attack}), profiling attempts will inevitably be met with constant rerandomizations.
+\fi
+
+% Essentially, profiling attacks attempt to break KALSR with statistical analysis~\cite{heckler,wesee,morbitzer2018severed,li2022systematic} and page access pattern matching~\cite{li2019exploiting,wilke2020sevurity}.
+% Most attacks require an accumulation of page traces that reach a certain critical mass, e.g., 22,400 memory accesses from boot to identify the OpenSSH pages~\cite{heckler}, or page accesses and their instruction counts throughout a HTTPS request~\cite{li2022systematic}.
+% If a \thename address space rerandomization is encountered during profiling, the attack is disrupted before yielding fruitful results.
+
+
+% This information could be obtained through assumed posterior knowledge of the target CVM execution~\cite{li2021cipherleaks,cachewarp,werner2019severest},
+
+
+\hdr{CVM secret extraction}
+\label{sec:relatedwork:extraction}
+Secret extraction attacks require prior identification of sensitive code and data, allowing the extraction of secret-dependent memory accesses.
+Previous work discussed secret extraction through fine-grained side channels~\cite{ciphersteal,li2022systematic,li2021cipherleaks,sevstep} whose temporal resolution is maximized through the single-stepping technique (\cref{sec:background:interrupts}).
+SEV-Step~\cite{sevstep} presents an L2 cache Prime+Probe attack on the AES T-table for key extraction.
+Li and Wilke et al.~\cite{li2022systematic} enhance the now-patched \texttt{CipherLeak}~\cite{li2021cipherleaks} ciphertext attack to perform secret key extraction without relying on the encrypted VMSA.
+\texttt{CipherSteal}~\cite{ciphersteal} infers input data in protected DNN computation using the ciphertext side channel.
+% Aside from introducing difficulties in locating sensitive code and data pages,
+% Although not designed to mitigate attacks using fine-grained side channels completely, 
+\iffalse
+	\thename would increase the rate of rerandomization during these attacks.
+	Each rerandomization effectively pushes the attacker back to the profiling stage.
+\fi
+% disrupt the attack before they yield fruitful results.
+
+% As another example, the \texttt{Prime+Probe} attack against L2 cache on AMD SEV~\cite{sevstep} requires tracing access to the AES T-table from 70 XTS decryption operations using single-stepping (\cref{sec:background:side-channels}), which requires at least $5,600$ cache access traces (70 $\times$ 80 accesses to the T-table per decryption). 
+% The two fine-grained side channels that are still prevalent on SEV are the ciphertext side-channel and L2 cache
+
+
+
+% Attacks on cryptographic implementations require tracking the page locations of cryptographic functions and sensitive buffers\cite{li2021cipherleaks,li2022systematic,sevstep}.
+% CacheWrap~\cite{cachewarp}, CipherLeak~\cite{li2021cipherleaks} requires identification of the starting point of the target function of the attack.
+
+
+
+% show how the side-channel attack primitives are chained to form a practical attack: a coarse-grained primitive is used for the \emph{profiling} phase while fine-grained ones are used for the \emph{extraction} phase.
+
+% In the \emph{profiling phase}, the adversary aims to pinpoint the sensitive pages/function executions within the \gls{gpa} space of the \gls{cvm}.
+% The adversary resorts to the coarse-grained \gls{npf} controlled channel that provides more bandwidth in this phase.
+
+\iffalse
+	Since the profiling phase has to be performed on the entire memory space of the \gls{cvm},
+	the fast \gls{npf} controlled-channel attack is used as a practical primitive to deterministically trace the page-level memory accesses of the \gls{cvm}~\cite{li2021cipherleaks,li2022systematic,li2019exploiting,cachewarp,sevstep,werner2019severest,morbitzer2018severed,heckler,wesee}.
+
+
+	Then, the adversary proceeds to the \emph{extraction phase} in which finer-grained attack primitives, including the finer-grained side channel primitives, are used.
+	The extraction phase focuses on recovering secrets from the \gls{cvm} by utilizing the information obtained from secret-dependent memory accesses exposed through side channels.
+	This phase often depends on the exact locations of the target code or data collected in the profiling phase, for example, the exact pages that store AES T-table~\cite{sevstep}.
+	With the targeted page locations established, the attacker can utilize lower-bandwidth yet high-precision side channels, such as cache and ciphertext, to carry out the extraction~\cite{sevstep,li2021cipherleaks}.
+
+	\hjcomm{Don't we need this?}{...}
+	~\cite{li2022systematic,werner2019severest,morbitzer2018severed,li2021cipherleaks,heckler,wesee,sevstep}.
+\fi
+
+
+\subsection{Approaches for side-channel mitigation}
+Aside from the approaches we discussed in \cref{sec:background:mitigations}, there are other proposals for side-channel mitigation, but with certain limitations.
+Raccoon~\cite{rane2015raccoon} is the first to discuss obfuscation for side-channel mitigation in the context of SGX by incorporating decoy execution and ORAM, which incurs up to 1000$\times$ overheads on simple programs.
+Shinde et al.~\cite{shinde2016preventing} propose a deterministic multiplexing that forces sensitive code and data accesses onto a single page but incurs up to 4000$\times$ overheads on program execution.
+SGX-Shield~\cite{seo2017sgxshield} introduces load-time address space randomization for enclaves but would be defeated through online access profiling.
+OBLIVIATE~\cite{ahmad2018obliviate} introduces an obfuscated file system for SGX enclaves.
+DR.SGX~\cite{brasser2019drsgx} proposes periodic runtime enclave memory rerandomization at the cache-line level.
+ZeroTrace~\cite{sasy2018zerotrace} implements a memory interface that uses ORAM to obfuscate memory accesses.
+Aside from introducing significant overheads, DR.SGX and ZeroTrace only support the obfuscation of data accesses.
+Finally, it is unclear how previous systems would be adapted to support CVM full-system memory access obfuscation.
+% Qin et al.~\cite{qin2023protecting} proposed refactoring the hypervisor to isolate access to paging through a \emph{Virtualization Security Module (VSM)} to mitigate the \gls{npf} controlled channel.
+% This approach necessitates maintaining complex invariants to safeguard the VSM from the untrusted hypervisor~\cite{dautenhahn2015nested} and requires intrusive modifications to the hypervisor codebase, which is not ideal in cloud computing.
+
+% Additionally, it requires establishing parts of the hypervisor as the TCB through the secure boot.
+% which may complicates VM migrations across different hosts.
+% For the control channel mitigation of \gls{sevsnp}
+
+
+% It also must tackle unique challenges in retrofitting, for instance, rerandomizing whole-system pages, including the page table itself.
+
+
+% Several \gls{tee} prototypes such as Keystone~\cite{keystone} and Sanctum~\cite{costan2016sanctum} employ a dual page table approach: the sensitive enclave pages are mapped in a dedicated page table, the \emph{enclave page table}, that are hardware-isolated from the untrusted OS.
+% In these systems, the enclaves self-handle their page faults, removing the controlled channel from the OS. 
+% This approach is limited as it is not compatible with the current OS memory management model, which uses demand-paging.
+% Extending these \gls{tee} designs, InvisiPage~\cite{aga2019invisipage} and Autarky~\cite{orenbach2020autarky} proposed ISA extensions to Intel SGX to enable demand-paging by facilitating cooperation between the enclave and the untrusted OS for ORAM-based page swapping.
+
+% Unlike the mentioned systems that require customized CPU designs or hardware modifications, \thename can be implemented on commodity \gls{sevsnp} hardware and other \gls{cvm} architectures.
+% Retrofitting an adaptive obfuscation scheme into the trust boundary of \gls{cvm} also poses unique challenges that \thename must address, namely the continuous randomization of whole-system pages, including the page table. 
+
+% Additionally, without hardware-enforced page table isolation, \thename's paging scheme achieves \gls{pao} for both data and page table pages by integrating a recursive ORAM scheme into the multi-level page table, thus ensuring comprehensiveness.
+
+% integrate a recursive ORAM scheme into the multi-level page table.
+% While InvisPage assumes hardware support for enclave-OS page table separation, Autarky only introduces minimal hardware changes that (1) hide the faulting address from the OS and (2) force the OS to notify the enclave about page faults.
+% Both works proposed using ORAM to swap EPC pages in and out of the enclave without leaking the access pattern.
+
+
+% Since \thename relies on the natural isolation of the guest page table in \glspl{cvm}, it does not need new hardware extensions like the previous work.
+
+% Moreover, \thename does not rely on compiler instrumentation like Autarky.
+
+
+
+% InvisiPage requires intrusive hardware modifications to support enclave-private page tables. On the other hand, Autarky ...
+
+
+
+% \subsection{Dynamic program instrumentation}
+% \label{sec:rw:dyn-inst}

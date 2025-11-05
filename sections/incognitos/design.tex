@@ -1,0 +1,318 @@
+
+
+\section{MMU-based Page Access Obliviousness}\label{sec:design:mmu}
+
+\key{
+	As the foremost layer of defense, \thename\ thwarts controlled-channel attacks by providing \gls{pao}~\cite{pao}, ensuring that page-level memory access traces generated obtained through controlled-channel attacks are indistinguishable.
+}
+This are achieved by enforcing identical sequences of memory traces or obfuscating memory traces based on random page accesses.
+
+\key{
+	\thename\ efficiently combines both tasks by leveraging the huge pages (\textbf{O2}) and direct access to the \gls{mmu} (\textbf{O1}).
+}
+With \gls{pao} in place, \thename\ not only renders the profiling phase of attacks on \gls{cvm} (\cref{sec:overview:threat}) infeasible but also stops in-track a plethora of attacks~\cite{} that depends on the controlled channel as core attack component.
+
+
+% Mreover, unlike compiler-based instrumentation, our Unikernel design fully leverage textbf{O1} to make it efficient.
+% \thename{} leverage the huge mappings (\textbf{O2}) to render the paging scheme very efficient.
+
+
+
+% Implementing a paging-based \gls{pao} scheme requires \thename\ to tackle three challenges.
+% The first paging scheme must include code and data pages and the OS page table.
+% Second, it must secure the location of trap and interrupt handlers (i.e., the \gls{isr}) from fingerprinting attacks, given that their mappings must always be present.
+% Finally, \thename{} must also retrofit the integrity of huge mappings in the existing \gls{cvm} architectures that allow the hypervisor to change memory mapping sizes arbitrarily.
+% In the next section, we will go into details \thename's solution to these problems.
+
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=.95\columnwidth]{figures/incongitos/concept.pdf}
+	\caption{Objective of \thename's paging scheme}
+	\label{fig:concept}
+\end{figure}
+
+% \key{
+% 	Since hardware interrupts are virtualized by the hypervisor, \thename must ensure that the hypervisor sends interrupts promptly.
+% }
+% \thename uses the secure timer (Secure \gls{tsc}) feature provided by \gls{sevsnp} to reliably obtain how much time has passed since the last validation.
+% % Fortunately, SEV-SNP provides a secure timer (Secure TSC) mechanism that the hypervisor cannot manipulate. 
+% Once Secure TSC is enabled, \texttt{rdtsc} computes the TSC with values outside the hypervisor's control~\cite{amd64}.
+% \thename then employs a threshold $\Delta$ as the maximum time between each validation.
+% When the time measured since the last validation exceeds $\Delta$, \thename also terminates the execution.
+
+
+\subsection{Efficient ORAM-backed paging}
+% \hdr{Whole-system ORAM-backed paging}
+
+% \key{
+% 	\thename takes full advantage of the gracious 2MB physical space provided by \gls{apage} to limit the amount of costly \gls{oram}-backed page swaps during runtime.
+% }
+
+% By ensuring that all in-\gls{cvm} access via \glspl{gva} is confined to a corresponding \gls{gpa} within \gls{apage}, \thename achieves full-system \gls{pao}.
+% In other words, all in-\gls{cvm} memory accesses must land on one of the 512 active subpages that are mapped into \gls{apage}'s \gls{gpa}.
+% An exception to this rule is the page swapping operations; with the now 2MB-limited currently active subpages, a scheme for paging in/out of the subpages is indispensable for practicality.
+
+\key{By exploiting direct MMU access, \thename decouples the paging granularity between the host and guest systems.
+	From the untrusted hypervisor's perspective, \gls{apage} is backed by a single huge page, but from the guest's viewpoint, each guest page is managed at a 4KB granularity.}
+This empowers the guest kernel to self-handle page faults at the 4KB level without detection by the host.
+Physical addresses outside of \gls{apage} serve as \gls{oram}-backed memory, regardless of whether the pages are backed by 4KB or 2MB.
+
+\thename then set up the OS page table, such that all \glspl{gva} that are not mapped to \gls{apage} would incur a \emph{page fault}.
+Upon accessing the faulting \gls{gva}, \thename's page fault handler covertly transfers the page's contents from \gls{oram}-backed storage to a physical page within \gls{apage} using Path ORAM algorithm.
+It then updates the page table to map the \gls{gva} to the corresponding \gls{gpa}.
+\key{Once the \gls{gva} is mapped, the hardware \gls{mmu} automatically handles address translation, resulting in zero overhead compared to standard \gls{cvm} execution.}
+
+
+
+\hdr{ORAM-backed page management}
+\todo{Some background on ORAM}
+
+
+\key{\thename's page table scheme retrofits the unused bits in its \gls{pte} to encode information for \thename ORAM-backed paging.}
+\autoref{fig:oram-pte} shows \thename \gls{pte} encoding inside the page table.
+A \gls{pte} that maps an ORAM-backed \gls{gva} may represent three different states.
+When the present bit is set, then the mapping is active, i.e., the \gls{pte} points to a \gls{pfn} inside \gls{asa}.
+A non-present PTE may be \emph{unallocated} or \emph{ORAM-backed}.
+\thename leverages an unused bit in the \gls{pte} to indicate that the backing \gls{pfn} is residing inside the ORAM tree (i.e., ORAM-backed bit), and an ORAM access must be performed to fetch the page.
+If the ORAM-backed bit is unset, \thename treats the \gls{pte} as unallocated and performs subpage allocation.
+Subpage allocation performs subpage replacement to obtain an empty subpage within \gls{asa} without fetching a new subpage from the stash.
+% \thename's paging scheme uses this bit to decide whether to allocate a new block or fetch a block from the ORAM tree with the Path ORAM algorithm.
+% and an ORAM access must be performed to fetch the block. 
+
+The Path ORAM algorithm maintains a PosMap structure that maps ORAM block addresses to their perspective leaf index in the ORAM tree (\cref{sec:bg:oram}).
+Similarly, the ORAM scheme of \thename also uses a PosMap but minimizes the memory and performance overheads of PosMap management by integrating them into the inherent overheads of paging.
+\key{
+	Specifically, once a subpage is evicted from \gls{asa} (\CircledN{3} in \autoref{fig:ovma-fault}), its \gls{pte} is encoded as ORAM-backed, and its bits[51-12] encode the ORAM leaf index such that \thename can quickly retrieve the leaf index when \gls{pager} is invoked during the software page table walk without additional lookups.
+}
+In other words, the PosMap of ORAM is now replaced with the page table in \thename's ORAM scheme.
+
+
+\hdr{Recursive-ORAM-backed software page walk}
+Interestingly, the subpage access pattern of a software page table walk for handling a faulting ORAM-backed \gls{gva} resembles that of a recursive ORAM scheme.
+Recursive ORAM algorithms break down the PosMap data structure into smaller blocks by a factor of $X$ and store them into another ORAM that uses a smaller PosMap.
+This smaller PosMap is then, once again, broken down and stored into another ORAM.
+The process is repeated recursively for $r$ times until the smallest PosMap is achieved, which is then stored inside secure memory.
+% and store them into ORAMs, leading to progressively smaller PosMaps. 
+To perform recursive ORAM access, PosMaps are accessed, starting from the smallest PosMap.
+For PosMaps backed by ORAM, ORAM accesses are performed to retrieve the PosMap ORAM block that stores the leaf ID of the next ORAM.
+A variation of this approach stores PosMap blocks alongside ORAM blocks within a \emph{unified} ORAM tree structure~\cite{freecursiveoram}, similar to \thename's single \gls{pagepool} both page tables and data pages.
+
+Similarly to a Recursive ORAM access, \thename leverages ORAM accesses to obliviously retrieve the subpage containing the \gls{gpt} required for mapping the faulting \gls{gva}.
+As we will discuss in \cref{sec:oram-encoding}, the \gls{gpt} now also functions as a PosMap with its retrofitted \gls{pte} scheme.
+\key{
+	{This means that \thename's software page table walk is in fact, a Recursive ORAM scheme with recursion level $r = 4$ levels of reduction factor $X = 512$ (the number of \gls{pte} per page table), where both data and PosMap ORAM blocks are 4KB and are stored in a unified ORAM tree.}
+}
+
+
+
+
+
+\subsection{Additional design considerations}
+In this subsection, we discuss additional aspects of the design and implementation of \thename's MMU-assisted \gls{pao} scheme that were left out for a more concise presentation.
+
+\hdr{Post-boot-time rerandomization}
+After \thename's paging scheme is initialized, if the attacker knows of the initial sequence of page accesses, they may be able to deduce the initial physical memory layout.
+This is because the page fault handler fetches the requested page into the code/data scratchpad at a specific offset, allowing the attacker to obtain the ciphertext update.
+To address this issue, \thename\ rerandomize the scratchpads by randomizing the subpages and the respective \gls{gva}-to-\gls{gpa} mappings.
+Combined with adaptive rerandomization, this ensures that it is extremely challenging for an attacker to infer the memory layout.
+
+
+
+\hdr{Handling interrupt service routines}
+Interrupt and trap handlers require their associated code and data pages to be mapped throughout kernel execution to handle hardware events.
+As a result, these pages must be excluded from \thename's paging scheme to ensure correct kernel execution.
+\thename\ is designed to allow certain kernel address regions to be excluded from its paging scheme.
+
+It is important to note that since the hypervisor can arbitrarily inject virtual interrupts, the profiling of \glspl{isr} cannot be prevented through \gls{pao} alone.
+However, as the remaining code and data are protected by \gls{pao}, the access pattern of the \glspl{isr} does not provide useful information to the attacker.
+
+\hdr{Page replacement algorithm}
+\key{
+	\thename's subpage replacement scheme is based on CLOCK~\cite{} page replacement algorithm that approximates LRU with low costs to cope with frequent page fault rates of ORAM-backed paging.
+}
+CLOCK page replacement maintains an index of the next page to be replaced (i.e., the \emph{clock hand}).
+When subpage replacement is requested, \thename\ checks the access bit of the corresponding \gls{pte} of the block pointed to by the current hand.
+If the access bit is set, \thename\ clear the bit, increment the clock hand and repeat the previous step until a non-access page is encountered.
+When a non-access page is reached, the page pointed to by the clock hand is chosen for eviction, and the clock hand is once again incremented.
+
+
+\hdr{Handling page dependencies}
+When dealing with subpages for data and page tables, \thename\ must consider the dependencies between these subpages before selecting pages to be swapped out of the scratchpad area.
+To maintain the \gls{gva}-to-\gls{gpa} translation chain, \thename\ must not swap out page table pages that currently have active mappings.
+Hence, before selecting a page for eviction, \thename\ scans the \glspl{pte} of the pages to locate any present \glspl{pte}.
+If a present \gls{pte} is found, it follows the \gls{pfn} encoded in the first \gls{pte} to access the \gls{gpt} subpage of the lower level within the same page.
+This process repeats until a data subpage is encountered (reaching page level 0) or no more present \glspl{pte} are found at the current \gls{gpt} level.
+The last visited subpage is then selected for eviction, and the clock hand is incremented, following the CLOCK replacement algorithm.
+
+% When dealing with both subpages for data and page tables, \thename must also consider the \emph{subpage dependencies}, before choosing pages to be swapped out of the scratchpad area.
+% That is, \thename\ must not swap out page table pages that currently have active mapping, or the \gls{gva}-to-\gls{gpa} translation chain would be broken.
+%
+% Hence, before selecting a page for eviction, it scans the \glspl{pte} of the pages to locate any present \glspl{pte}. If a present \gls{pte} is found, it follows the \gls{pfn} encoded in the \emph{first} \gls{pte} to access the \gls{gpt} subpage of the lower level within the same page.
+% This dependency check resembles a software page table walk, with the distinction that it visits the first present \gls{pte} found. This process repeats until a data subpage is encountered (reaching page level 0), or no more present \glspl{pte} are found at the current \gls{gpt} level.
+% The last visited subpage is then selected for eviction, and the clock hand is incremented, following CLOCK replacement.
+
+% While CLOCK replacement is sufficient when only data subpages are considered,
+
+% \thename instead chooses to preemptively \emph{prevent} the \gls{gva}-to-\gls{gpa} translation chain from being broken by subpage replacement.
+% It introduces a dependency-aware subpage replacement method built upon the CLOCK replacement algorithm.
+% Instead of immediately evicting a page when the clock hand points to it, \thename checks for dependencies by inspecting its \glspl{pte}.
+
+% Finally, \thenaem\ aim to preserve the layout of the unikernel application.
+% Previous attack techniques leverage the controlled channel to infer
+% First, Wilke et al. \cite{wilke2020sevurity} leverage the controlled channel and the deterministic page access pattern at boot time to identify
+%
+% Second,  \cite{morbitzer2021severity}
+% Dependencies between subpages are demonstrated in \autoref{fig:replacement}.
+% % For a \gls{gva}-to-\gls{gpa} translation to be active, all of the subpage \gls{gpt} used for its translation must be activated (fetched into the \gls{asa} by the \gls{pager}).
+% When a subpage that has active mappings is evicted by the replacement algorithm, the chain of \gls{gva}-to-\gls{gpa} is broken.
+% Thus, the \texttt{pt\_vaddr} for all of its dependent subpages (A and B in \autoref{fig:replacement}) becomes invalid, and these subpages become \emph{orphan} subpages.
+
+% The problem is apparent later when the orphan page A is chosen for replacement; since \texttt{pt\_vaddr} is invalid, we cannot use it to unmap the subpage.
+% A naive approach to solve this would be to evict all of the dependent subpages along the \gls{gva}-to-\gls{gpa} translation chain, whether a \gls{gpt} page is chosen for eviction.
+% However, this leads to a surge in the number of subpages inside the ORAM stash after a subpage replacement.
+% This is undesirable in ORAM schemes due to the problem of ORAM stash overflow that happens when stash occupancy is too high~\cite{stefanov2018path,freecursiveoram}.
+% Another approach could be to trigger a software page table walk (\cref{sec:pf-handler}) with the ORAM block ID of A as the faulting virtual address to re-fetch the depended \gls{gpt} subpage into the \gls{asa}.
+% This, however, would incur additional subpage replacements that lead to additional software page table walks.
+
+
+
+
+
+% In Unikraft, the unikernel \thename is prototyped upon, and the virtual memory subsystem is implemented through in a \gls{vma} abstraction library called \texttt{ukvmem}.
+% To support \thename, we introduce a non-intrusive extension to \texttt{ukvmem} to ensure \gls{pager}, implemented as a \gls{vma}'s \texttt{fault} callback, is invoked when handling \gls{gpt} pages during the software page table walk, similar to how Unikraft's paging handles last-level \glspl{pte}.
+% \thename then implements its paging scheme as a new type of \gls{vma} called the \gls{ovma}.
+% \key
+% {
+% 	The abstraction allows \thename to manage the unikernel and its hosted program memory using its oblivious paging scheme.
+% 	It also allows \emph{exclusion} of certain pages from the paging scheme.
+% 	For instance, the \gls{gpa} of an I/O buffer shared with the hypervisor is inevitably known to the hypervisor.
+% }
+%
+% More importantly, it allows the selective treatment of the interrupt handlers, which must be excluded from \thename ORAM-backed paging to avoid \emph{double-faulting}.
+
+
+
+% \key{
+% 	\thename provides a deterministic security guarantee: in cases of page smashing attacks, the leaked information from \gls{npf} attacks on the \gls{apage} would only extract at most a configurable $n$ number of memory accesses.
+% }
+% Note that $n$ can be configured to  1,  at which point the validation scheme prevents the hypervisor from leveraging page smashing to leak any memory accesses.
+
+% One concern with this approach is that the hypervisor can manipulate the value returned by \texttt{rdtsc} to affect $T$.
+
+
+% In more detail, $T_{smash}$ includes the overheads taken to (1) invoke \texttt{PSMASH} on a page, (2) unmapping of the smashed \gls{gpa} page range (i.e., \emph{zapping} the page range in the \gls{npt}).
+% Assuming that all \gls{cvm}'s \gls{gpa} have been unmapped in the \gls{npt} as a preparation, $T_{npf}$ consists of the overheads to (3) wait for the guest to access memory and trigger an \gls{npf} that would incur a \texttt{VMEXIT}, (4) remap the faulting \gls{gpa}  (5) invoking \texttt{VMRESUME} to resume \gls{cvm}'s execution.
+% In \cref{sec:eval:psmash-profile}, we provide the detailed measurement of $T_{smash}$ and $T_{npf}$ on a \gls{sevsnp}-enabled machine.
+
+
+\section{Adaptive Defense Layer}
+The purpose of \thename's adaptive defense layer is to introduce an intolerable cost to the data extraction primitives in Phase II explained in ~\cref{sec:modeling-attacks}.
+
+\subsection{Securing periodic security routines}
+\thename's \gls{pao} scheme we discussed in \cref{sec:design:mmu} requires a security invariant that the hypervisor must not be able to smash the huge mapping during \gls{cvm} execution.
+This requires a mechanism to \emph{periodically} check and verify the security invariants of the running \gls{cvm}.
+Unfortunately, within a \gls{cvm}, there is a lack of reliable ways to intercept the running application and perform the security routines periodically.
+While interrupt controllers like \gls{apic} and \gls{pit} could be programmed by the \gls{cvm} to trigger interrupt at a high, the actual interrupt delivery is virtualized by the hypervisor, making hardware-based interrupts untrustworthy.
+% For instance, a malicious hypervisor can intentionally delay or not deliver virtualized interrupts, causing the security routines to be delayed or indefinitely postponed.
+Previously, for Intel SGX enclaves, systems for detecting abnormal execution delays~\cite{dejavu} and enclave exit tracking~\cite{oleksenko2018varys} were proposed.
+These works leverage a custom compiler to insert periodic security-checking after a few hundred instructions, hence having the source code requirement limitations we discussed in \cref{sec:preliminaries}.
+
+\hdr{Time-verified interrupt}
+% To achieve its goal of being compatible with unmodified application binaries and fully leveraging the underexplored opportunities in \glspl{cvm}, 
+To ensure that security routines are invoked periodically and timely, \thename\ introduces a new OS primitive called the \emph{time-verified interrupt} (\veriint).
+\veriint\ is essentially a wrapper for interrupt handler that measures the reliability of hardware interrupt delivery through the secure timer now available in \gls{cvm} (\othree).
+The user of \veriint\ specifies a security callback $Cb_{periodic}$ that is expected to be invoked at each period $T$.
+A small constant $\Delta$ is also specified to consider the variability of interrupt deliveries.
+The actual interrupt period programmed into hardware is $T - \Delta$, so actual interrupt delivery falls into $T \pm \Delta$.
+The user also registers $Cb_{late}$ that is to be invoked whenever the interrupt delivery is detected to be unreliable, which may perform \gls{cvm} termination or rerandomization of scratchpad (\cref{sec:design:rerandomization}).
+
+\veriint\ guarantees the reliability of interrupt injection through two thesholds, $\delta_{late}$ and $\delta_{reset}$.
+The \veriint\ interrupt handler increments a \emph{lateness} counter if an interrupt is detected late, and $Cb_{late}$ is invoked whether the counter surpasses $\delta_{late}$.
+The lateness counter is reset every $\delta_{reset}$.
+In other words, the rate of on-time interrupt must be at least $\delta_{late}/\delta_{reset}$.
+
+\begin{algorithm}[h]
+	\small
+	% \SetKwFunction{Fn}{VerifIntHandler}
+	\SetKwProg{Fn}{fn}{:}{}
+	\SetKwFunction{FMain}{VeriIntHandler}
+	\Fn{\FMain{$T$, $\Delta$, $\delta_{late}$, $\delta_{reset}$ ,$Cb_{periodic}$, $Cb_{late}$}}{
+		$T_{now} \gets SecureRdtsc()$\;
+		$T_{elapsed} \gets T_{now} - T_{prev}$\;
+		\If {$T_{elapsed} > (T + \Delta)$}{
+			$Cnt_{Late} \gets Cnt_{Late} + 1$\;
+		}
+		\If{$Cnt_{late} > \delta_{late}$}{
+			$Cb_{Late}$()\;
+		}
+		\If{$Cnt_{Handled} > \delta_{reset}$}
+		{
+			$Cnt_{Late} \gets 0$\;
+			$Cnt_{Handled} \gets 0$\;
+		}
+		$Cb_{periodic}$()\;
+		$T_{prev} \gets SecureRdtsc()$\;
+		$Cnt_{handled} \gets Cnt_{handled}+1$\;
+	}
+	\caption{Time-verified interrupt handler}
+\end{algorithm}
+
+
+
+\hdr{Detection of interrupt starving}
+% In OSes that support preemptive scheduling, hardware timer interrupts are fundamental for OS scheduling, so postponing interrupt delivery leads to DoS.
+% However, unikernels often leverage simpler cooperative scheduling that does not require hardware periodic interrupts~\cite{mirage,unikraft}, detecting the lack of interrupts must be in place.
+We choose to detect long delays of interrupts \emph{opportunitstically} whenever the control is passed back from the \gls{cvm} application to the unikernel, which occurs on two occasions.
+The first occasion is when handling any types of interrupts and traps, including the page faults by our \thename.
+The second occasion is whenever a system call is invoked.
+On any of these occasions, for each \veriint\ interrupt handler, we compute the time since the last interrupt and invoke $Cb_{late}$ if a long delay is detected.
+
+
+
+\hdr{Page Smashing detection with \veriint}
+\todo{Rewrite to reflect TOCTOU scenario}
+To determine the optimal revalidation period $T$, we carefully analyze the overheads required to \emph{smash} a page and perform subsequence \gls{npf} attacks.
+We first define the total time it takes to perform the page-smashing attack to extract $n$ memory accesses as  $T_{smash} + T_{npf} \times n$, where $T_{smash}$ is the overhead of smashing the \gls{apage} into 512 4KB mappings, and $T_{npf}$ is the time it takes to extract a single \gls{gpa} access, using the \gls{npf} control-channel attack.
+Thus, by configuring the validation thread to re-validate the \gls{apage} at a period $T < T_{smash} + T_{npf} \times n$, the information leak obtained through page smashing would be bounded to $n$ memory accesses.
+
+
+
+
+\subsection{Adaptive scratchpad rerandomization}
+\thename\ adaptively rerandomize the physical layout of the scratchpads regions in response to high exit rates.
+
+\hdr{VMEXIT tracking with \veriint}
+Leveraging the verified interrupt.
+\todo{wip}
+Secret extraction through fine-grained primitives requires abnormally high exit rates that can be leveraged to indicate attacks~\cite{oleksenko2018varys,zhang2020klotski}.
+We leverage \veriint\ to implement a periodic VMEXIT tracking scheme.
+by polling for the exit code inside \gls{vmsa}.
+$T$ is set to be the overhead of a round trip of VM enter and exit.
+% A common characteristic of fine-grained attack primitives is that they require abnormally high rates of interruption~\cite{zhang2020klotski,oleksenko2018varys}, which is also the case for fine-grained extraction attacks targeting SEV \glspl{cvm}~\cite{li2021cipherleaks,sevstep}.
+% Thus, previous works in Intel SGX leverage interrupt rate as a metric for attack detection and abort the execution the interrupt rate surpasses a chosen threshold~\cite{oleksenko2018varys,dejavu}.
+% Unfortunately, detection-based approaches suffer from false positives when the application requires frequent interrupts (e.g., I/O intensive applications)~\cite{oleksenko2018varys}.
+
+% To get away with false positive rates, \thename\ instead chooses to build a layer-2 defense on top of layer 1's \gls{pao} protection.
+% It introduces a \emph{subpage randomization} scheme that is adaptive to the rate of \gls{cvm} interruption (VMEXIT).
+% It first implements a VMEXIT detection scheme that leverages the secure timer (\textbf{O3}) to periodically pool for the hardware-maintained exit code inside the \gls{vmsa}.
+% After the number of VMEXIT reaches a configured threshold, \thename\ \emph{rerandomize} the subpages within the \glspl{apage}, halting in-flight attack attempts.
+
+
+
+\subsection{Selective ciphertext protection}
+To cope with layer-2 rerandomization, attackers now must leverage the low-bandwidth fine-grained side channels to extract the memory accesses from the entire guest physical spaces used for \glspl{apage} (up to 4MB).
+For cache attacks, this is rather infeasible because of their susceptibility to noise.
+On the other hand, we chose to provide a defense against ciphertext side-channel due to their \emph{deterministic} nature that can be used to break layer 2's probabilistic guarantees.
+We leverage MMU access (\textbf{O1}) to build a protection scheme against the \emph{colision}-based and \emph{dictionary}-based ciphertext side channels~\cite{cipherh,li2022systematic}.
+% Against the dictionary-based ciphertext side channel, which aims to build plaintext-ciphertext dictionaries from memory content, we leverage page permissions to implement a paging-based trap-and-salt mechanism to add nonces, making every memory written to selected pages indistinguishable.
+% Collision-based ciphertext side-channel observes whether a memory location changed or not.
+% Against this side channel, we introduce a protection that opportunistically performs dummy memory writes to memory locations within \gls{apage}.
+% Kernel-performed dummy memory writes are indistinguishable from application memory writes, thanks to the unikernel design.
+
+\hdr{Paging-powered trap-and-emulate}
+
+\hdr{Dummy accesses}
+
+\hdr{Selective enforcement}
+
+

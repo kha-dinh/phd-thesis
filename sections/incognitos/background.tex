@@ -1,0 +1,473 @@
+% !TEX root = ../main.tex
+% The \gls{seves} extension automatically encrypts the register state in the \gls{vmsa} upon VMExits and introduces the \gls{ghcb} communication protocol that lets the \gls{cvm} safely decide which state to export to the hypervisor.
+
+\section{Background and Related work}
+\label{sec:background}
+
+\subsection{AMD SEV} \label{sec:bg:amdsev}
+\gls{sev} isolates the execution of \glspl{cvm} from the untrusted hypervisor through transparent memory encryption and access control.
+% Memory encryption is performed by the \gls{sp}, using a \gls{vek} uniquely provisioned to each \gls{cvm}.
+\gls{sevsnp} is the newest iteration of SEV that encrypts register states in \gls{vmsa} and addresses mapping integrity through a hardware-maintained \gls{rmp}. 
+% \textcolor{red}{Explain, VMCB: for our exit code checking , RMP: to explain in advance that hypervisor relocating stuff is not possible}
+
+\hdr{VMSA update on VMExits}
+When a VMExit transitions from \gls{cvm} to host execution, the processor automatically updates the \gls{vmsa} with exit information.
+Specifically,  the \texttt{vmsa.exit\_code} field is set as the exit reason for the current VMexit, e.g., 0x400 for \gls{npf}.
+This recording is unavoidable as it takes place at the hardware level without the intervention of the hypervisor~\cite{amd64} and is non-forgeable as the \gls{vmsa} must be mapped as a private \gls{cvm} page that is automatically encrypted.
+
+% Our examination of the AMD SEV-SNP specification~\cite{amd64} and the KVM implementation confirms that this
+
+\hdr{Mapping integrity with RMP}
+\gls{sevsnp} provides mapping integrity through the \gls{rmp}, which contains integrity-protected mapping information such as the page's state (encrypted or non-encrypted) and mapping sizes.
+On any mapping changes, the mapping information in the \gls{rmp} is invalidated; the \gls{cvm} must \emph{validate} this update with the \texttt{pvalidate} instruction.
+The \gls{rmp} is consulted by the CPU on every memory access, which allows a \gls{cvm} to detect illegal changes to the mappings.
+
+\subsection{Side-channel threats in CVMs}
+\label{sec:background:side-channels}
+Side-channel attacks that undermine the confidentiality of trusted executions have long plagued Intel SGX, and many such threats continue in CVMs.
+
+
+\hdr{NPF Controlled-channel attacks}
+\label{sec:background:controlled-channel}
+Adversaries who control the untrusted hypervisor can leverage its control over the \gls{npt} to strategically trigger \gls{npf} on \gls{cvm} pages by marking a page \emph{non-present}.
+When the victim \gls{cvm} accesses such pages, the CPU generates a \texttt{\#NPF}, with the corresponding faulting address recorded in the \gls{vmcb}.
+In the current SEV-SNP~\cite{amd64}, the processor notifies the hypervisor of (1) the faulting \gls{gpfn} (e.g.,\texttt{ 0xff...ab\textbf{000}}) through {\tt VMCB.EXITINFO2} and (2) the cause of the fault, along with other information~\cite{amd64} through the {\tt VMCB.EXITCODE} upon the \gls{npf} occurrence.
+These so-called \gls{npf} controlled-channel attacks are adaptations of the page fault-based attacks against Intel SGX~\cite{xu2015controlledchannel,hahnel2017highresolution}.
+Through the attack, the adversary can trace instruction fetches and data accesses at page granularity.
+In many previous SEV(-SNP) attacks, NPF attacks have been employed as a CVM memory profiling primitive for pinpointing attack targets (\cref{sec:relatedwork:profiling}).
+
+% We classify this attack methodology as an \emph{\gls{npf} controlled-channel attack}, drawing parallels to similar controlled-channel attacks previously documented on 
+
+
+\hdr{Fine-grained side-channels}
+\label{sec:background:fine-grained-sc}
+Fine-grained side-channel attacks represent attack vectors that leak memory access patterns at a resolution finer than the page size.
+These attacks typically exploit microarchitectural leakages (e.g., cache~\cite{sgx-cache-attack,cache-attack-sgx,hahnel2017highresolution} and TLB~\cite{wang2017leaky}) or architectural leakages such the encrypted memory access patterns~\cite{leeoffchip}, and ciphertext updates~\cite{li2021cipherleaks,li2022systematic}.
+Fine-grained side-channel attack vectors have been extensively studied in the context of Intel SGX~\cite{sgx-cache-attack,cache-attack-sgx,sgxstep,bulck2018nemesis,hahnel2017highresolution,cachezoom,sgxspectre,foreshadow}, and certain attacks remain feasible against SEV-SNP \glspl{cvm}.
+For instance, recent research highlights the exploitation of L2 cache Prime+Probe and ciphertext side-channel attacks to extract sensitive information from SEV CVMs~\cite{li2021cipherleaks,li2022systematic,sevstep}.
+Ciphertext side-channel attacks~\cite{li2021cipherleaks,li2022systematic,ciphersteal} are specific to AMD SEV(-SNP).
+They exploit the weak AES-XEX cipher used for CVM memory encryption, which consistently produces the same ciphertext for identical plaintext written to the same physical address.
+In combination with other primitives, a previous work~\cite{li2021cipherleaks} demonstrated a case of full RSA key leak.
+% \limcomm{What's the purpose of this sentence?}
+% {The L2 cache attacks function is almost identical in principle to its Intel SGX counterpart~\cite{cache-attack-sgx} but is much noisier~\cite{sevstep}.}
+
+\subsubsection{Untrustworthy interrupts and temporal resolution}
+\label{sec:background:interrupts}
+% \textcolor{red}{Need details}
+A SEV-SNP CVM currently has no option but to rely solely on the untrusted hypervisor to deliver \emph{virtualized} interrupts, which may be delayed or completely skipped.
+Also, the hypervisor may leverage the precise hardware interrupt timer (e.g., APIC) to seize the victim's CVM execution for itself at any moment and at an arbitrary frequency.
+This untrustworthy interrupt delivery relation has been exploited as a primitive to boost the temporal resolution of the fine-grained side channels.
+Since the fine-grained side channels must target very specific addresses and are often noisy due to the ongoing CVM computations, \emph{single-stepping} technique~\cite{sevstep,sgxstep,cachewarp} was often used to acquire temporal resolution of a single instruction.
+
+% The attack exploits ciphertext being generated for writes to the same physical address, where the physical address serves as the encryption tweak.
+
+\iffalse
+\subsection{Side-channel attack in practice}
+Previous attacks on SEV CVMs~\cite{li2021cipherleaks,li2022systematic,li2019exploiting,cachewarp,sevstep,werner2019severest,morbitzer2018severed,heckler,wesee} show how the side-channel attack primitives are chained to form a practical attack: a coarse-grained primitive is used for the \emph{profiling} phase while fine-grained ones are used for the \emph{extraction} phase.
+
+In the \emph{profiling phase}, the high-bandwidth \gls{npf} controlled-channel attack is used as a practical primitive to pinpoint the sensitive pages and functions by accumulating traces the page memory accesses in the \gls{cvm}~\cite{li2021cipherleaks,li2022systematic,li2019exploiting,cachewarp,sevstep,werner2019severest,morbitzer2018severed,heckler,wesee}.
+
+The adversary aims to pinpoint the sensitive pages/function executions within the \gls{gpa} space of the \gls{cvm}.
+The adversary resorts to the coarse-grained \gls{npf} controlled channel that provides more bandwidth in this phase since the profiling phase has to be performed on the entire memory space of the \gls{cvm}.
+
+
+
+\limcomm{Should be repharsed?}{
+Then, the adversary proceeds to the \emph{extraction phase} in which finer-grained attack primitives, including the finer-grained side channel primitives, are used.
+The extraction phase focuses on recovering secrets from the \gls{cvm} by utilizing the information obtained from secret-dependent memory accesses exposed through side channels.
+This phase often depends on the exact locations of the target code or data collected in the profiling phase, for example, the exact pages that store AES T-table~\cite{sevstep}.
+With the targeted page locations established, the attacker can utilize lower-bandwidth yet high-precision side channels, such as cache and ciphertext, to carry out the extraction~\cite{sevstep,li2021cipherleaks}.
+}
+\fi
+
+% For instance,
+% or perform specific exploits, e.g., injecting a malicious interrupt~\cite{wesee,heckler}.
+
+
+% the attacker may launch secret extraction attacks through different side channels right when they are about to be accessed.
+
+% the attacker may employ different different side-channel attacks to extract the memory accesses to the identified sensitive pages as the target.
+
+% For instance, the ciphertext attacks on ECDSA target the pages accessed during \texttt{ec\_scalar\_mul\_ladder} function from OpenSSL.
+% The L2 cache Prime+Probe attack~\cite{sevstep} targets the memory accesses to the AES T-Table during a round of XTS decryption.
+
+
+% Most previous attacks rely on the \gls{npf} side-channel to obtain the since it has high bandwidth.
+% Finer-grained exploits such as single-stepping are performed after identifying the execution of the function of interest.
+
+% \subsubsection{Attack phases}
+% The attack patterns of SEV can generally be classified into two phases, \emph{profiling} and \emph{extraction}.
+
+% In the profiling phase.
+% The attacker has two goals when leveraging side channels.
+% First, the attacker might want to fingerprint the application that is running in the \gls{cvm}.
+% This information can be leveraged to either (1) leak secret algorithm itself, or (2) used to study the target \gls{cvm} application before launching subsequence attacks.
+%
+% Second, the attacker might want to extract secrets from a running \gls{cvm}.
+% This is done through leveraging side-channels to observe secret-dependent memory accesses.
+% To do this, the attacker must know the \gls{cvm} application layout, which can be either achieved through pre-exisitng knowledge, or through using the
+%
+% Third, the attacker might want to compromise the integrity of the \gls{cvm}.
+% Similarly, with the previous goal, the attacker must be aware of the application layout.
+
+
+% \hdr{Phase I: CVM execution profiling }
+% \todo{put some numbers, how many cycles it takes for 1 step}
+% \todo{convince people that single-step is not practical}
+% \todo{Coarse-grained and opportunistic is enough}
+
+% \hdr{Extracting fine-grained secrets}
+% % In the final stage, the attacker might perform information extraction through fine-grained side-channels such as the ciphertext side-channel~\cite{li2021cipherleaks,li2022systematic} or cache side-channel~\cite{cache}
+
+% As an alternative, the attacker can leverage a specific architectural vulnerability, such as the unprotected I/O~\cite{}, unauthenticated encryption.
+
+% % While many of these exploits are no longer possible in the latest version of \gls{sevsnp}.
+
+% \hdr{Amplifying resolution with single-stepping}
+% \emph{Single-stepping}~\cite{sevstep,sgxstep} plays a crucial technique in secret extraction; it maximizes the \emph{temporal} resolution of the fine-grained secret extraction primitives such as cache side-channel and ciphertext.
+% With single-stepping the adversary can collect memory content changes with the resolution of one instruction execution.
+% Single-stepping leverages a precise hardware interrupt timer (e.g., APIC or \todo{something}) to intercept the execution of the victim after exactly one instruction.
+
+\subsection{Previous mitigation approaches}
+\label{sec:background:mitigations}
+While side-channel mitigations are not explored in the context of \gls{cvm}, several works have strived to protect Intel SGX workloads from side-channel attacks.
+
+\subsubsection{Detection of side-channel attacks}
+% \thename's adaptive obfuscation approach draws inspiration from previous works that aim to \emph{detect} the presence of side-channel attacks through periodic checks~\cite{oleksenko2018varys,shih2017tsgx,fu2017sgxlapd,dejavu}.
+% A line of research aims to \emph{detect} the presence of side-channel attacks through periodic checks~\cite{oleksenko2018varys,shih2017tsgx,fu2017sgxlapd,dejavu}.
+Many works propose the \emph{detection} of side-channel attacks through their observable side-effects, such as significantly long delays in program execution~\cite{dejavu} or exceedingly high rates of enclave exits~\cite{oleksenko2018varys,shih2017tsgx}.
+T-SGX~\cite{shih2017tsgx} and SGX-LAPD~\cite{fu2017sgxlapd} propose terminating enclave execution if a configured number of enclave exits is detected.
+T-SGX retrofits the Intel-specific TSX feature to detect page faults during sensitive computation.
+% which informs the enclave if a page fault occurs during a TSX-protected memory transaction.
+SGX-LAPD proactively accesses memory pages before use and checks for enclave exits.
+% by sampling the enclave's save area.
+Unfortunately, these approaches overly restrict the OS page management capabilities by preventing traditional demand paging.
+
+Instead of forbidding all enclave exits, Varys~\cite{oleksenko2018varys} advocated periodically sampling the enclave's exit rate and terminating based on a set threshold.
+
+
+
+
+% SGX-LAPD~\cite{fu2017sgxlapd} instruments the enclave to \emph{preemptively} touch pages and sample the exit code reported in
+% T-SGX 
+
+
+% Among obfuscated execution engines, Klotski~\cite{zhang2020klotski} sought practicality through a realistic reassessment of the side-channel attack model on SGX.
+% Klotski~\cite{zhang2020klotski} argues that a practical attack attack must involve a preliminary stage of the attack that leverages a coarse-grained (i.e., page fault-based controlled channel) for profiling a wide range of memory addresses.
+% This is because the fine-grained side-channel attack primitives, such as the cache-based ones, require frequent enclave exits (e.g., single-stepping) to boost \emph{temporal resolution} to be feasible.
+% With the target sensitive code pinpointed in the preliminary stage, the adversary can then proceed to extract information with .
+% Klotski then proposes a periodic memory rerandomization as an efficient and practical solution.
+% Klotski employs a minipage-granular (2K pages) periodic page rerandomization scheme implemented through software MMU constructed from instrumenting program memory loads and stores.
+% Klotski applies a \emph{fixed-rate} periodic rerandomization throughout enclave execution.
+% As we will show in this work, an ability to sense of the adversary's temporal resolution allows an adaptive rate that minimizes overhead during benign execution with lowered rates.
+
+
+% \khacomm{need rewrite}{
+% While these approaches suggest terminating enclave execution, \thename takes a different route and leverages the measured VMExit rates to guide its adaptive obfuscation scheme.
+% }
+
+ % the \gls{cvm} to protect itself, and avoid termination from false positives.
+% This prevent \gls{cvm} termination in the case of false positive.
+% Moreover, \thename adapts a binary-only approach, while most previous work relies on a custom compiler.
+
+% There are works that utilize to \emph{detect}
+% \cite{shih2017tsgx}
+
+% Detection-based approaches rely on specific hardware (Intel TSX) and are defeated by control-channel attacks that do not rely on page faults ~\cite{}
+
+\subsubsection{Obfuscated execution engines}
+% \hdr{Obfuscated execution engines}
+% Many previous works have proposed obfuscated execution engines for SGX to render the enclave execution more resilient against side-channel attacks~\cite{ahmad2019obfuscuro,obelix,shinde2016preventing,zhang2020klotski}.
+A line of work sought after an ideal oblivious execution model in which ORAM manages all code and data, and their execution and accesses are always performed through cache line-size \emph{scratchpads}~\cite{ahmad2019obfuscuro,obelix}.
+Notably, Obfuscuro~\cite{ahmad2019obfuscuro} provides cache-line-level obfuscated execution through ORAM.
+Obelix~\cite{obelix} extends upon the ideas of Obfuscuro to also grant protection against ciphertext attacks and resistance against microarchitectural instruction profiling attacks.
+However, such approaches accompany multiple magnitudes lower runtime overhead (up to 100,000$\times$ in ECDHE algorithm~\cite{obelix}) for maximized resilience against side-channel attacks.
+Besides performance overheads, the approaches require recompilation of protected programs.
+% The above works lead to limited practicality from several magnitudes higher runtime overheads by proposing an overly ideal obfuscation scheme.
+
+Klotski~\cite{zhang2020klotski} argues for a more practical attacker modeling and presents a practical page-level obfuscation engine that balances security and performance by leveraging larger scratchpad sizes and periodic rerandomization.
+
+% Several approaches were proposed to obfuscate the memory access patterns of sensitive applications by using a custom compiler to transform a program's memory accesses~\cite{rane2015raccoon,borrello2021constantine,brasser2019drsgx,ahmad2019obfuscuro,shinde2016preventing,obelix}.
+
+% DR.SGX~\cite{brasser2019drsgx} continuously permutates an enclave data location at runtime at the cache-line level.
+
+
+
+% \subsubsection{Obfuscation}
+% Rather than eliminating all side-channels, several works invalidate the side-channel attacks by expose obfuscated information.
+
+% \gls{oram}~\cite{zhang2020klotski,obelix,ahmad2019obfuscuro} is the most common robust obfuscation technique. ...
+
+% \emph{Rerandomization} can be a supplement for \gls{oram}, to improve the obfuscation in practical manner.
+% Klotski~\cite{zhang2020klotski} proposed \emph{rerandomization}. ...
+
+
+\iffalse
+\subsubsection{Our Approach}
+\thename adopts both obfuscation and monitoring based approach by taking each approach's strength.
+
+We obfuscated the page-granular memory access patterns with \gls{oram}.
+
+For fine-grained side-channels, we monitor the execution and adaptively adjust the obfuscation level to minimize the side-channel leakage. ...
+
+However, the challenge of rerandomization is ...
+
+We propose a novel rate-adaptive obfuscation scheme by monitoring based on 
+\fi
+
+% \khacomm{need rewrite}{
+% \thename further extends the idea for practical obfuscation by adapting the adaptive obfuscation principle and supporting unmodified binaries through its OS-level mechanisms.
+% }
+
+
+\iffalse
+\subsection{Mitigations}
+\label{sec:background:mitigations}
+There are two common approaches to mitigate the side-channel attacks, monitoring and obfuscation.
+Each approach has its own trade-offs and limitations in terms of performance and security guarantees.
+
+\subsubsection{Monitoring execution}
+One straight forward approach is to prevent the attackers to observe the side-channels.
+Some works restricted the attacker's capability by monitoring them.
+
+Varys~\cite{oleksenko2018varys} monitors asynchronous enclave exit (AEX) to detect system footprints generated by side-channel attacks, and terminate the execution on detection.
+
+However, eliminate all side-channels through monitoring, is infeasible due to large attack surface.
+
+Therefore, monitoring based approaches often are aims to be practical, rather than provide full security guarantees.
+
+\subsubsection{Obfuscation}
+Rather than eliminating all side channels, several works invalidate the side-channel attacks by exposing obfuscated information.
+
+\gls{oram}~\cite{zhang2020klotski,obelix,ahmad2019obfuscuro} is the most common robust obfuscation technique. ...
+
+\emph{Rerandomization} can be a supplement for \gls{oram}, to improve the obfuscation in practical manner.
+Klotski~\cite{zhang2020klotski} proposed \emph{rerandomization}. ...
+
+
+
+\subsubsection{Our Approach}
+\thename adopts both obfuscation and monitoring based approach by taking each approach's strength.
+
+We obfuscated the page-granular memory access patterns with \gls{oram}.
+
+For fine-grained side-channels, we monitor the execution and adaptively adjust the obfuscation level to minimize the side-channel leakage. ...
+
+However, the challenge of rerandomization is ...
+
+We propose a novel rate-adaptive obfuscation scheme by monitoring based on 
+\fi
+
+
+\subsection{Threat model}
+\label{subsec:threat-model}
+% \khacomm{todo}{mention spectre out of scope, }
+\thename adopts the conventional \gls{cvm} threat model, where the hypervisor is untrusted and may commit to powerful side-channel attacks that undermine the confidentiality of the \gls{cvm}.
+The \gls{tcb} encompasses the CPU hardware, the entire \gls{cvm}, and \thename components.
+We assume the attacker has knowledge of the \gls{cvm} application and can send requests to it, enabling runtime page access profiling and secret extraction attacks through side channels.
+\thename aims to thwart these attacks through obfuscation while maintaining reasonable performance.
+% \thename's goal is to render these attacks significantly more challenging or impractical through its obfuscation scheme while minimizing the performance overheads of the defense.
+We do not consider transient execution attacks, e.g., Spectre~\cite{kocher2019spectre} and Meltdown~\cite{lipp2018meltdown}.
+Their variants for Intel SGX enclaves have been patched in SGX's latest iteration~\cite{sgxspectre,foreshadow}; their effectiveness on \glspl{cvm} has not been extensively studied.
+% However, 
+
+
+
+
+% \limcomm{Is 'objective' the right term? How about explaining it using 'phases', such as attacks have two 'phases' and we aim to make each phase significantly more challenging.}
+% Through the side-channels described in \cref{sec:background:side-channels}, the attacker may pursue two primary objectives:
+% (1) profiling the \gls{cvm} to prepare for potential exploits (2) to extract secrets from the \gls{cvm}'s secret-dependent memory accesses.
+% The attacker may employ memory-based side-channels, including cache, ciphertext, and \gls{npf} attacks to achieve them.
+% These side-channels allow the attacker to collect \gls{gpa} memory access traces of the victim \gls{cvm}, potentially revealing sensitive information or execution patterns.
+
+
+
+
+% TODO: needed?
+\iffalse
+\hdr{Two-level memory management}
+The memory management of a \gls{cvm} is decoupled from the hypervisor memory management.
+In the \gls{cvm}, \gls{gpt} controls the \gls{gva}-to-\gls{gpa} translations, while the hypervisor maintains the \gls{npt} that controls \gls{gpa}-to-\gls{hpa} translations.
+Page faults due to missing mappings in the \gls{gpt} are directly handled by the \gls{cvm}, while \gls{npf}, triggered by missing mapping in the \gls{npt}, are reported to the hypervisor to be handled.
+\fi
+% \thename's paging subsystem utilizes this decoupled memory management model to implement memory access obfuscation while keeping the \gls{cvm}'s \gls{gva} intact.
+% The MMU walks both page tables on a \gls{tlb} miss. 
+
+
+% The decision to make certain privilege operations interceptable varies between \gls{cvm} implementations.
+
+
+% \hdr{Address translation integrity}
+
+
+
+
+%
+% Along with the introduction of the \gls{rmp}, the guest \gls{cvm} can issue the \texttt{PVALIDATE} instruction to ensure that mapping integrity has not been violated for a specified \gls{gva}.
+% The mechanism can also be used to verify the mapping size, as we will later describe~\cref{sec:apage-validation}.
+%
+% \texttt{PVALIDATE}'s arguments are the virtual address to be validated, the expected page size, and the \emph{validated} bit to be written into the \gls{rmp}.
+% \texttt{PVALIDATE} only succeed if the \texttt{validated} bit in \gls{rmp} \emph{changed} to the requested value, allowing the \gls{cvm} to detect any illegal modifications to the \gls{rmp}.
+% Moreover, it will return an error code to the \gls{cvm} if the expected page size is 2MB, while the page size inside \gls{rmp} is 4KB.
+
+
+
+
+% Commonly, when the mapping size of the \gls{cvm} is larger than that of the host, the \gls{cvm} would attempt to match the host's mapping size by splitting its own huge mapping into smaller pages.
+
+
+
+% \gls{sev} piggy-backs on the AMD \gls{sme}'s support for transparent memory encryption automatically performed by the \gls{sp}.
+% When \gls{sev} is enabled, each \gls{cvm} is provisioned a unique \gls{vek} that the \gls{sp} uses to encrypt its memory pages.
+% A \gls{cvm}'s \gls{vek} is securely maintained by the CPU and is indexed by the \gls{cvm}'s unique \gls{asid}.
+
+
+% each \gls{cvm} is provisioned a unique \gls{vek} for memory encryption, and memory encryption
+% \gls{sev} is enabled,
+% The \gls{vek} is generated and managed by the \gls{sp}
+% , and each VM is distinguished with unique \gls{asid}. \gls{sp} places the \gls{vek} within the \gls{ume} for transparent memory encryption of \gls{cvm}'s vCPU. The entire process is executed discreetly, ensuring the \gls{vek} is never disclosed to the CPU itself.
+
+
+\iffalse
+	There have been two extensions to the baseline \gls{sev} architecture, along with numerous microcode patches, to tackle the critical vulnerabilities identified by the research community~\cite{morbitzer2018severed,morbitzer2021severity,werner2019severest,li2021cipherleaks}.
+	% Since \gls{sev}'s release, several vulnerabilities have been discovered by the research community.
+	% For instance, the initial release of \gls{sev} does not protect the \gls{cvm} states that are stored in the \gls{vmcb}, allowing a malicious hypervisor to inject register values alter the \gls{cvm} execution~\cite{}, or extract sensitive values that are stored in the registers~\cite{morbitzer2019extracting}.
+	% Moreover, the lack of protection in the \gls{gpa} to \gls{hpa} mappings enables the hypervisor to replace the mapping, or map a single \gls{gpa} to multiple \glspl{hpa}.
+	% In response, AMD introduced two new security extensions.
+	The first major security extension is \gls{seves}, introducing two key features. First, the register information inside the VMCB is encrypted.
+	Second, it lets the \gls{cvm} decide which state to export when VMEXITs occur.
+	\added{First, the CPU register states of vCPU are encrypted and saved as \gls{vmsa} within \gls{vmcb} for additional protection. Second, on VMEXIT, SEV-ES allows the \gls{cvm} to selectively reveal CPU register states that are only essential for the host hypervisor's support.}
+	The next major security extension to \gls{sev} is \gls{sevsnp}, which adds integrity protection to encrypted pages.
+	It introduces a \gls{rmp} that tracks the metadata (e.g., owner of the page and the mapped \gls{gpa}) for each \gls{hpa}.
+	\added{, to ensure one-to-one mapping of guest page to host page}
+	The processor then looks up the \gls{rmp} and checks for permission on every memory access.
+\fi
+
+
+
+
+
+
+
+
+
+
+% % \thename
+% % \todo{check}
+
+% % \hdr{Exit rates of side-channel attacks}
+% % A growing body of research on the side-channel vulnerabilities of SGX indicates that side-channel attacks necessitate frequent interruptions of enclaves for measurement, resulting in an unusually high exit rate~\cite{oleksenko2018varys,zhang2020klotski,bulk2017telling}.
+% % This has led to efforts focused on detecting high exit rates~\cite{grussoleksenko2018varys,shih2017tsgx,gruss2017strong} as primary indicators of such attacks.
+% %
+% % In our own analysis of AMD SEV (\cref{subsec:attack-analysis}), we also observe the same behavior on the VMExit rate on reenacted \gls{cvm} side-channel attacks.
+% % This motivates \thename's rate-adaptive obfuscation approach as a practical defense against side-channels.
+
+% % An increasing body of research on the side-channel of SGX has shown that side-channel attacks require frequent enclave interruptions for measurement, leading to an abnormally high VMExit rate~\cite{oleksenko2018varys}.
+% % This motivates works that attempt to detect the occurrence of VMExits~\cite{shih2017tsgx}, abnormally high enclave exit rates~\cite{oleksenko2018varys}, as the main indication of attacks.
+
+
+
+% % It maximizes the \emph{temporal} resolution of the fine-grained secret extraction primitives such as cache side-channel and ciphertext.
+% % \jycomm{Can it be seen as amplifying? It is a must in does paper to determine precise attack timing.}
+% % With single-stepping, the adversary can collect memory access traces with the resolution of one instruction execution.
+
+% % Moved to Intro
+% \begin{comment}
+
+%   \subsection{Prior works}
+%   \label{subsec:related-works}
+%   Many previous works have proposed obfuscated execution engines and side-channel mitigations in the context of securing SGX enclaves.
+%   Here we discuss the approaches that are closely related to \thename's contributions.
+
+%   \subsubsection{Prior approaches: obfuscated execution}
+%   Obfuscated execution engines have been explored many works in the context of securing SGX enclaves against side-channel attacks~\cite{ahmad2019obfuscuro,obelix,shinde2016preventing,zhang2020klotski}.
+%   Quite understandably often induce a prohibitively high performance overheads.
+%   \key{A line of works have sought after an ideal oblivious execution model in which all code and data are managed by ORAM and their execution and accesses are always performed cache line sized \emph{scratchpads}~\cite{ahmad2019obfuscuro,obelix,shinde2016preventing}.}
+%   Of course, these approaches endure multiple magnitudes lower runtime overhead (up to 100,000$\times$ in ECDHE algorithm~\cite{obelix}) for maximized resilience against side-channel attacks.
+%   Also, such approaches, implemented through complex compiler instrumentation, have only been evaluated with cryptographic libraries and seldom shown compatibility with large programs.
+
+%   Among obfuscated execution engines, Klotski~\cite{zhang2020klotski} seeks practicality with a more realistic attack model and focuses on mitigating the coarse-grained side-channel attacks such as the page fault controlled channel.
+%   Klotski argues that fine-grained side-channel attacks such as the cache-based ones cause a very high frequency of \emph{exits} (from SGX enclave) that make them impractical as the main data acquisition method.
+%   The work then points out that a practical attack inevitably involve a preliminary stage in which the target sensitive function or data is pinpointed through a coarse-grained attack.
+%   To this end, Klotski employs a minipage-granular (2K pages) periodic page shuffling scheme implemented through software MMU constructed from instrumenting program memory loads and stores.
+
+%   \subsubsection{Prior approaches: SGX AEX threshold}
+%   Exit rate threshold policy was another pragmatic approach in mitigating side-channel attacks against SGX enclaves.
+%   Observing that all known practical side-channel attacks require frequent \gls{aex} to acquire necessary \emph{temporal resolution} on the channel, Varys~\cite{oleksenko2018varys} sets a \gls{aex} rate threshold and terminates the enclave if the observed exit rate exceeds it.
+%   \hjcomm{Is this right?}{Furthermore Varys introduces a set of enclave code transformation to minimize the amount of intentional \gls{aex}.}
+% \end{comment}
+
+
+
+
+%  Side channels have plagued the Intel SGX architecture.
+
+
+
+
+
+
+
+
+
+
+% As mentioned in \cref{sec:intro}, the cache attack is no longer feasible on \gls{cvm} architectures.
+% However, \gls{cvm} architectures still suffer from the notorious paging-based controlled-channel attacks that plagued Intel SGX enclaves~\cite{xu2015controlledchannel}.
+
+% \hdr{Address translation}
+% As with the case of hardware-assisted virtualization, when \gls{sev} is enabled, the MMU translates a virtual address accessed by software inside a \gls{cvm} in two levels.
+% The first level is the translation between \gls{gva} and \gls{gpa}, which is mapped in the \gls{cvm}'s page table.
+
+% We refer to page faults that happen during first-level translation as the \gls{gpf}.
+% The \glspl{gpf} are directly handled by the guest without the hypervisor's intervention.
+% % First, if the requested page is not mapped within the guest's page table, a guest page fault is triggered and is directly handled by the guest.
+% % Note that
+
+% The second level translates \gls{gpa} and \gls{hpa}, mapped in the \gls{npt} maintained by the hypervisor.
+
+% \input{tables/previous-npf-attacks}
+
+% \hdr{Access pattern leakage through page frame accesses}
+% The hierarchical nature of memory management in a virtualized environment inherently enables the hypervisor to extract information about guest memory accesses.
+% Similar to traditional virtualization, \glspl{cvm} relies on the hypervisor to manage physical memory and a \gls{cvm}'s \gls{gpa}-to-\gls{hpa} address translation.
+% However, this brings the issue of controlled-channel attacks, which we will refer to as the \emph{\gls{npf} controlled-channel attack} since its methodology is similar to the controlled-channel attacks previously discussed on Intel SGX~\cite{xu2015controlledchannel}.
+
+% While our work focuses on \gls{sev}, we provide a discussion of the \gls{npf} controlled-channel threats on other \glspl{cvm} in \cref{sec:discussion:cvms}.
+
+
+
+% These attacks relies on the access pattern obtained from the \gls{npf} controlled-channel
+% This shows that the \gls{npf} controlled channel attacks are a serious threat, and stopping them can make future attacks more difficult.
+
+
+% With attackers can infer much more fine-grained information, such as the system call trace~\cite{hetzelt2017security}, or the sequence of functions that performs certain sensitive operations~\cite{}.
+
+
+
+
+
+% For this reason, \thename focuses on mitigating the two most prominent side-channel attacks against \glspl{cvm}.
+
+
+% There are two security impacts of the \gls{npf} controlled-channel.
+
+% First, the hypervisor can peek into the \gls{cvm}'s execution states and potentially leak data.
+% To this end, its impact is similar to the Page Fault controlled-channel on SGX~\cite{xu2015controlledchannel}, which has been shown to leak sensitive information.
+% On SEV, researcher has been \gls{cvm}~\cite{werner2019severest}.
+% TODO: We perform additional evaluations to confirm this.
+
+
+
+
+
+% \begin{figure}[t]
+% 	\begin{center}
+% 		\includegraphics[width=0.95\columnwidth]{figures/attack-model.pdf}
+% 	\end{center}
+% 	\caption{Practical side-channel attack methodology}\label{fig:}
+% \end{figure}
+
+% \subsection{CVM side-channels and existing attacks}
+% \label{sec:background:attack-mod}
+
+% This section systematically analyzes the attack side-channel patterns that are used in \gls{cvm} based on previous attacks.
