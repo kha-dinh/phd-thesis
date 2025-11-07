@@ -12,3 +12,6 @@ _minted
 *.toc
 *.xdv
 *.lof
+out
+build
+main.pdf
