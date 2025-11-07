@@ -1,45 +1,88 @@
+% \begin{table}[t]
+% 	\setlength\tabcolsep{2pt}
+% 	\footnotesize
+% 	\begin{tabularx}{\columnwidth}{@{}c >{\tt}l Y Y Y >{\hspace{5pt}\tt}l Y Y Y}
+% 		\toprule
+% 		% \newcommand{\txthead}[1]{\text{\thead{#1}}}
+% 		                                                                & \textnormal{\thead{Syscall                                                                                                                                                                                \\ \& API}} & \text{\thead{Base.\\(ns)}} & \text{\thead{Cap.\\(ns)}} & \text{\thead{\underline{Ovh.}\\(\%)}} & \textnormal{\thead{Syscall\\ \& API}} & \text{\thead{Base.\\(ns)}} & \text{\thead{Cap.\\(ns)}} & \text{\thead{\underline{Ovh.}\\(\%)}} \\ \midrule
+% 		\multirow{8}{*}[-0.0em]{\thead{\begin{sideways}Syscall\end{sideways}}}
+% 		                                                                & socket                                                       & 718.5 & 722.5             & \underline{0.56}     & setsockopt                               & 235.7 & 242.2             & \underline{2.75} \\
+% 		% \cmidrule{2-9}
+% 		                                                                & \rowcolor[gray]{0.925} bind                                  & 400.0 & 408.0             & \underline{1.98}     & listen                                   & 351.2 & 361.5             & \underline{2.91} \\
+% 		% \cmidrule{2-9}
+% 		% & accept4 & 1235.9 & 1247.8 & \underline{0.96}
+% 		                                                                & accept4                                                      & 1236  & 1248              & \underline{0.96}     & recvfrom                                 & 192.6 & 199.4             & \underline{3.56} \\
+% 		% \cmidrule{2-9}
+% 		                                                                & \rowcolor[gray]{0.925} openat                                & 471.5 & 486.9             & \underline{3.26}     & read                                     & 247.1 & 254.2             & \underline{2.88} \\
+% 		% \cmidrule{2-9}
+% 		                                                                & pwrite64                                                     & 320.6 & 328.2             & \underline{2.35}
+% 		                                                                & pread64                                                      & 231.8 & 239.0             & \underline{3.06}                                                                                               \\
+% 		% \cmidrule{2-9}
+% 		                                                                & \rowcolor[gray]{0.925} fstat                                 & 185.9 & 191.5             & \underline{3.03}     & fcntl                                    & 148.1 & 155.8             & \underline{5.20} \\
+% 		% \cmidrule{2-9}
+% 		                                                                & dup3                                                         & 132.5 & 138.0             & \underline{4.22}     & lseek                                    & 149.7 & 154.8             & \underline{3.38} \\
+% 		% \cmidrule{2-9}
+% 		                                                                & \rowcolor[gray]{0.925} mmap                                  & 130.0 & 130.0             & \underline{0.01}     & \textbf{getpid}                          & 118.6 & -                 & -                \\ \midrule
+% 		\multirow{4}{*}[0em]{\begin{sideways}\thead{API}\end{sideways}} &
+% 		\texttt{capac\_malloc}                                          & 23.46                                                        & 50.28 & \underline{114.6} & \texttt{capac\_free} & 14.7                                     & 37.4  & \underline{154.4}                    \\
+% 		% \cmidrule{2-9}
+% 		                                                                & \rowcolor[gray]{0.925} \texttt{capac\_enter}                 & -     & 167.7             & -                    & \texttt{capac\_exit}                     & -     & 161.2             & -                \\
+% 		% \cmidrule{2-9}
+% 		                                                                & \texttt{delegate\_ptr}\textsuperscript{*}                    & -     & 327.7             & -                    & \texttt{delegate\_fd}\textsuperscript{*} & -     & 182.9             & -                \\
+% 		% \cmidrule{2-9}
+% 		                                                                & \rowcolor[gray]{0.925} \texttt{limit\_fd}\textsuperscript{*} & -     & 142.4             & -                    &                                          &       &                   &                  \\
+% 		\bottomrule
+% 	\end{tabularx}
+% 	\begin{tablenotes}
+% 		\item \textsuperscript{*} {\small \texttt{capac\_} \ prefix is omitted}
+% 	\end{tablenotes}
+% 	\caption{The latency of \thename system calls intervened by reference monitor and \libcapac APIs (\textbf{Cap.}), in comparision with the baseline (\textbf{Base.}). Latency of \texttt{getpid} is also measured for comparison.}
+% 	\label{tbl:micro}
+% 	% \vspace{-2em}
+% \end{table}
 \begin{table}[t]
-\setlength\tabcolsep{2pt}
-\footnotesize
-\begin{tabularx}{\columnwidth}{@{}c >{\tt}l Y Y Y >{\hspace{5pt}\tt}l Y Y Y}
-  \toprule
-% \newcommand{\txthead}[1]{\text{\thead{#1}}}
-  & \textnormal{\thead{Syscall\\ \& API}} & \text{\thead{Base.\\(ns)}} & \text{\thead{Cap.\\(ns)}} & \text{\thead{\underline{Ovh.}\\(\%)}} & \textnormal{\thead{Syscall\\ \& API}} & \text{\thead{Base.\\(ns)}} & \text{\thead{Cap.\\(ns)}} & \text{\thead{\underline{Ovh.}\\(\%)}} \\ \midrule
-  \multirow{8}{*}[-0.0em]{\thead{\begin{sideways}Syscall\end{sideways}}} 
-  & socket & 718.5 &   722.5 & \underline{0.56} & setsockopt & 235.7 &   242.2 & \underline{2.75} \\
-  % \cmidrule{2-9}
-  &\rowcolor[gray]{0.925} bind &  400.0 &   408.0 & \underline{1.98} & listen & 351.2 &  361.5 & \underline{2.91}  \\
-  % \cmidrule{2-9}
-  % & accept4 & 1235.9 & 1247.8 & \underline{0.96}
-  & accept4 & 1236 & 1248 & \underline{0.96} & recvfrom & 192.6 &  199.4 & \underline{3.56} \\
-  % \cmidrule{2-9}
-  & \rowcolor[gray]{0.925} openat & 471.5 &   486.9 & \underline{3.26} & read &247.1 &   254.2  & \underline{2.88} \\
-  % \cmidrule{2-9}
-  & pwrite64 & 320.6 &   328.2 & \underline{2.35}
-  & pread64 &  231.8 &   239.0 & \underline{3.06} \\
-  % \cmidrule{2-9}
-  &\rowcolor[gray]{0.925} fstat &  185.9 &   191.5 & \underline{3.03} & fcntl &  148.1 &   155.8 & \underline{5.20} \\
-  % \cmidrule{2-9}
-  & dup3 &  132.5 &   138.0  & \underline{4.22} & lseek & 149.7 & 154.8 & \underline{3.38} \\
-  % \cmidrule{2-9}
-  &\rowcolor[gray]{0.925} mmap & 130.0 &   130.0 & \underline{0.01} & \textbf{getpid} & 118.6 & - & -\\ \midrule
-  \multirow{4}{*}[0em]{\begin{sideways}\thead{API}\end{sideways}} &
-  \texttt{capac\_malloc} & 23.46 & 50.28 & \underline{114.6} & \texttt{capac\_free} & 14.7 & 37.4 & \underline{154.4} \\
-  % \cmidrule{2-9}
-  &\rowcolor[gray]{0.925} \texttt{capac\_enter} & - & 167.7 & - & \texttt{capac\_exit} & - & 161.2 & - \\
-  % \cmidrule{2-9}
-  & \texttt{delegate\_ptr}\textsuperscript{*} & - &  327.7 & - & \texttt{delegate\_fd}\textsuperscript{*} & - & 182.9 & - \\
-  % \cmidrule{2-9}
-  &\rowcolor[gray]{0.925} \texttt{limit\_fd}\textsuperscript{*} & - &  142.4 & -&&&& \\
-  \bottomrule
-\end{tabularx}
-  \begin{tablenotes}
-  \item \textsuperscript{*} {\small \texttt{capac\_} \ prefix is omitted}
-  \end{tablenotes}
-\caption{The latency of \thename system calls intervened by reference monitor and \libcapac APIs (\textbf{Cap.}), in comparision with the baseline (\textbf{Base.}). Latency of \texttt{getpid} is also measured for comparison.}
-\label{tbl:micro}
-% \vspace{-2em}
+	\setlength\tabcolsep{2pt}
+	\footnotesize
+	\begin{threeparttable}
+		\begin{tabularx}{\columnwidth}{@{}c >{\tt}l Y Y Y >{\tt}l Y Y Y}
+			\toprule
+			 & \thead{Syscall
+			\\ \& API} & \thead{Base.\\(ns)} & \thead{Cap.\\(ns)} & \thead{\underline{Ovh.}\\(\%)} &
+			\thead{Syscall                                                                                                                                \\ \& API} & \thead{Base.\\(ns)} & \thead{Cap.\\(ns)} & \thead{\underline{Ovh.}\\(\%)} \\
+			\midrule
+			\multirow{8}{*}[-0.0em]{\thead{\begin{sideways}Syscall\end{sideways}}}
+			 & socket                           & 718.5 & 722.5 & \underline{0.56}  & setsockopt                      & 235.7 & 242.2 & \underline{2.75}  \\
+			% \rowcolor[gray]{0.925}
+			 & bind                             & 400.0 & 408.0 & \underline{1.98}  & listen                          & 351.2 & 361.5 & \underline{2.91}  \\
+			 & accept4                          & 1236  & 1248  & \underline{0.96}  & recvfrom                        & 192.6 & 199.4 & \underline{3.56}  \\
+			% \rowcolor[gray]{0.925}
+			 & openat                           & 471.5 & 486.9 & \underline{3.26}  & read                            & 247.1 & 254.2 & \underline{2.88}  \\
+			 & pwrite64                         & 320.6 & 328.2 & \underline{2.35}  & pread64                         & 231.8 & 239.0 & \underline{3.06}  \\
+			% \rowcolor[gray]{0.925}
+			 & fstat                            & 185.9 & 191.5 & \underline{3.03}  & fcntl                           & 148.1 & 155.8 & \underline{5.20}  \\
+			 & dup3                             & 132.5 & 138.0 & \underline{4.22}  & lseek                           & 149.7 & 154.8 & \underline{3.38}  \\
+			% \rowcolor[gray]{0.925}
+			 & mmap                             & 130.0 & 130.0 & \underline{0.01}  & getpid                          & 118.6 & -     & -                 \\
+			\midrule
+			\multirow{4}{*}[0em]{\begin{sideways}\thead{API}\end{sideways}}
+			 & capac\_malloc                    & 23.46 & 50.28 & \underline{114.6} & capac\_free                     & 14.7  & 37.4  & \underline{154.4} \\
+			% \rowcolor[gray]{0.925}
+			 & capac\_enter                     & -     & 167.7 & -                 & capac\_exit                     & -     & 161.2 & -                 \\
+			 & delegate\_ptr\textsuperscript{*} & -     & 327.7 & -                 & delegate\_fd\textsuperscript{*} & -     & 182.9 & -                 \\
+			% \rowcolor[gray]{0.925}
+			 & limit\_fd\textsuperscript{*}     & -     & 142.4 & -                 &                                 &       &       &                   \\
+			\bottomrule
+		\end{tabularx}
+
+		\begin{tablenotes}
+			\item \textsuperscript{*} {\small \texttt{capac\_} prefix omitted.}
+		\end{tablenotes}
+
+		\caption{Latency of \thename system calls intercepted by the reference monitor and \libcapac APIs (Cap.) vs. baseline (Base.). We also report \texttt{getpid} for context.}
+		\label{tbl:micro}
+	\end{threeparttable}
 \end{table}
+
 % [BENCH] capac_enter 167.713375
 % [BENCH] capac_exit 328.89095833333334
 % [BENCH] capac_free 14.410083333333333
