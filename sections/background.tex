@@ -7,65 +7,65 @@
 \label{chap:background}
 
 \iffalse
-\section{Security principles}
-\label{sec:bg:principles}
-% I first explain the security principles that the systems proposed in this thesis adhere to. I will also show the research trends in applying these security principles.
+	\section{Security principles}
+	\label{sec:bg:principles}
+	% I first explain the security principles that the systems proposed in this thesis adhere to. I will also show the research trends in applying these security principles.
 
-\subsection{Principle of Least Privilege and Privilege Separation}
- 
-% Modern example
+	\subsection{Principle of Least Privilege and Privilege Separation}
 
-
-The \emph{Principle of Least Privilege} mandates that each software component should only have minimal permissions to execute its intended task.
-The principle is commonly implemented through \emph{Privilege Separation}, or \emph{compartmentalization}, where software is separated into least-privileged components.
-% How it helps software security
-The intuition behind the principle is that even when the control over a software component is conceded to an adversary, the maximal damage the component could do is limited to its current privileges.
-
-An example of both the Principle of Least Privilege and Privilege Separation in effect can be seen in the application OpenSSH~\cite{openssh}. 
+	% Modern example
 
 
+	The \emph{Principle of Least Privilege} mandates that each software component should only have minimal permissions to execute its intended task.
+	The principle is commonly implemented through \emph{Privilege Separation}, or \emph{compartmentalization}, where software is separated into least-privileged components.
+	% How it helps software security
+	The intuition behind the principle is that even when the control over a software component is conceded to an adversary, the maximal damage the component could do is limited to its current privileges.
 
-\begin{figure}[t]
-    \centering
-    \includesvg[width=.9\textwidth,inkscapelatex=false]{figures/ssh-privilege-separation.svg}
-    \caption[Sequence Diagram for OpenSSH Privilege Separation.]{Sequence Diagram for OpenSSH Privilege Separation\footnotemark.}
-    \label{fig:enter-label}
-\end{figure}
-
-\footnotetext{ \url{https://commons.wikimedia.org/wiki/File:OpenSSH-Privilege-Separation.svg} from Larsnooden, licensed under CC BY-SA 4.0 (\url{https://creativecommons.org/licenses/by-sa/4.0/})}
-
-Following the Principle of Least Privilege, research effort has been made to develop tools to support the compartmentalization of applications~\cite{privman,privtrans,gudka_clean_2015,rlbox,ptrsplit}, and to provide efficient mechanisms for finer-grained program compartmentalization~\cite{erim,hodor,muswitch,lwc,jing_operating_2022,kolosick_isolation_2022, enclosure}. I discuss the the research trend for the former in this section, and the current research on the latter when discussion \gls{os} security mechanisms in \ref{sec:bg:os}.
-
-\subsubsection{Research trend: Tools for software compartmentalization}
-Splitting any moderately complex program into least-privilege components is a time-consuming and error-prone process.
-Privman~\cite{privman} introduced a library that simplifies the task of splitting programs into a privileged server and a main application contains application logic  (similar to OpenSSH Privilege Separation model).
-
-
-\subsection{Capability-based security}
-\label{sec:bg:principles:capability}
-
-Capability-based security, or \emph{capabilities}, is a security model where access control decisions are based on authenticating non-forgeable \emph{capability tokens}.
-
-
-To demonstrate the usefulness of capability-based security, it is useful to compare it against \gls{acl}-based approaches. Let us use an example of a file system with three files and three users, Alice, Bob and Carol. 
-
-\input{figures/bg-cap-vs-acl-tikz}
+	An example of both the Principle of Least Privilege and Privilege Separation in effect can be seen in the application OpenSSH~\cite{openssh}.
 
 
 
-\subsubsection{Capabilities in OSes}
-UNIX file descriptors
+	\begin{figure}[t]
+		\centering
+		\includesvg[width=.9\textwidth,inkscapelatex=false]{figures/ssh-privilege-separation.svg}
+		\caption[Sequence Diagram for OpenSSH Privilege Separation.]{Sequence Diagram for OpenSSH Privilege Separation\footnotemark.}
+		\label{fig:enter-label}
+	\end{figure}
+
+	\footnotetext{ \url{https://commons.wikimedia.org/wiki/File:OpenSSH-Privilege-Separation.svg} from Larsnooden, licensed under CC BY-SA 4.0 (\url{https://creativecommons.org/licenses/by-sa/4.0/})}
+
+	Following the Principle of Least Privilege, research effort has been made to develop tools to support the compartmentalization of applications~\cite{privman,privtrans,gudka_clean_2015,rlbox,ptrsplit}, and to provide efficient mechanisms for finer-grained program compartmentalization~\cite{erim,hodor,muswitch,lwc,jing_operating_2022,kolosick_isolation_2022, enclosure}. I discuss the the research trend for the former in this section, and the current research on the latter when discussion \gls{os} security mechanisms in \ref{sec:bg:os}.
+
+	\subsubsection{Research trend: Tools for software compartmentalization}
+	Splitting any moderately complex program into least-privilege components is a time-consuming and error-prone process.
+	Privman~\cite{privman} introduced a library that simplifies the task of splitting programs into a privileged server and a main application contains application logic  (similar to OpenSSH Privilege Separation model).
 
 
-\subsubsection{Research trend: Hardware-enforced capabilities}
-There have been efforts to integrate capability principles into hardware
+	\subsection{Capability-based security}
+	\label{sec:bg:principles:capability}
 
-% \section{Compilers}
+	Capability-based security, or \emph{capabilities}, is a security model where access control decisions are based on authenticating non-forgeable \emph{capability tokens}.
 
-\section{Memory safety}
 
-Memory corruption bugs are one of the oldest software bugs in history.
-They are caused by memory errors in programs written in low-level, \emph{memory-unsafe} languages like C and C++ to perform read/write to attacker-controlled locations in the process memory. While the root cause of this type of bug is rather straightforward, it is a difficult path toward eradicating it. 
+	To demonstrate the usefulness of capability-based security, it is useful to compare it against \gls{acl}-based approaches. Let us use an example of a file system with three files and three users, Alice, Bob and Carol.
+
+	\input{figures/bg-cap-vs-acl-tikz}
+
+
+
+	\subsubsection{Capabilities in OSes}
+	UNIX file descriptors
+
+
+	\subsubsection{Research trend: Hardware-enforced capabilities}
+	There have been efforts to integrate capability principles into hardware
+
+	% \section{Compilers}
+
+	\section{Memory safety}
+
+	Memory corruption bugs are one of the oldest software bugs in history.
+	They are caused by memory errors in programs written in low-level, \emph{memory-unsafe} languages like C and C++ to perform read/write to attacker-controlled locations in the process memory. While the root cause of this type of bug is rather straightforward, it is a difficult path toward eradicating it.
 
 \fi
 
@@ -80,14 +80,14 @@ They are caused by memory errors in programs written in low-level, \emph{memory-
 
 \section{Memory safety}
 \subsection{Memory corruption}
-Memory corruption bugs may be classified into \emph{spatial} - bugs that exploit out-of-bound pointers dereference - and \emph{temporal} - bugs that exploit the dereference of pointers that the memory allocator has freed. Using memory corruption as the primitive, more complex attack, such as control-flow diversion attacks, is performed, as I will show later in this section. 
+Memory corruption bugs may be classified into \emph{spatial} - bugs that exploit out-of-bound pointers dereference - and \emph{temporal} - bugs that exploit the dereference of pointers that the memory allocator has freed. Using memory corruption as the primitive, more complex attack, such as control-flow diversion attacks, is performed, as I will show later in this section.
 
 \autoref{fig:bg-spatial-bug} shows a rudimentary example of a spatial memory bug. A case of \emph{buffer overflow} causes the memory corruption in the example. Buffer overflows are commonly caused by performing memory access in an unsafe manner. In the example, the C standard function \mintinline{c}{gets} reads the content from the standard input into a buffer in the argument. However, the function might overwrite memory \emph{outside} of the buffer since no length is specified. Even worse, since \mintinline{c}{gets} reads input from the terminal, an attacker could inject arbitrary value at specified memory locations through carefully crafted \emph{payloads}.
 
 %TODO: example of OOB 
 \begin{figure}[h]
-    \centering
-    \begin{minted}{c}
+	\centering
+	\begin{minted}{c}
 void get_name() {
     char name[32];
     // Read from stdio into a buffer, but the read may overflow.
@@ -95,13 +95,13 @@ void get_name() {
     printf("Hello %s!\n", name); 
 }
     \end{minted}
-    \caption{Example of a buffer overflow spatial memory bug.}
-    \label{fig:bg-spatial-bug}
+	\caption{Example of a buffer overflow spatial memory bug.}
+	\label{fig:bg-spatial-bug}
 \end{figure}
 
 \begin{figure}[h]
-    \centering
-    \begin{minted}{c}
+	\centering
+	\begin{minted}{c}
 void use_after_free() {
     char* buf = malloc(512);
     if (have_error()) {
@@ -110,8 +110,8 @@ void use_after_free() {
     printf("Buffer content is %s\n", buf);
 }
     \end{minted}
-    \caption{Example of a use-after-free temporal memory bug.}
-    \label{fig:bg-temp-bug}
+	\caption{Example of a use-after-free temporal memory bug.}
+	\label{fig:bg-temp-bug}
 \end{figure}
 
 
@@ -154,7 +154,7 @@ Software sanitizers try to detect memory errors as they happen. However, it come
 % Modern hardware vendors provide plethoras of hardware features, ranging from ISA extensions to dedicated hardware modules.
 
 \section{Trusted Execution Environments}
-Modern cloud computing allows users to deploy applications to remote machines hosted by the \gls{csp}. 
+Modern cloud computing allows users to deploy applications to remote machines hosted by the \gls{csp}.
 Traditionally, this deployment model requires the cloud users to fully trust the \gls{csp}.
 More specifically, while the size of the cloud applications may be limited, the \gls{tcb} for cloud applications include the operating system (that the \gls{csp} installed) and the machines that the program executes on, now under the control of the \gls{csp}.
 
@@ -166,24 +166,24 @@ Moreover, with control over the physical machine, a potentially malicious \gls{c
 \input{figures/bg-tee-trust-model-tikz}
 
 
-\Gls{tee} technologies allow remote users to discard trust in the system that runs the sensitive application. 
-Instead, the \gls{tcb} of the \gls{tee}-protected applications would only include the application and the hardware. \autoref{fig:bg:trust-model-tee} demonstrates the comparison of the trust models of traditional computing and enclave-based \glspl{tee} such as Intel SGX~\cite{costan_intel_2016}. 
+\Gls{tee} technologies allow remote users to discard trust in the system that runs the sensitive application.
+Instead, the \gls{tcb} of the \gls{tee}-protected applications would only include the application and the hardware. \autoref{fig:bg:trust-model-tee} demonstrates the comparison of the trust models of traditional computing and enclave-based \glspl{tee} such as Intel SGX~\cite{costan_intel_2016}.
 While traditional computing (left figure) requires that the application owner trusts the entire system that hosts the application, including the \gls{os}, the hypervisor, and the hardware, the \gls{tcb} of \gls{tee}-based applications (right side) is limited to only the \gls{tee}-enabled hardware, and a limited, trusted part of the application called the \emph{enclave} (in the case of Intel SGX).
 
 \subsection{Functionalities of TEEs}
-Most \gls{tee} technologies provide memory isolation primitives, such that the memory space of \gls{tee}-protected applications are isolated from each other and the rest of the system. Memory encryption is also a common feature~\cite{advanced_micro_device_sev_2022,costan_intel_2016} to thwart cold boot and memory scanning attacks. 
+Most \gls{tee} technologies provide memory isolation primitives, such that the memory space of \gls{tee}-protected applications are isolated from each other and the rest of the system. Memory encryption is also a common feature~\cite{advanced_micro_device_sev_2022,costan_intel_2016} to thwart cold boot and memory scanning attacks.
 
 \emph{Remote attestation} is another core functionality of \glspl{tee}. It allows a remote user to verify the state of a deployed program (e.g., initial memory, developer's signature, ...) and the authenticity of a \gls{tee}-enabled CPU.
 A simplified procedure for remote attestation is as follows.
 To perform remote attestation, the CPU first measures the state of a deployed application and generates a checksum on this data.
-The checksum is then cryptographically \emph{signed} using an \emph{attestation key} only known to the CPU that is \emph{provisioned} during manufacture time. 
-Attestation keys are provisioned in \emph{pairs}. 
+The checksum is then cryptographically \emph{signed} using an \emph{attestation key} only known to the CPU that is \emph{provisioned} during manufacture time.
+Attestation keys are provisioned in \emph{pairs}.
 The manufacturer burns one attestation key into a fuse of the CPU. It keeps the other to verify signatures created the one burnt into the CPU\footnote{Attestation keys are similar to the public and private key of the private key infrastructure}.
 
-The signed checksum is returned to the remote attestation requester (i.e., the \emph{challenger}). 
+The signed checksum is returned to the remote attestation requester (i.e., the \emph{challenger}).
 The challenger now sends the signed checksum to a \emph{verifier service}, hosted by the \gls{tee} manufacturer.
-This verifier service holds the other, which it can use to verify the signed checksum. 
-If verification succeeds, the challenger can re-compute the expected checksum and compare it with the one returned by the \gls{tee} application.  
+This verifier service holds the other, which it can use to verify the signed checksum.
+If verification succeeds, the challenger can re-compute the expected checksum and compare it with the one returned by the \gls{tee} application.
 
 
 
@@ -289,8 +289,8 @@ Given these limitations, recent research introduces in-process isolation primiti
 
 \subsection{System call filtering}
 \begin{figure}[h]
-    \centering
-    \begin{minted}{c}
+	\centering
+	\begin{minted}{c}
 struct sock_filter filter[] = {
         ...
         BPF_JUMP ( BPF_JMP | BPF_JEQ | BPF_K , __NR_open , 2 , 0) ,
@@ -307,13 +307,13 @@ struct sock_fprog prog = {
 
 seccomp(SECCOMP_SET_MODE_FILTER, 0, &prog);
     \end{minted}
-    \caption[An example of using seccomp-BPF to block \texttt{open} system calls.]{An example of using seccomp-BPF to block \texttt{open} system calls\footnotemark{}.}
-    \label{fig:seccomp-bpf}
+	\caption[An example of using seccomp-BPF to block \texttt{open} system calls.]{An example of using seccomp-BPF to block \texttt{open} system calls\footnotemark{}.}
+	\label{fig:seccomp-bpf}
 \end{figure}
 
 
-Not all applications fully utilize the full spectrum of system calls the \gls{os} provides. 
-However, most system calls are available to any application through the standard library, and many remain unused throughout the lifetime of processes. These unused system calls are a form of \emph{over-privilege}, which, when left intact, would grant the attackers additional capabilities in case the application is compromised. For instance, a compression application would unlikely need access to networking system calls such as \texttt{sys\_socket} and \texttt{sys\_listen}. In another case, common applications only operate on user-specified files and do not need access to the entire file system of the user. With such access, there would be catastrophic consequences when the control is taken by attackers, such as leaking private keys or a corrupted file system. Following the Principle of Least Privilege, most modern \glspl{os}, including Linux, OpenBSD, and macOS provides \emph{filtering} mechanisms to specify the allowed system calls a process can invoke. 
+Not all applications fully utilize the full spectrum of system calls the \gls{os} provides.
+However, most system calls are available to any application through the standard library, and many remain unused throughout the lifetime of processes. These unused system calls are a form of \emph{over-privilege}, which, when left intact, would grant the attackers additional capabilities in case the application is compromised. For instance, a compression application would unlikely need access to networking system calls such as \texttt{sys\_socket} and \texttt{sys\_listen}. In another case, common applications only operate on user-specified files and do not need access to the entire file system of the user. With such access, there would be catastrophic consequences when the control is taken by attackers, such as leaking private keys or a corrupted file system. Following the Principle of Least Privilege, most modern \glspl{os}, including Linux, OpenBSD, and macOS provides \emph{filtering} mechanisms to specify the allowed system calls a process can invoke.
 
 \footnotetext{adapted from \texttt{seccomp/seccomp\_deny\_open.c} by Michael Kerrisk \url{https://man7.org/tlpi/code/online/dist/seccomp/seccomp_deny_open.c.html}, licensed under GNU GPLv3 \url{https://www.gnu.org/licenses/gpl-3.0.html}}
 

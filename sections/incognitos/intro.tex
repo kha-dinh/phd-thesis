@@ -1,5 +1,4 @@
-\section{Introduction}
-\label{sec:intro}
+\section{Introduction}\label{sec:incognitos:intro}
 Ensuring the confidentiality of computation in untrusted environments such as the cloud remains a daunting challenge even with the mature hardware-assisted \emph{TEE (Trusted Execution Environment)} architectures~\cite{sgx,kaplanamd,tdx}.
 % \hjcomm{Side-channel threat summary}{...}
 A plethora of attacks have demonstrated their effectiveness in undermining the confidentiality of the userspace enclaves (e.g., Intel SGX)~\cite{sgx-cache-attack,cache-attack-sgx,sgxstep,bulck2018nemesis,xu2015controlledchannel,hahnel2017highresolution,cachezoom,sgxspectre,foreshadow}.
@@ -11,7 +10,7 @@ A plethora of attacks have demonstrated their effectiveness in undermining the c
 \hdr{Shift towards CVMs}
 Meanwhile, a shift from process-based enclaves~\cite{costan2016intel,costan2016sanctum,keystone} such as Intel SGX towards \glspl{cvm} is anticipated with the current and upcoming hardware extensions.
 Intel's \gls{tdx}~\cite{tdx}, AMD's \gls{sev}~\cite{amd64,kaplanamd}, and ARM's \gls{cca}~\cite{cca} all adopt the virtual machine construct as TEE boundary.
-This means the OS kernel now resides within the trust boundary, unlike the previous userspace enclave design of Intel SGX~\cite{sgx}. 
+This means the OS kernel now resides within the trust boundary, unlike the previous userspace enclave design of Intel SGX~\cite{sgx}.
 
 
 \hdr{Persisting side-channel threats in CVMs}
@@ -54,7 +53,7 @@ As we will show through our paper, a design space exists for adaptive and robust
 
 
 
- % As we will show in this work, an ability to sense the adversary's temporal resolution allows an adaptive rate that minimizes overhead during benign execution with lowered rates.
+% As we will show in this work, an ability to sense the adversary's temporal resolution allows an adaptive rate that minimizes overhead during benign execution with lowered rates.
 
 % However, performance overhead is not sufficiently limited, and the enclave program must be instrumented with \emph{software MMU} to be under Klotski's protection.
 % We point out the inefficiency of its \emph{fixed-rate} periodic rerandomization scheme.
@@ -107,14 +106,14 @@ Lastly, we summarize the contributions of this paper as follows:
 \vspace{0.2em}
 
 \begin{itemize}
-    \setlength\itemsep{0.3em}
-    \item[-] We propose a unikernel-based design for an efficient obfuscation execution engine that achieves transparent and full-system obfuscation.
+	\setlength\itemsep{0.3em}
+	\item[-] We propose a unikernel-based design for an efficient obfuscation execution engine that achieves transparent and full-system obfuscation.
 
-    \item[-] We propose a novel rate-adaptive obfuscation scheme to address the inefficiency of fixed-rate rerandomization and robustness issues of threshold-based termination schemes.
-    % and demonstrate its robust implementation by tackling non-trivial challenges with a unique design.
-	% \item We thoroughly assessed the proposed approach through 
-    \item[-] We performed evaluations using microbenchmarks and real-world workloads to show its effectiveness.
-    \item[-] We open source \thename and all implementations involved in its evaluation for future research and adoption\footnote{Available at \url{https://github.com/sslab-skku/incognitos}}.
+	\item[-] We propose a novel rate-adaptive obfuscation scheme to address the inefficiency of fixed-rate rerandomization and robustness issues of threshold-based termination schemes.
+	      % and demonstrate its robust implementation by tackling non-trivial challenges with a unique design.
+	      % \item We thoroughly assessed the proposed approach through 
+	\item[-] We performed evaluations using microbenchmarks and real-world workloads to show its effectiveness.
+	\item[-] We open source \thename and all implementations involved in its evaluation for future research and adoption\footnote{Available at \url{https://github.com/sslab-skku/incognitos}}.
 \end{itemize}
 
 

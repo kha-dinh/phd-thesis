@@ -182,16 +182,6 @@ Major Advisor\\
 % \fallbackchar{}
 
 % \newunicodechar{^^^^007e}{{\JapSubstFont\symbol{"007e}}}
-\setmainfont{HMJ}[
-	Mapping=tex-text,
-	AutoFakeSlant=0.3,AutoFakeBold=1, % There are no no italic and bold faces so we fake them LOL
-	Path=./,
-	Extension = .ttf,
-	UprightFont=korean.h2mjsm,
-	% BoldFont=*-Bold,
-	% ItalicFont=*-Italic,
-	% BoldItalicFont=*-BoldItalic
-]
 %
 % \newunicodechar{^^^^2013}{{\emojifont\symbol{"260E}}} % ☎️
 % \iffontchar \font  "2e3a
@@ -219,6 +209,19 @@ Major Advisor\\
 \newunicodechar{^^^^0161}{{\fallbackfont{^^^^0161}}}
 \newunicodechar{^^^^0103}{{\fallbackfont{^^^^0103}}}
 \newunicodechar{^^^^2022}{{\fallbackfont{^^^^2022}}}
+\DeclareRobustCommand\dash{{\fallbackfont{^^^^2014}}}
+
+\setmainfont{HMJ}[
+	Mapping=tex-text,
+	AutoFakeSlant=0.3,AutoFakeBold=1.5, % There are no no italic and bold faces so we fake them LOL
+	Path=./,
+	Extension=.ttf,
+	UprightFont=korean.h2mjsm,
+	% BoldFont=*-Bold,
+	% ItalicFont=*-Italic,
+	% BoldItalicFont=*-BoldItalic
+]
+
 % % \newunicodechar{^^^^2013}{\textfallback{\char"2013}}
 % \newunicodechar{^^^^2014}{testset}
 % \newunicodechar{^^^^2015}{testset}

@@ -2,25 +2,108 @@
 \pagenumbering{arabic}
 \label{sec:intro}
 
-The security primitives provided by \glspl{os} lay the foundation of many modern software systems. For instance, \gls{os} process abstraction not only enables efficient multitasking on a processor but also provides a unit of isolation to perform \emph{privilege separation}. Many real-world programs such as the Chrome web browser~\cite{chrome-security} and OpenSSH~\cite{openssh} choose to split programs into components within less-privilege processes to limit attackers' access. Moreover, Linux's \glspl{cgroup} and \emph{namespaces} are the core of container technologies like Docker~\cite{merkel2014docker}, which power a large share of modern cloud computing. \gls{os} system call filtering like Linux Seccomp effectively restricts available system calls and their argument, commonly used in conjunction with the mentioned primitives~\cite{docker-seccomp,kubernetes-seccomp}.
+An \gls{os}, or kernel, is the software layer that mediate programs accesses to underlying hardware resources.
+Any operating system wants to achieve two goals.
+First, an OS must provide a set of interface \glspl{api} that are easy to work with by the application developers, and abstract away the complexity of underlying hardware.
+Second, it must efficiently \emph{manage hardware resources} like CPUs execution time, memory and disk, by allocating resources to applications and reclaiming them when needed.
 
-Unfortunately, in the modern world, these mechanisms have been proven insufficient. Incidents such as Heartbleed~\cite{heartbleed} that leak the webserver private key due to a buggy TLS component call for finer-grained isolation of program components. However, applying process-based isolation for such program components requires non-trivial engineering efforts. Moreover, process isolation suffers from significant performance degradation due to \gls{ipc} costs and heavy context switching~\cite{erim,lwc}. At the same time, the rise of confidential computing applications through hardware-assisted \glspl{tee} calls for considering more advanced threat models. \Glspl{tee} technologies place the kernel or hypervisor outside of their \glspl{tcb}. Moreover, side-channel attacks~\cite{zhang_klotski_2020,sgx-cache-attack,sgx-grand-exposure,controlled-channel,morbitzer_extracting_2019,morbitzer_severed_2018,wilke_sevurity_2020} means that the promised confidentiality and integrity of \glspl{tee} are threatened.
-Against these attacks, we need to revisit the security role of \glspl{os}, especially when the OS is also included within the application, as in the case of VM-based \glspl{tee} like AMD \gls{sev}~\cite{advanced_micro_device_sev_2022}.
+Ever since the introduction of multi-user systems, \glspl{os} has also played a central role in guaranteeing security of the system.
+With the ability to download and execute any programs from the internet.
+The OS must mediate all access to resources such that a potentially malicious process cannot compromise the execution of others, ensuring the security of process and the entire system, more specifically, in terms of \emph{confidentiality}, \emph{integrity} and \emph{availability}.
 
-Also, security hardware features are constantly released by hardware vendors. Intel \gls{pku} enables page-granularity memory isolation for in-process domains. Recently, ARM released \gls{mte} and \gls{pa} that open up a large design space for exploration~\cite{pac-it-up,pactight,color-my-world}. Still, using these security features properly is non-trivial since there may be pitfalls when security mechanisms are carelessly designed around them. For instance, recent research discussed the issue of kernel confused deputy through the system call interface~\cite{pku-pitfalls,jenny,cerberus}.
-For \glspl{tee} technologies, Iago attacks \cite{checkoway_iago_2013} is a concern that must be addressed.
-
-
-Amidst these issues, two new research challenges must be addressed for modern \gls{os} security. First, how can the modern hardware security features be properly utilized, or \emph{retrofitted} to implement \gls{os} security mechanisms? Second, how \gls{os} designs must be adapted to tackle security issues when adapting modern hardware features?
-
-My first work, \sepim, tries to answer the first question by retrofitting \gls{pim} technologies to be used as accelerators for confidential computing.
-I discussed the benefits, as well as carefully studied the security challenges. Based on the observations, I proposed minimal yet imperative extensions to \gls{pim} to mitigate security issues and enable them as secure accelerators for \glspl{tee}.
-
-My second work, \capacity, attempts to answer both questions. It proposes an access control model for in-process domains inspired by capability systems~\cite{cheri,capsicum,eros,cheri-jni}. \capacity utilizes modern ARM hardware features, \gls{pa} and \gls{mte}, which already exhibit characteristics of capabilities, to turn process references into cryptographic references. \capacity protection coherently overs the life-cycles of protected resources, from the time of import from the file system to its location within memory, accessed through pointers.
-
-Finally, \oblivm, a work-in-progress, answers the second question. It enhances the design of unikernels to provide portable and efficient side-channel defense mechanisms. The design is based on the observation that unikernels have direct and efficient access to privileged hardware features.
+Abstractions are the lingua franca of operating systems designs.
+A well-design abstraction for a particular resource helps an OS achieve both of its goals simultaneously.
+Take the process abstraction for example, has ben a stable of any OS ever since the 1960s~\cite{denning2022systems}.
+Process is the unit of execution that consume CPU processing time and interact wih resources .
+Encapsulating related functions into the unit of processes significantly simplify both application programming (each services can be developed and debugged independently) and resource management (resources can be allocated and reclaimed).
+Another well designed abstractions are files.
+Files allows programs to interratcts with..
+Taking files to the extreme, as in UNIX prniciple, they are handle for I/O, networking, IPC, and other OS services, allowing all OS services to be serviced through the same interface.
 
 
+% Interface
+\hdr{The need to retrofit security into legacy systems}
+Despite decades of innovation, certain interfaces and abstractions provided by the \gls{os} remain pretty much unchanged since the 90s.
+The past 60 years have seen in proposal toward secure operating system constructions; security kernel, capability-based OSes and microkernels promised superior security compared to mainstream OSes.
+Yet, these systems often fail to see large-scale adoption.
+The reason for this is that most modern applications are written with the assumption of standard interfaces, particularly the \gls{posix}.
+Thus, a majority of today's infrastructures for cloud computing still relies on monolithic OS like Linux and Windows with first-class \gls{posix} support.
 
-\textbf{Outline.}
-The remainder of this dissertation is structured as follows. I first cover the preliminaries in \autoref{chap:background}. In the next two chapters, \autoref{chap:sepim} and \autoref{chap:capacity}, I describe \sepim and \capacity. Finally, I briefly review \oblivm, a work-in-progress in \autoref{chap:oblivm}.
+% At the same time, applications continues to evolve to be more complex, encompasing multiple third-party libraries, all relying on the legacy set of interfaces and abstractions.
+% The legacy process abstraction is starting to show its age, with the lack of support for fine-grained isolation within a single process.
+
+Thus, the most practical approach to security has been to security mechanisms into existing OS abstractions instead of inventing new ones.
+SELinux~\cite{selinux} introduce a \gls{mac} system on top of default Linux's insecure \gls{dac} model.
+Within large and complicated code bases like Chrome and Firefox browsers, there have been attempt to retrofit fine-grained isolation into the process abstraction to limit the impact of compromised third-parties libraries.
+
+
+\hdr{The rise of hardware-defined trust models}
+As software abstractions stagnate, hardware has taken the lead in redefining isolation, moving protection responsibilities downward into the processor itself.
+Over the past decade, hardware has begun reshaping how system software defines trust boundaries.
+Modern systems research thus evolves along two opposing yet complementary directions: one compressing the trust boundary inward into the process, and the other expanding it outward to the entire OS image.
+
+\begin{itemize}
+	\item[-] \textbf{Finer-grained boundaries.} Features like Intel \gls{pku} provides fine-grained, sub-process memory isolation on top of tranditional OS page table-based one.
+	      On ARM, Pointer Authentication (PA) and Memory Tagging (MTE) introduce integrity isolation and semantics for pointers.
+	      Prototypes like \gls{cheri} that promised hardware-enforced memory safety and isolation semantics are being integrated into real products~\cite{cheri}.
+	      These mechanisms enable hardware-backed partitions within a single process, allowing different libraries or components to coexist under differentiated privileges without incurring the cost of full process separation.
+	\item[-] \textbf{Broader, mutually distrusting boundaries.} At the opposite extreme, Confidential Virtual Machines (CVMs) encapsulate entire operating systems within hardware-encrypted containers.
+	      Technologies such as AMD SEV-SNP and Intel TDX relocate the root of trust from the hypervisor to the hardware itself, protecting the whole OS instance from the surrounding platform and cloud provider.
+\end{itemize}
+
+
+\hdr{Toward retrofitting operating system for modern trust boundaries}
+The legacy OS trust model is starting to show its age.
+Both extremes expose the same weakness: existing OS abstractions, processes, syscalls, and file descriptor, or even virtual machines, were never designed for either sub-process or system-scale trust boundaries.
+
+\begin{itemize}
+	\item[-]  At the fine-grained, sub-process level, research has found that hardware primitives must not be use superficially, or no security guarantee is provided at all.
+	      Attacks on in-process isolation systems~\cite{pku-pitfall,schrammel2022jenny,endokernel} demosntrates the need to rethink how existing \gls{os} interfaces interact with subprocess compartments
+	\item[-]  At the level of \gls{cvm}, The large TCB into its trusted computing base, which contain million lines of vulnerable code.
+	      Moreover, execution of \gls{cvm} now have to be worry of side-channel attacks from a malicious hypervisor that allow them to sensitive information; the OS, with its large code base, potentially introduce or amplify side-channel attacks.
+\end{itemize}
+
+The deeper issue is that the OS abstractions still reflect the 1960s trust model, where isolation is only needed between processes.
+The central challenge, therefore, is to retrofit these abstractions to the finer and broader trust boundaries defined by contemporary hardware.
+This thesis tries to answer the following research question.
+
+\begin{displayquote}
+	\emph{How can operating system abstraction be retrofitted to align with the new trust boundaries introduced by modern hardware security mechanisms?}
+\end{displayquote}
+
+Toward answering the above question, my work explore solutions at both at the fine-grained boundary and the broad bounary.
+
+\begin{itemize}
+	\item[-] \textbf{Retrofitting hardware-assisted fine-grained isolation into the process abstraction with capabilities.} \capacity, attempts to retrofit security .... It proposes an access control model for in-process domains inspired by capability systems~\cite{cheri,capsicum,eros,cheri-jni}. \capacity utilizes modern ARM hardware features, \gls{pa} and \gls{mte}, which already exhibit characteristics of capabilities, to turn process references into cryptographic references. \capacity protection coherently overs the life-cycles of protected resources, from the time of import from the file system to its location within memory, accessed through pointers.
+	\item[-] \textbf{Retrofitting OS abstractions for whole-system side-channel security.}
+	      \incognitos. IncognitOS rethinks the OS itself as a self-obfuscating entity within a Confidential VM, using adaptive scheduling and memory rerandomization to preserve secrecy even under a malicious hypervisor.
+\end{itemize}
+
+
+
+
+
+
+
+
+% The security primitives provided by \glspl{os} lay the foundation of many modern software systems.
+
+% For instance, \gls{os} process abstraction not only enables efficient multitasking on a processor but also provides a unit of isolation to perform \emph{privilege separation}. Many real-world programs such as the Chrome web browser~\cite{chrome-security} and OpenSSH~\cite{openssh} choose to split programs into components within less-privilege processes to limit attackers' access. Moreover, Linux's \glspl{cgroup} and \emph{namespaces} are the core of container technologies like Docker~\cite{merkel2014docker}, which power a large share of modern cloud computing.\ \gls{os} system call filtering like Linux Seccomp effectively restricts available system calls and their argument, commonly used in conjunction with the mentioned primitives~\cite{docker-seccomp,kubernetes-seccomp}.
+%
+% Unfortunately, in the modern world, these mechanisms have been proven insufficient. Incidents such as Heartbleed~\cite{heartbleed} that leak the webserver private key due to a buggy TLS component call for finer-grained isolation of program components. However, applying process-based isolation for such program components requires non-trivial engineering efforts. Moreover, process isolation suffers from significant performance degradation due to \gls{ipc} costs and heavy context switching~\cite{erim,lwc}. At the same time, the rise of confidential computing applications through hardware-assisted \glspl{tee} calls for considering more advanced threat models. \Glspl{tee} technologies place the kernel or hypervisor outside of their \glspl{tcb}. Moreover, side-channel attacks~\cite{zhang_klotski_2020,sgx-cache-attack,sgx-grand-exposure,controlled-channel,morbitzer_extracting_2019,morbitzer_severed_2018,wilke_sevurity_2020} means that the promised confidentiality and integrity of \glspl{tee} are threatened.
+% Against these attacks, we need to revisit the security role of \glspl{os}, especially when the OS is also included within the application, as in the case of VM-based \glspl{tee} like AMD \gls{sev}~\cite{advanced_micro_device_sev_2022}.
+
+% Also, security hardware features are constantly released by hardware vendors. Intel \gls{pku} enables page-granularity memory isolation for in-process domains. Recently, ARM released \gls{mte} and \gls{pa} that open up a large design space for exploration~\cite{pac-it-up,pactight,color-my-world}. Still, using these security features properly is non-trivial since there may be pitfalls when security mechanisms are carelessly designed around them. For instance, recent research discussed the issue of kernel confused deputy through the system call interface~\cite{pku-pitfalls,jenny,cerberus}.
+% For \glspl{tee} technologies, Iago attacks \cite{checkoway_iago_2013} is a concern that must be addressed.
+
+
+% Amidst these issues, two new research challenges must be addressed for modern \gls{os} security. First, how can the modern hardware security features be properly utilized, or \emph{retrofitted} to implement \gls{os} security mechanisms? Second, how \gls{os} designs must be adapted to tackle security issues when adapting modern hardware features?
+
+% My first work, \sepim, tries to answer the first question by retrofitting \gls{pim} technologies to be used as accelerators for confidential computing.
+% I discussed the benefits, as well as carefully studied the security challenges. Based on the observations, I proposed minimal yet imperative extensions to \gls{pim} to mitigate security issues and enable them as secure accelerators for \glspl{tee}.
+
+
+
+
+% \textbf{Outline.}
+% The remainder of this dissertation is structured as follows. I first cover the preliminaries in \autoref{chap:background}. In the next two chapters, \autoref{chap:sepim} and \autoref{chap:capacity}, I describe \sepim and \capacity. Finally, I briefly review \oblivm, a work-in-progress in \autoref{chap:oblivm}.

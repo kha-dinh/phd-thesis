@@ -7,6 +7,8 @@
 
 \usepackage{IEEEtrantools}
 \usepackage{pdfpages}
+\usepackage{csquotes}
+
 \usepackage[a4paper]{geometry}
 \usepackage{rotating}
 \usepackage[breaklinks = true]{hyperref} % to use \phantomsection
@@ -201,7 +203,10 @@ Traditional \emph{operating systems (OSes)} often only provide coarse-grained se
 Unfortunately, these mechanisms are insufficient in the modern world.
 Security threats are getting increasingly advanced, while application security requirements are also increasing. For instance, modern confidential computing systems must consider the threat of side-channel leakages and sophisticated physical attacks. Moreover, traditional security mechanisms such as process-based isolation entail performance and usability trade-offs.
 
+
+
 At the same time, hardware vendors constantly roll out modern hardware security features with the hope of tackling those problems. For example, Intel released Protection Keys for Userspace (PKU) to enable efficient page-granularity in-process memory isolation. Trusted Execution Environment (TEE) technologies create an environment shielded against potentially compromised system software. This trend creates two research questions. First, how to adapt operating system designs to the security constraints of new hardware features such as TEEs. Second, how modern hardware features can be retrofitted to implement OS security mechanisms.
+
 
 % Thus, a key question that modern operating systems must answer is how to effectively take advantage of modern hardware features to (1) provide a safe execution environment for applications robust against advanced threats and (2) introduce low-overhead primitives for implementing robust applications.
 
