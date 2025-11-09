@@ -1,3 +1,5 @@
+% !TeX root = ../main.tex
+
 \chapter{Introduction}
 \pagenumbering{arabic}
 \label{sec:intro}
@@ -44,52 +46,61 @@ As a result, the most practical path forward has been to \emph{retrofit} securit
 For instance, SELinux~\cite{selinux} extends Linux’s discretionary access control () model with mandatory access control (\gls{mac}) enforcement.
 Similarly, large applications such as Chrome and Firefox retrofit finer-grained isolation mechanisms into the process abstraction to limit the damage caused by compromised third-party libraries~\cite{rlbox}.
 
-\hdr{Trust and threat models of OSes in modern landscape}
+\hdr{Protection models of legacy OSes in modern landscape}
 
-As explained above, most OS enforce the
+Similarly the protection model of modern OSes has remain largely the same.
+The security goals of the OS is to ensure all access to system resouces satisfy the classical properties confidentiality, integrity and availablity.
 
-To understand the security of operating systems, one must understand its threat model.
+The operating system act as a \emph{reference monitor} that mediate all accesses of the system. 
+Thus, it is traditionally assume to be trusted, or within the system's \gls{tcb}.
 
+Most modern OS enforces enforces two distinct security boundaries: one between itself and the userspace processes, and the other between different processes.
+
+The first boundary, enforced through hardware ring protection, is critical to protect the \gls{os} \gls{tcb}, ensuring that all its security enforcement are untampered.
+
+The second boundary is the foundation for security in multiprogramming systems. 
+Each process is given a dedicated adress space.
+They are also given a dedicated set of resource handle (UNIX file descriptors) that they uniquely access.
+
+Interaction  between these boundaries are strictly mediated by the OS. 
+System calls allows the processes to access system services and hardware resources.
+The OS validate the legitimacy of these system calls (e.g., does the process's owner have the right permission to the file it is requesting?), before granting the access to the process.
 
 \hdr{The rise of hardware-defined trust models}
 
-While software abstractions have stagnated, hardware innovation has reshaped how systems define and enforce trust boundaries.
-Modern systems research now evolves along two complementary directions: compressing the trust boundary inward (toward finer-grained isolation) and expanding it outward (toward whole-system protection).
+While os protection models have stagnated, hardware innovation has reshaped how systems define and enforce isolation boundaries that the legacy OS protection were never designed to  handle.
+Modern systems security research now evolves along two complementary direction.
+Both direction expose limitations in traditional abstractions such as processes, file descriptors, and even virtual machines, and introduce security challenges for systems designer.
 
-\begin{itemize}
-	\item[-] \textbf{Finer-grained boundaries.}
-	      Features such as Intel \gls{pku} enable sub-process memory isolation beyond traditional page-table mechanisms.
-	      On ARM, Pointer Authentication (PA) and Memory Tagging (MTE) introduce pointer integrity and spatial safety semantics.
-	      Research prototypes like \gls{cheri} extend these concepts toward full hardware-enforced memory safety and capability-based isolation~\cite{cheri}.
-	      These mechanisms support hardware-backed partitions within a single process, enabling components to coexist under differentiated privileges without incurring the high overhead of separate processes.
-	\item[-] \textbf{Broader, mutually distrusting boundaries.}
-	      % Technologies such as AMD SEV-SNP and Intel TDX relocate the root of trust from the hypervisor to the processor, protecting guest OSes from potentially malicious hosts or cloud providers.
-	      CPU vendors are introducing features that enable creating secure "enclaves" that are isolated from the rest of the system, even from compromised operating systems and hypervisors.
-	      Confidential Virtual Machines (CVMs), the latest development, encapsulate entire OS instances within hardware-encrypted enclaves.
-	      This simplify the development by bring the application along with all of operational software within a single package.
+\hdr{Compressed protection boundaries}
 
-\end{itemize}
+On one end, we are seeing hardware support toward \emph{compressing the protection boundaries inward}.
+Motivated by how large and complex modern applications has become features such as Intel \gls{pku} enable sub-process memory isolation beyond traditional page-table mechanisms.
+On ARM, Pointer Authentication (PA) and Memory Tagging (MTE) introduce pointer integrity and spatial safety semantics.
+Research prototypes like \gls{cheri} extend these concepts toward full hardware-enforced memory safety and capability-based isolation~\cite{cheri}.
+These mechanisms support hardware-backed partitions within a single process, enabling components to coexist under differentiated privileges without incurring the high overhead of separate processes.
+
+Taking this principle to the extreme, CPU vendors are introducing features that enable creating secure "enclaves" that are isolated from the rest of the system, even from compromised operating systems and hypervisors.
+This allow for remote cloud user to deply trusted computation with the smallest TCB. 
 
 
-The legacy OS trust model—designed for process-level isolation—is increasingly inadequate in the face of these evolving hardware capabilities.
-Both fine-grained and coarse-grained hardware mechanisms expose limitations in traditional abstractions such as processes, syscalls, file descriptors, and even virtual machines.
+Hardware primitives cannot be applied superficially; incorrect integration often nullifies their security benefits.
+Attacks on in-process isolation mechanisms~\cite{pku-pitfall,schrammel2022jenny,endokernel} demonstrate that existing OS interfaces must be rethought to safely support sub-process compartments.
 
+\hdr{Expanded protection boundaries}
+On the other end, we are seing the protection model \emph{expanded outward} toward whole-system protection.
+Confidential Virtual Machines (CVMs), the latest development, encapsulate entire OS instances within hardware-encrypted enclaves.
+This simplify the development by bring the application along with all of operational software within a single package.
 
-\begin{itemize}
-	\item[-] \textbf{At the fine-grained level:}
-	      Hardware primitives cannot be applied superficially; incorrect integration often nullifies their security benefits.
-	      Attacks on in-process isolation mechanisms~\cite{pku-pitfall,schrammel2022jenny,endokernel} demonstrate that existing OS interfaces must be rethought to safely support sub-process compartments.
-
-	\item[-] \textbf{At the system level:}
-	      CVMs, while shifting trust into hardware, inherit a large trusted computing base (TCB) from their guest OS—often millions of lines of vulnerable code.
+CVMs, while shifting trust into hardware, inherit a large trusted computing base (TCB) from their guest OS—often millions of lines of vulnerable code.
 	      Furthermore, they remain susceptible to side-channel attacks from malicious hypervisors or co-located tenants, as the OS itself may amplify information leakage through shared resources.
-\end{itemize}
 
-The root issue is that modern OS abstractions still reflect a 1960s-era trust model, where isolation was needed only between processes.
+
+\hdr{Research question}
 This thesis explores the following research question:
 
 \begin{displayquote}
-	\emph{How can operating system abstractions be retrofitted to align with the trust boundaries introduced by modern hardware security mechanisms?}
+	\emph{How can operating systems be retrofitted to align with the trust boundaries introduced by modern hardware security mechanisms?}
 \end{displayquote}
 
 To address this question, this work explores both directions of isolation: sub-process fine-grained boundaries and system-wide trusted execution boundaries.
