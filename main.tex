@@ -9,6 +9,8 @@
 \usepackage{pdfpages}
 \usepackage{csquotes}
 
+\usepackage{epigraph}
+
 \usepackage[a4paper]{geometry}
 \usepackage{rotating}
 \usepackage[breaklinks = true]{hyperref} % to use \phantomsection
@@ -86,6 +88,7 @@
 \newcommand{\cref}{\autoref}
 % \renewcommand{\ref}{\autoref}
 \providecommand*{\listingautorefname}{Listing}
+\renewcommand*{\chapterautorefname}{Chapter}
 \renewcommand*{\sectionautorefname}{Section}
 \renewcommand*{\subsectionautorefname}{Subsection}
 \renewcommand*{\subsubsectionautorefname}{Subsubsection}
@@ -235,8 +238,10 @@ Its ideas contribute to the long-term vision of secure computing infrastructures
 \include{sections/capacity}
 \include{sections/incognitos}
 \include{sections/discussion}
+\include{sections/conclusion}
 
 % \include{sections/oblivm}
+
 
 %%--------------------------------------
 % Chapters.....
@@ -286,6 +291,9 @@ Its ideas contribute to the long-term vision of secure computing infrastructures
 %\pagenumbering{arabic}
 
 
+
+
+\end{document}
 
 
 \end{document}

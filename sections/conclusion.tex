@@ -1,0 +1,13 @@
+\chapter{Conclusion}
+\label{sec:conclusion}
+
+This thesis revisited operating system security through the lens of \emph{protection alignment}—the need to reconcile legacy OS abstractions with modern hardware-based isolation.
+It argued that sustainable system security cannot rely on stronger mechanisms alone, but on the coherence of protection semantics across hardware and software layers.
+
+Through two complementary systems, \capacity and \incognitos, this work demonstrated how such alignment can be achieved in practice.
+\capacity retrofits capability-based protection into legacy process abstractions, using ARM Pointer Authentication (\gls{pa}) and Memory Tagging (\gls{mte}) to ensure consistent, hardware-backed enforcement within a process.
+\incognitos redefines the OS’s role in trusted execution environments, treating it as an active mediator that mitigates side-channel leakage through scheduling and memory re-randomization.
+
+Together, these systems show that aligning protection models enhances both the security and efficiency of computation, transforming hardware support from an external defense mechanism into an integral part of OS design.
+
+Looking forward, this principle of protection alignment suggests a broader agenda for systems research: operating systems must evolve toward cooperative enforcement with hardware, bridging traditional abstractions with emerging isolation technologies to form a coherent, verifiable foundation for secure computation.

@@ -1,7 +1,6 @@
 % !TeX root = ../main.tex
 %
-\chapter{Lessons Learned and Path Forward}
-\label{ch:discussion}
+\chapter{Lessons Learned and Path Forward}\label{ch:discussion}
 
 \section{Overview}
 
@@ -38,8 +37,8 @@ Despite these contributions, several open challenges remain in the pursuit of ha
 Future processors will likely expose richer isolation primitives—such as fine-grained enclaves or programmable integrity domains.
 
 Integrating such features coherently will require new interfaces that can express multi-level trust relationships.
+Integrating such features coherently will require new interfaces that can express multi-level trust relationships.
 
-\hdr{Formal reasoning and verification of trust realignment}
 Both systems implicitly redefine the \gls{tcb}, yet current formal methods lack tools to reason about partial trust or shifting boundaries.
 Future work should explore hybrid verification frameworks that combine symbolic reasoning for software with microarchitectural models of hardware-enforced isolation.
 Such frameworks could formally prove the correctness of trust realignment strategies, ensuring that retrofitting does not inadvertently introduce new vulnerabilities.
@@ -55,5 +54,6 @@ Generalizing this adaptability beyond unikernels could reshape how security poli
 \hdr{Hardware transparency and accountability}
 Retrofitting security also depends on the verifiability of hardware behavior.
 Emerging security processors must expose trustworthy telemetry and introspection mechanisms to avoid opaque enforcement that undermines accountability.
+
 
 

@@ -1,11 +1,16 @@
 % !TeX root = ../main.tex
 %
-\chapter{Capacity: Retrofitting Capability-Based Access Control within In-Process Domains}
+\chapter{CAPACITY: Cryptographically-Enforced In-Process Capabilities for Modern ARM Architectures}
 \label{chap:capacity}
 
 
 \emph{* The content of this chapter were published in Proceedings of the 2023 ACM SIGSAC Conference on Computer and Communications Security (CCS '23). Association for Computing Machinery, New York, NY, USA, 874-888.}
 \\
+
+
+
+\epigraph{There is no fundamental reason why a program that you write for me should be able to delete my bank transactions file just because I can. Yet those are the permission rules imposed by the current commercial OSes for personal systems.}{\textit{Norm Hardy, Capability Theory}}
+
 
 Modern hardware increasingly embeds security primitives that, if properly integrated, can enforce fine-grained protection within software.
 Yet, mainstream operating systems continue to rely on legacy abstractions and trust assumptions that position the kernel as the sole arbiter of protection.
@@ -38,6 +43,15 @@ We evaluate our \thename-enabled NGINX web server prototype and other common app
 \input{sections/capacity/ref-mon}
 \input{sections/capacity/instrumentation}
 \input{sections/capacity/evaluation}
+\input{sections/capacity/discussion}
+\input{sections/capacity/related-work}
+
+
+\section{Conclusion}
+This paper proposed a novel design called \thename that enables the compartmentalization of in-process domains by employing hardware-accelerated and cryptographically-authenticated capabilities.
+We presented complete mediation and authentication schemes that satisfy the security requirements of capability systems throughout the life cycle of sensitive domain objects and addressed compatibility issues when adapting \pamte-based instrumentation for large programs.
+We evaluated \thename through microbenchmarks and real-world applications, including an NGINX webserver prototype in which the important resources are protected in secure domains.
+The results show the efficacy of \thename the in terms of performance with an average webserver throughput overhead of $17\%$ for single-threaded and $13.54\%$ for multi-threaded experiments.
 \input{sections/capacity/discussion}
 \input{sections/capacity/related-work}
 
