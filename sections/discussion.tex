@@ -1,0 +1,59 @@
+% !TeX root = ../main.tex
+%
+\chapter{Lessons Learned and Path Forward}
+\label{ch:discussion}
+
+\section{Overview}
+
+This chapter synthesizes the findings of the two systems presented in this thesis—\capacity and \incognitos—and reflects on their broader implications for operating system (OS) security in the era of hardware-defined protection.
+While these systems address different layers of the trust stack, they share a common goal: reestablishing coherence between the protection and trust boundaries that define modern computing.
+Together, they illustrate that security retrofitting is not merely an engineering exercise, but a rethinking of how trust is distributed between hardware and software components.
+
+
+\section{Lessons Learned}
+
+Several key insights emerge from the exploration of hardware-assisted retrofitting across these two systems.
+
+\hdr{Retrofitting demands principled abstraction design}
+Adapting hardware security primitives is not simply a matter of rewriting OS interfaces.
+Without coherent abstraction boundaries, new mechanisms risk semantic drift—hardware may enforce guarantees that the OS does not expose or understand.
+\capacity highlights the importance of aligning enforcement granularity (capability-based references) with existing abstractions (file descriptors, pointers).
+
+
+\hdr{Compatibility is both a constraint and an enabler}
+While retrofitting inherently limits radical redesign, it ensures deployability in existing ecosystems.
+Both \capacity and \incognitos succeed because they extend, rather than replace, established abstractions (\gls{posix}, file descriptors, memory mappings).
+This pragmatic stance enables security evolution without ecosystem fragmentation.
+
+\hdr{4. Security must be co-designed with performance and observability.}
+Hardware features introduce subtle trade-offs between efficiency, transparency, and trust.
+The evaluation of both systems demonstrates that principled use of hardware capabilities can achieve meaningful security benefits with acceptable overheads.
+
+\section{Open Challenges}
+
+Despite these contributions, several open challenges remain in the pursuit of hardware-software co-design for OS security.
+
+
+\hdr{Evolving hardware trust anchors}
+Future processors will likely expose richer isolation primitives—such as fine-grained enclaves or programmable integrity domains.
+
+Integrating such features coherently will require new interfaces that can express multi-level trust relationships.
+
+\hdr{Formal reasoning and verification of trust realignment}
+Both systems implicitly redefine the \gls{tcb}, yet current formal methods lack tools to reason about partial trust or shifting boundaries.
+Future work should explore hybrid verification frameworks that combine symbolic reasoning for software with microarchitectural models of hardware-enforced isolation.
+Such frameworks could formally prove the correctness of trust realignment strategies, ensuring that retrofitting does not inadvertently introduce new vulnerabilities.
+
+\hdr{Formal reasoning across protection boundaries}
+Current verification frameworks often assume a single trusted kernel.
+As OS trust becomes distributed across hardware and user space, reasoning about global invariants will demand compositional verification techniques that span layers.
+
+\hdr{Dynamic trust adaptation}
+\incognitos hints at a future where trust may shift dynamically at runtime (e.g., obfuscation levels adjusted to threat conditions).
+Generalizing this adaptability beyond unikernels could reshape how security policies are enforced in general-purpose systems.
+
+\hdr{Hardware transparency and accountability}
+Retrofitting security also depends on the verifiability of hardware behavior.
+Emerging security processors must expose trustworthy telemetry and introspection mechanisms to avoid opaque enforcement that undermines accountability.
+
+

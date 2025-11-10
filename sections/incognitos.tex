@@ -1,8 +1,18 @@
 % !TeX root = ../main.tex
-\chapter{Taming modern threats against hardware TEEs using the OS}
+\chapter{Incognitos: A Self-Obfuscating Unikernel for Confidential Virtual Machines}
 
 \emph{* The content of this chapter were published in Proceedings of the 2023 ACM SIGSAC Conference on Computer and Communications Security (CCS '23). Association for Computing Machinery, New York, NY, USA, 874-888.}
 \\
+
+
+
+As cloud computing increasingly adopts \emph{Confidential Virtual Machines} (CVMs) for trusted execution, the system’s traditional trust hierarchy is being inverted.
+Where the operating system once resided within the trusted computing base (\gls{tcb}), it now operates alongside or even below untrusted hypervisors and shared hardware resources.
+This evolution exposes a fundamental \emph{trust-model misalignment}: the OS still assumes a position of privilege and control, yet hardware-level isolation confines it outside the core trust boundary.
+Consequently, even with hardware-provided isolation, side-channel attacks continue to undermine confidentiality guarantees.
+This chapter introduces \incognitos, a unikernel-based operating system that restores coherence between trust and protection by reimagining the OS as a self-obfuscating execution environment within a CVM.
+By retrofitting scheduling and memory management with adaptive obfuscation mechanisms, \incognitos transforms the OS from a potential attack surface into an active contributor to system-level confidentiality.
+The remainder of this chapter presents the motivation, design, and evaluation of \incognitos, demonstrating how trust can be reestablished through self-obfuscation and dynamic adaptation in hardware-enforced environments.
 
 \input{sections/incognitos/terminologies}
 

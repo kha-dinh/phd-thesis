@@ -5,119 +5,165 @@
 \label{sec:intro}
 
 The past century has witnessed rapid technological progress, with computing systems among its most transformative developments.
-The introduction of the internet revolutionizes how information is shared and retrieved across the world.
-More recently, advancements in AI technologies significantly impact different fields, including medical, ..... .
-At the foundation of these advancement lies the infrastructures that runs computation.
-The core part of managing the infrastructures has always been the \gls{os} \dash\ the mediator of computation and the underlying hardware.
+The advent of the internet revolutionized global information sharing and retrieval.
+More recently, advances in artificial intelligence have profoundly influenced diverse fields~\cite{}.
+Underpinning these developments are the infrastructures that enable computation, managed fundamentally by the \gls{os}—the mediator between hardware and software.
 
 Every \gls{os} pursues three fundamental objectives.
-First, it must expose a set of \glspl{api} that are intuitive for application developers while abstracting the complexity of underlying hardware.
-Second, it must efficiently \emph{manage hardware resources}, including CPU time, memory, and storage, by allocating them to applications and reclaiming them when necessary.
-Third, since the advent of multiprogramming in the 1960s, the \gls{os} has been central to ensuring system \emph{security}.
-Running a malicious program can endanger the confidentiality, integrity, and availability of other applications.
-Early systems such as MULTICS (MULTiplexed Information and Computing Service) tackled these challenges by introducing protection domains and privilege rings \dash\ concepts that remain foundational today.
+First, it must provide a set of \glspl{api} that are intuitive for application developers.
+This is achieved through \emph{abstractions} that describe high-level resource properties while concealing implementation details.
+
+Second, it must efficiently \emph{manage hardware resources}—including CPU time, memory, and storage—by allocating and reclaiming them as needed.
+Disciplines such as file system design and scheduling evolved to fulfill this objective.
+
+Third—and the focus of this thesis—the \gls{os} must ensure the \emph{security} of computation.
+This objective became essential with the advent of multiprogramming in the 1960s, when systems began supporting multiple concurrent users and programs.
+A malicious program could compromise the confidentiality, integrity, or availability of both the \gls{os} and other applications.
+Consequently, the \gls{os} must mediate resource access to uphold these guarantees, even in the presence of potentially hostile users.
+
+\section{Legacy OSes' protection model}
+
+\begin{table}[h]
+	\begin{center}
+		\begin{tabular}[c]{l|lll}
+			       & File 1 & File 2 & File 3 \\
+			\midrule
+			User 1 & access &        &        \\
+			User 2 &        & access &        \\
+			User 3 &        &        & access \\
+		\end{tabular}
+		\caption{Example access control matrix specifying a simple protection model}\label{tab:example-acm}
+	\end{center}
+\end{table}
+
+\glspl{os} ensure security by enforcing a \emph{protection model}~\cite{lampsonprotection} that specifies access control between \emph{subjects} (e.g., users and processes) and \emph{objects} (e.g., memory, files, and resource handles). More specifically, it defines what operations subjects may perform on each object at any given time.
+For example, a simple policy might dictate that users cannot access resources owned by others.
+Assuming a system with three users and three files, this policy can be represented using an \emph{access control matrix}~\cite{lampsonprotection}, as shown in \autoref{tab:example-acm}.
+
+
+\glspl{os} map their \emph{abstractions} into the \emph{subjects} and \emph{objects} of this protection model.
+The \emph{process} abstraction, introduced in the 1960s~\cite{denning2022systems}, remains the foundation for representing subjects.
+A process is a unit of execution that consumes CPU time and interacts with system resources.
+Encapsulating functionality within processes simplifies development—each service can be built and debugged independently—and enables precise resource management.
+Commodity \glspl{os}, such as UNIX-based systems, associate users and groups with each process, enforcing protection on a per-process basis.
+To represent objects, \glspl{os} employ the \emph{file} abstraction, which initially referred to a block of data on disk.
+UNIX-inspired systems generalized this concept so that disk I/O, networking, and interprocess communication all appear as file operations, thereby unifying access under a consistent interface and simplifying access control.
+
+Building on these abstractions, \glspl{os} enforce two primary security boundaries: one between the kernel and \emph{userspace} processes, and another among the processes themselves.
+The first boundary, maintained through hardware privilege rings, protects the \gls{os}'s components that enforce security (also called its \gls{tcb}) from being tampered.
+The second boundary underpins multiprogramming security, enforced via memory translation and mediation of all userspace resource accesses.
+
+This is the protection model that this thesis refers to as the \emph{legacy protection model}.
+Despite substantial advances in hardware and increasingly sophisticated attacks, the conceptual foundation of mainstream \glspl{os} security has remained largely unchanged since the 1970s.
+Modern applications depend on long-standing standards \dash\ particularly the \gls{posix} interface \dash which constrains compatibility with alternative architectures.
+Consequently, dominant infrastructures continue to rely protection models based on processes and files abstractions, prioritizing \gls{posix} compliance.
+
+Although the legacy protection model has provided a robust foundation for decades, its underlying assumptions no longer align with modern computing environments.
+Contemporary software systems are becoming increasingly large and complex, often incorporating untrusted extensions~\cite{}.
+Consequently, the coarse-grained process-level protection of traditional \glspl{os} is no longer sufficient containing bugs; the peril which of this is highlighted by the heartbleed attack that exploit a memory corruption error in a cryptographic library.
+Furthermore, emerging paradigms such as \emph{confidential computing} invert the traditional trust hierarchy, with the \gls{os} itself no longer considered fully trusted.
+This thesis therefore argues that sustaining strong security requires reasoning about the legacy protection models in modern systems.
 
 
 
 
 
 
+%
+% Early systems such as MULTICS introduced protection domains and privilege rings—concepts still fundamental today.
+% Over the past six decades, numerous secure OS architectures (e.g., security kernels, capability-based OSes, microkernels) have been proposed, each offering stronger isolation and formal security guarantees.
+% However, few have achieved mainstream adoption.
+% Modern applications depend on long-standing standards—particularly the \gls{posix} interface—which limits compatibility with alternative architectures.
+% As a result, dominant infrastructures today rely on monolithic systems such as Linux and Windows that prioritize \gls{posix} compliance over adopting new security paradigms.
 
 
 
-% Interface
-\hdr{The need to retrofit security into legacy abstractions}
-
-Abstractions are the lingua franca of operating system design.
-A well-crafted abstraction allows the OS to balance usability, efficiency, and security enforcement.
-For instance, the \emph{process} abstraction, introduced in the 1960s~\cite{denning2022systems}, remains the cornerstone of modern operating systems.
-A process represents a unit of execution that consumes CPU time and interacts with system resources.
-Encapsulating related functions within processes simplifies application development (each service can be developed and debugged independently), facilitates resource management (resources can be allocated and reclaimed cleanly), and enforces isolation between mutually untrusted programs.
-Another fundamental abstraction is the \emph{file}, which initially represented a block of data on disk.
-In UNIX-inspired systems, this abstraction was extended so that nearly all disk I/O, networking, and interprocess communication are treated as file operations, thereby unifying system access under a single interface.
-This unification also allows the OS to enforce access control policies consistently across subsystems.
 
 
-Despite decades of innovation, core interfaces and abstractions in modern \glspl{os} have remained largely unchanged since the 1990s.
-Over the past sixty years, numerous secure operating system architectures—such as security kernels, capability-based OSes, and microkernels—have been proposed, each promising stronger isolation and verifiable security guarantees.
-However, these systems rarely achieve mainstream adoption.
-Most modern applications depend on long-standing standards, particularly the \gls{posix} interface, which constrains compatibility with alternative OS architectures.
-Consequently, the dominant computing infrastructures of today—such as Linux and Windows—remain monolithic systems that prioritize \gls{posix} compliance over new security paradigms.
 
-As a result, the most practical path forward has been to \emph{retrofit} security mechanisms into existing abstractions rather than replacing them.
-For instance, SELinux~\cite{selinux} extends Linux’s discretionary access control () model with mandatory access control (\gls{mac}) enforcement.
-Similarly, large applications such as Chrome and Firefox retrofit finer-grained isolation mechanisms into the process abstraction to limit the damage caused by compromised third-party libraries~\cite{rlbox}.
-
-\hdr{Protection models of legacy OSes in modern landscape}
-
-Similarly the protection model of modern OSes has remain largely the same.
-The security goals of the OS is to ensure all access to system resouces satisfy the classical properties confidentiality, integrity and availablity.
-
-The operating system act as a \emph{reference monitor} that mediate all accesses of the system. 
-Thus, it is traditionally assume to be trusted, or within the system's \gls{tcb}.
-
-Most modern OS enforces enforces two distinct security boundaries: one between itself and the userspace processes, and the other between different processes.
-
-The first boundary, enforced through hardware ring protection, is critical to protect the \gls{os} \gls{tcb}, ensuring that all its security enforcement are untampered.
-
-The second boundary is the foundation for security in multiprogramming systems. 
-Each process is given a dedicated adress space.
-They are also given a dedicated set of resource handle (UNIX file descriptors) that they uniquely access.
-
-Interaction  between these boundaries are strictly mediated by the OS. 
-System calls allows the processes to access system services and hardware resources.
-The OS validate the legitimacy of these system calls (e.g., does the process's owner have the right permission to the file it is requesting?), before granting the access to the process.
-
-\hdr{The rise of hardware-defined trust models}
-
-While os protection models have stagnated, hardware innovation has reshaped how systems define and enforce isolation boundaries that the legacy OS protection were never designed to  handle.
-Modern systems security research now evolves along two complementary direction.
-Both direction expose limitations in traditional abstractions such as processes, file descriptors, and even virtual machines, and introduce security challenges for systems designer.
-
-\hdr{Compressed protection boundaries}
-
-On one end, we are seeing hardware support toward \emph{compressing the protection boundaries inward}.
-Motivated by how large and complex modern applications has become features such as Intel \gls{pku} enable sub-process memory isolation beyond traditional page-table mechanisms.
-On ARM, Pointer Authentication (PA) and Memory Tagging (MTE) introduce pointer integrity and spatial safety semantics.
-Research prototypes like \gls{cheri} extend these concepts toward full hardware-enforced memory safety and capability-based isolation~\cite{cheri}.
-These mechanisms support hardware-backed partitions within a single process, enabling components to coexist under differentiated privileges without incurring the high overhead of separate processes.
-
-Taking this principle to the extreme, CPU vendors are introducing features that enable creating secure "enclaves" that are isolated from the rest of the system, even from compromised operating systems and hypervisors.
-This allow for remote cloud user to deply trusted computation with the smallest TCB. 
+% The \gls{os} acts as a \emph{reference monitor} mediating all system accesses.
+% Accordingly, it is assumed to be part of the trusted computing base (\gls{tcb}).
+% Interaction across these boundaries occurs solely through system calls.
+% The \gls{os} validates each request—for example, whether the process owner has the necessary permission to access a file—before granting access.
 
 
-Hardware primitives cannot be applied superficially; incorrect integration often nullifies their security benefits.
-Attacks on in-process isolation mechanisms~\cite{pku-pitfall,schrammel2022jenny,endokernel} demonstrate that existing OS interfaces must be rethought to safely support sub-process compartments.
+\section{Misalignment of OS and hardware-defined protection}
 
-\hdr{Expanded protection boundaries}
-On the other end, we are seing the protection model \emph{expanded outward} toward whole-system protection.
-Confidential Virtual Machines (CVMs), the latest development, encapsulate entire OS instances within hardware-encrypted enclaves.
-This simplify the development by bring the application along with all of operational software within a single package.
-
-CVMs, while shifting trust into hardware, inherit a large trusted computing base (TCB) from their guest OS—often millions of lines of vulnerable code.
-	      Furthermore, they remain susceptible to side-channel attacks from malicious hypervisors or co-located tenants, as the OS itself may amplify information leakage through shared resources.
+Historically, the \gls{os} assumed complete mediation and exclusive control over hardware resources.
+However, new hardware components increasingly implement their own protection and isolation mechanisms, often without the \gls{os}’s full visibility or authority.
+This shift undermines the \gls{os}’s role as the sole enforcement point for access control.
 
 
-\hdr{Research question}
-This thesis explores the following research question:
+The \gls{os}, once central to enforcement, is now a potential liability due to misalignment between hardware-enforced and software-enforced protection.
+
+\hdr{Sub-process isolation domains}
+
+As modern applications grow in complexity, features such as Intel \gls{pku} enable sub-process memory isolation beyond traditional page-table mechanisms.
+On ARM, Pointer Authentication (PA) and Memory Tagging (MTE) provide pointer integrity and spatial safety.
+Research prototypes like \gls{cheri} extend these ideas to full hardware-enforced memory safety and capability-based isolation~\cite{cheri}.
+These mechanisms allow components within a single process to coexist under differentiated privileges without incurring the overhead of multiple processes.
+
+However, hardware primitives cannot be applied superficially.
+Improper integration may nullify their benefits.
+Attacks on in-process isolation mechanisms~\cite{pku-pitfall,schrammel2022jenny,endokernel} demonstrate that existing OS interfaces must be redesigned to safely support sub-process compartments.
+
+\hdr{Trusted execution and CVMs}
+
+Trusted execution technologies significantly alter the protection models assumed in systems.
+
+
+Taking this principle further, CPUs now support secure “enclaves” that isolate computation even from compromised OSes or hypervisors, enabling remote users to deploy trusted workloads with a minimal \gls{tcb}.
+
+[[PLACEHOLDER: Add discussion of SGX and TEEs here for context]]
+
+Confidential Virtual Machines (CVMs) encapsulate entire OS instances within hardware-encrypted enclaves.
+This approach simplifies deployment by bundling applications with their supporting software.
+
+While CVMs shift trust toward hardware, they inherit a large \gls{tcb} from guest OSes—often millions of lines of code.
+They also remain susceptible to side-channel attacks from malicious hypervisors or co-located tenants, as shared resources may amplify leakage through the OS.
+
+\section{Thesis statement}
+
+The divergence between modern hardware capabilities and legacy OS protection abstractions presents both a challenge and an opportunity.
+Replacing long-standing OS architectures is infeasible given decades of entrenched software compatibility and standardization.
+Yet, ignoring these hardware advances risks leaving core systems unable to leverage the strong, fine-grained protection guarantees that processors now provide.
+This thesis argues that the practical path forward lies in \emph{retrofitting}—systematically integrating hardware-backed security mechanisms into existing OS protection models without breaking their foundational abstractions or interfaces.
+This has been the approach that has seen the most success.
+For example, SELinux~\cite{selinux} extends Linux’s \gls{dac} model with \gls{mac} enforcement, while Capsicum~\cite{watson2010capsicum} retrofits a capability-based \gls{api} in FreeBSD to enable fine-grained access control~\cite{freebsd-capsicum}.
+Similarly, large applications such as Chrome and Firefox retrofit finer-grained sub-process isolation to contain vulnerabilities from compromised third-party libraries~\cite{rlbox}.
+
+This thesis asks a fundamental question:
 
 \begin{displayquote}
-	\emph{How can operating systems be retrofitted to align with the trust boundaries introduced by modern hardware security mechanisms?}
+	\emph{How can operating systems be retrofitted to align with the protection models introduced by modern hardware security mechanisms?}
 \end{displayquote}
 
-To address this question, this work explores both directions of isolation: sub-process fine-grained boundaries and system-wide trusted execution boundaries.
+To answer this, the thesis addresses two key challenges in retrofitting OS security within the evolving hardware-defined landscape:
 
 \begin{itemize}
-	\item[-] \textbf{Retrofitting hardware-assisted fine-grained isolation into the process abstraction using capabilities.}
-	      \capacity retrofits capability-based security into in-process domains~\cite{cheri,capsicum,eros,cheri-jni}.
-	      Leveraging modern ARM features such as Pointer Authentication (\gls{pa}) and Memory Tagging (\gls{mte}), \capacity transforms process references into cryptographically verifiable capabilities.
-	      It enforces coherent protection across the lifecycle of resources—from file import to memory access—providing hardware-backed integrity and confidentiality guarantees.
+	\item[-]
+	      \emph{How can hardware-based security mechanisms be retrofitted into legacy OS protection models in a principled manner?}
+
+	      Retrofitting must be systematic to avoid misalignments discussed earlier.
+
+	      To address this, I introduce \capacity, a system that retrofits capability-based security into in-process domains~\cite{cheri,capsicum,eros,cheri-jni}.
+	      Leveraging ARM features such as Pointer Authentication (\gls{pa}) and Memory Tagging (\gls{mte}), \capacity transforms process references into cryptographically verifiable capabilities.
+	      It enforces consistent protection across the resource lifecycle—from file import to memory access—providing hardware-backed integrity and confidentiality guarantees.
 		      [[PLACEHOLDER: brief summary of \capacity’s evaluation or contribution impact]]
 
-	\item[-] \textbf{Retrofitting OS abstractions for whole-system side-channel security.}
-	      \incognitos reimagines the OS as a self-obfuscating entity within a Confidential VM.
-	      It employs adaptive scheduling and memory re-randomization to obscure side-channel signals, maintaining secrecy even when the underlying hypervisor is malicious.
+	\item[-]
+	      \emph{How can operating systems be retrofitted to align with emerging hardware protection models?}
+	      Certain hardware mechanisms (e.g., TEEs and CVMs) fundamentally alter system protection assumptions, requiring a redefinition of OS security roles.
+	      Side-channel threats, for instance, become a responsibility of the OS, which must evolve from a passive mediator to an active component shaping computational security.
+
+	      To address this, \incognitos reimagines the OS as a self-obfuscating entity within a Confidential VM.
+	      It employs adaptive scheduling and memory re-randomization to obscure side-channel signals, maintaining secrecy even under malicious hypervisors.
 		      [[PLACEHOLDER: add short statement on its contribution or results]]
-
-
 \end{itemize}
+
+
+This thesis positions itself at the intersection of legacy operating system design and emerging hardware security paradigms.
+It argues that while modern processors introduce powerful protection primitives, their security potential can only be realized when operating systems evolve to integrate them coherently.
+Through \capacity and \incognitos, this work explores two complementary facets of this evolution: the former demonstrates how in-process security can be retrofitted into existing abstractions, while the latter redefines the OS’s role under hardware-enforced isolation.
+Together, they advance the broader goal of rethinking how modern computing infrastructures can achieve principled, hardware-backed security without sacrificing compatibility or usability.
+The subsequent chapters elaborate on these systems, detailing their design, implementation, and evaluation.

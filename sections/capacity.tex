@@ -1,12 +1,22 @@
 % !TeX root = ../main.tex
-\chapter{Retrofitting OS security with modern hardware features}
+%
+\chapter{Capacity: Retrofitting Capability-Based Access Control within In-Process Domains}
+\label{chap:capacity}
+
 
 \emph{* The content of this chapter were published in Proceedings of the 2023 ACM SIGSAC Conference on Computer and Communications Security (CCS '23). Association for Computing Machinery, New York, NY, USA, 874-888.}
 \\
 
+Modern hardware increasingly embeds security primitives that, if properly integrated, can enforce fine-grained protection within software.
+Yet, mainstream operating systems continue to rely on legacy abstractions and trust assumptions that position the kernel as the sole arbiter of protection.
+This creates a \emph{trust-model misalignment}: while hardware features such as ARM’s \emph{Pointer Authentication} (PA) and \emph{Memory Tagging Extension} (MTE) provide verifiable guarantees at the hardware level, the OS continues to mediate access through coarse-grained, software-defined policies.
+This chapter presents \capacity, a hardware-assisted intra-process access control framework that reconciles these trust and protection misalignments by retrofitting capability-based security into existing OS abstractions.
+By transforming memory and file references into cryptographically verifiable capabilities, \capacity extends trust enforcement beyond the kernel boundary and establishes hardware-backed integrity across in-process domains.
+The remainder of this chapter details the design, implementation, and evaluation of \capacity, demonstrating how principled retrofitting enables efficient and trustworthy in-process isolation on modern ARM systems.
+
+
 % \pagenumbering{arabic}
 \newcommand{\thename}{\capacity}
-\label{chap:capacity}
 \input{sections/capacity/sslab-code}
 \input{sections/capacity/terminologies}
 
