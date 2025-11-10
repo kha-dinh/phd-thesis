@@ -132,7 +132,8 @@
 
 \author{Kha Dinh Duy}
 \department{Computer Science and Engineering}
-\title{Retrofitting Modern Operating System Security with Hardware Supports}
+% \title{Retrofitting Modern Operating System Security with Hardware Supports}
+\title{Retrofitting Operating System Security for Modern Hardware Protections}
 \setyear{2025}
 \month{November}
 \advisor{Hojoon Lee}
@@ -198,28 +199,32 @@
 %\include{ldt-MBL-Pre-0-abstract}
 \makeabstracttitle
 
+Computing systems have evolved dramatically, yet the security foundations of mainstream operating systems (OSes) remain rooted in protection models conceived decades ago.
+Traditional OSes enforce security through process- and file-based abstractions, mediating access between subjects and objects under a monolithic kernel trusted computing base.
+While this legacy model has proven durable, it no longer aligns with modern software complexity and emerging hardware protection mechanisms.
+Contemporary processors introduce primitives such as sub-process isolation (e.g., Intel PKU, ARM MTE, CHERI) and trusted execution environments (TEEs, Confidential VMs), which redefine the boundaries of trust and isolation.
+However, these advances often operate independently of OS enforcement, creating misalignments and new attack surfaces.
 
-Traditional \emph{operating systems (OSes)} often only provide coarse-grained security mechanisms for rudimentary protection, such as process isolation and system calls white-listing.
-Unfortunately, these mechanisms are insufficient in the modern world.
-Security threats are getting increasingly advanced, while application security requirements are also increasing. For instance, modern confidential computing systems must consider the threat of side-channel leakages and sophisticated physical attacks. Moreover, traditional security mechanisms such as process-based isolation entail performance and usability trade-offs.
+This thesis argues that sustainable system security requires systematically integrating hardware-backed protection into existing OS architectures.
+It explores two key challenges: (1) principled retrofitting of hardware-based security into legacy OS abstractions, and (2) redefining OS responsibilities under hardware-enforced isolation.
+To this end, the thesis presents \capacity, which retrofits capability-based security into in-process domains using hardware features such as pointer authentication and memory tagging; and \incognitos, which reimagines the OS as a self-obfuscating entity within Confidential VMs to mitigate side-channel leakage.
+These systems illustrate how principled retrofitting enables better security within and beyond traditional process boundaries.
 
-
-
-At the same time, hardware vendors constantly roll out modern hardware security features with the hope of tackling those problems. For example, Intel released Protection Keys for Userspace (PKU) to enable efficient page-granularity in-process memory isolation. Trusted Execution Environment (TEE) technologies create an environment shielded against potentially compromised system software. This trend creates two research questions. First, how to adapt operating system designs to the security constraints of new hardware features such as TEEs. Second, how modern hardware features can be retrofitted to implement OS security mechanisms.
-
-
-% Thus, a key question that modern operating systems must answer is how to effectively take advantage of modern hardware features to (1) provide a safe execution environment for applications robust against advanced threats and (2) introduce low-overhead primitives for implementing robust applications.
-
-This dissertation provides steps toward answering those questions. I first took a look at the emerging hardware of \gls{pim} and the newly introduced features \gls{pa} and \gls{mte} on modern ARM processors and see how they can be retrofitted into \gls{os} security primitives. Based on our observation, I devised two systems, \textsc{SE-PIM} and \textsc{Capacity}.
-I next study the security issues of modern hardware-supported confidential \gls{vm}.
-I am in the process of designing and evaluating a novel design for OS-supported side-channel defense mechanisms that take advantage of direct privileged hardware access provided by the unikernel.
+This thesis contributes to bridging the widening gap between legacy operating system architectures and the evolving landscape of hardware-enforced security.
+By demonstrating how hardware protection mechanisms can be systematically retrofitted into established OS abstractions, it offers a practical pathway for strengthening system security without disrupting decades of software compatibility.
 
 
+These approaches influence both research and practice: they provide a blueprint for extending the lifespan and trustworthiness of existing OSes, inform the design of future security architectures that align with modern hardware, and advance the broader goal of achieving provable security guarantees in commodity systems.
+
+
+Its ideas contribute to the long-term vision of secure computing infrastructures where hardware and software collaborate seamlessly to defend against contemporary and emerging threats.
 
 
 
 
-\textbf{Keywords:} Security, Operating System
+
+
+\textbf{Keywords:} Security, Operating System, Protection, Side channels
 
 \newcommand{\hdr}[1]{\paragraph{#1.}\xspace{}}
 
@@ -229,6 +234,7 @@ I am in the process of designing and evaluating a novel design for OS-supported 
 % \include{sections/sepim}
 \include{sections/capacity}
 \include{sections/incognitos}
+\include{sections/discussion}
 
 % \include{sections/oblivm}
 

@@ -2234,6 +2234,121 @@ https://www.amd.com/en/technologies/hbm
           capsicum(4):/Users/hojoon/Cloud/Papers/zotero/storage/39XAIZ94/man.html:text/html
           },
 }
+
+@book{posix,
+  author = {Zlotnick, Fred},
+  title = {The POSIX.1 standard: a programmer's guide},
+  year = {1991},
+  isbn = {0805396055},
+  publisher = {Benjamin-Cummings Publishing Co., Inc.},
+  address = {USA},
+}
+@misc{winapi,
+  title = {Windows {API} index},
+  author = {Microsoft},
+  year = 2025,
+  howpublished = {\url{
+                  https://learn.microsoft.com/en-us/windows/win32/apiindex/windows-api-list
+                  }},
+  lastaccessed = {2025-10-16},
+}
+
+@inproceedings{incognitos,
+  author = { Duy, Kha Dinh and Kim, Jaeyoon and Lim, Hajeong and Lee, Hojoon },
+  booktitle = { 2025 IEEE Symposium on Security and Privacy (SP) },
+  title = {{ INCOGNITOS: A Practical Unikernel Design for Full-System
+           Obfuscation in Confidential Virtual Machines }},
+  year = {2025},
+  volume = {},
+  ISSN = {},
+  pages = {4192-4209},
+  abstract = { Recent works have repeatedly proven the practicality of
+              side-channel attacks in undermining the confidentiality guarantees
+              of Trusted Execution Environments such as Intel SGX. Meanwhile, the
+              trusted execution in the cloud is witnessing a trend shift towards
+              confidential virtual machines (CVMs). Unfortunately, several
+              side-channel attacks have survived the shift and are feasible even
+              for CVMs, along with the new attacks discovered on the CVM
+              architectures. Previous works have explored defensive measures for
+              securing userspace enclaves (i.e., Intel SGX) against side-channel
+              attacks. However, the design space for a CVM-based obfuscation
+              execution engine is largely unexplored. This paper proposes a
+              unikernel design named NCOGNITOS provide full-system obfuscation
+              for CVM-based cloud workloads. INCOGNITOS fully embraces unikernel
+              principles such as minimized TCB and direct hardware access to
+              render full-system obfuscation feasible. INCOGNITOS retrofits two
+              key OS components, the scheduler and memory management, to
+              implement a novel adaptive obfuscation scheme. INCOGNITOS's
+              scheduling is designed to be self-sovereign from the timer
+              interrupts from the untrusted hypervisor with its synchronous tick
+              delivery. This allows INCOGNITOS to reliably monitor the frequency
+              of the hypervisor's possession of execution control (i.e., VMExits)
+              and adjust the frequency of memory rerandomization performed by the
+              paging subsystem, which transparently performs memory
+              rerandomization through direct MMU access. The resulting INCOGNITOS
+              design makes a case for a self-obfuscating unikernel as a secure
+              CVM deployment strategy while further advancing the obfuscation
+              technique compared to previous works. Evaluation results
+              demonstrate INCOGNITOS'S resilience against CVM attacks and show
+              that its adaptive obfuscation scheme enables practical performance
+              for real-world programs. },
+  keywords = {Cloud computing;Privacy;Virtual machine monitors;Side-channel
+              attacks;Virtual machines;Hardware;Robustness;Security;Frequency
+              control;Resilience},
+  doi = {10.1109/SP61157.2025.00222},
+  url = {https://doi.ieeecomputersociety.org/10.1109/SP61157.2025.00222},
+  publisher = {IEEE Computer Society},
+  address = {Los Alamitos, CA, USA},
+  month = May,
+}
+  @inproceedings{capacity,
+  author = {Dinh Duy, Kha and Cho, Kyuwon and Noh, Taehyun and Lee, Hojoon},
+  title = {Capacity: Cryptographically-Enforced In-Process Capabilities for
+           Modern ARM Architectures},
+  year = {2023},
+  isbn = {9798400700507},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {https://doi.org/10.1145/3576915.3623079},
+  doi = {10.1145/3576915.3623079},
+  abstract = {In-process compartmentalization and access control have been
+              actively explored to provide in-place and efficient isolation of
+              in-process security domains. Many works have proposed
+              compartmentalization schemes that leverage hardware features, most
+              notably using the new page-based memory isolation feature called
+              Protection Keys for Userspace (PKU) on x86. Unfortunately, the
+              modern ARM architecture does not have an equivalent feature.
+              Instead, newer ARM architectures introduced Pointer Authentication
+              (PA) and Memory Tagging Extension (MTE), adapting the reference
+              validation model for memory safety and runtime exploit mitigation.
+              We argue that those features have been underexplored in the context
+              of compartmentalization and that they can be retrofitted to
+              implement a capability-based in-process access control scheme.This
+              paper presents Capacity, a novel hardware-assisted intra-process
+              access control design that embraces capability-based security
+              principles. Capacity coherently incorporates the new hardware
+              security features on ARM that already exhibit inherent
+              characteristics of capability. It supports the life-cycle
+              protection of the domain's sensitive objects - starting from their
+              import from the file system to their place in memory. With
+              intra-process domains authenticated with unique PA keys, Capacity
+              transforms file descriptors and memory pointers into
+              cryptographically-authenticated references and completely mediates
+              reference usage with its program instrumentation framework and an
+              efficient system call monitor. We evaluate our Capacity-enabled
+              NGINX web server prototype and other common applications in which
+              sensitive resources are isolated into different domains. Our
+              evaluation shows that Capacity incurs a low-performance overhead of
+              approximately 17\% for the single-threaded and 13.54\% for the
+              multi-threaded webserver.},
+  booktitle = {Proceedings of the 2023 ACM SIGSAC Conference on Computer and
+               Communications Security},
+  pages = {874–888},
+  numpages = {15},
+  keywords = {capabilities, compartmentalization, pointer authentication},
+  location = {Copenhagen, Denmark},
+  series = {CCS '23},
+}
 @misc{fuchsia,
   title = {Fuchsia},
   author = {Google},
@@ -12274,6 +12389,29 @@ https://www.amd.com/en/technologies/hbm
 % #########################  Unikernels  ###############################
 % ######################################################################
 %
+%
+@article{lampsonprotection,
+  author = {Lampson, Butler W.},
+  title = {Protection},
+  year = {1974},
+  issue_date = {January 1974},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  volume = {8},
+  number = {1},
+  issn = {0163-5980},
+  url = {https://doi.org/10.1145/775265.775268},
+  doi = {10.1145/775265.775268},
+  abstract = {Abstract models are given which reflect the properties of most
+              existing mechanisms for enforcing protection or access control,
+              together with some possible implementations. The properties of
+              existing systems are explicated in terms of the model and
+              implementations.},
+  journal = {SIGOPS Oper. Syst. Rev.},
+  month = jan,
+  pages = {18–24},
+  numpages = {7},
+}
 @article{denning2022systems,
   author = {Denning, Peter J.},
   title = {Systems abstractions},
