@@ -19,6 +19,9 @@
 \renewcommand{\bibname}{References}
 \newcommand*{\TitleFont}{%
 	\fontsize{24}{24}%
+	\selectfont}
+\newcommand*{\TitleFontBold}{%
+	\fontsize{24}{24}%
 	\selectfont\bfseries}
 \newcommand*{\subTitleFont}{%
 	\fontsize{18}{18}%
@@ -39,6 +42,7 @@
 %\usepackage[english]{babel}
 
 \usepackage[cjk]{kotex}
+\usepackage{setspace}
 %\usepackage{xcolor}
 %\usepackage{url}
 %
@@ -64,9 +68,11 @@
 	{\centering \subTitleFont Ph.D. Dissertation\vfill}
 	{\centering \TitleFont \@title \vfill}
 	{\centering \subTitleFont \@author \vfill}
-	{\centering \subTitleFont Department of \@department\\
+	{\centering \setstretch{2} \subTitleFont%
 		The Graduate School\\
-		Sungkyunkwan University\\}
+		Sungkyunkwan University\\
+		Department of \@department\\
+	}
 	\newpage
 	\thispagestyle{empty}~
 }
@@ -76,9 +82,11 @@
 	{\centering \subTitleFont Ph.D. Dissertation\vfill}
 	{\centering \TitleFont \@title\vfill}
 	{\centering \subTitleFont \@author\vfill}
-	{\centering \subTitleFont Department of \@department\\
+	{\centering \setstretch{2} \subTitleFont%
 		The Graduate School\\
-		Sungkyunkwan University\\}
+		Sungkyunkwan University\\
+		Department of \@department\\
+	}
 	\newpage
 }
 
@@ -86,13 +94,13 @@
 \thispagestyle{empty}~
 {\centering \TitleFont \@title\vfill}
 {\centering \subTitleFont \@author\vfill}
-{\centering \subsubTitleFont
+{\centering \setstretch{2} \subsubTitleFont
 A Ph.D. Dissertation Submitted to the Department of  \@department{} and the\\
 Graduate School of Sungkyunkwan University in partial fulfillment of
 the requirements for the\\
 degree of Ph.D. in Engineering\vfill}
 {\centering \subsubTitleFont \@month{} \@year\vfill}
-{\centering \subTitleFont Supervised by\\
+{\centering \setstretch{2} \subTitleFont Supervised by\\
 Professor \@advisor\\
 Major Advisor\\
 }
@@ -100,31 +108,31 @@ Major Advisor\\
 }
 \newcommand{\makecertification}{
 	\thispagestyle{empty}
-	{\centering \subTitleFont This certifies that the Ph.D. Dissertation of \\
+	{\centering \setstretch{2} \subTitleFont This certifies that the Ph.D. Dissertation of \\
 		\@author\ is approved.\vfill}
-	\begin{minipage}{0.35\linewidth}
+	\begin{minipage}{0.50\linewidth}
 		~
 	\end{minipage}
-	\begin{minipage}{0.65\linewidth}
+	\begin{minipage}{0.50\linewidth}
 		% Somehow only hphantom works here
-		{\SectionFont \hphantom{CCCCCCC}\textcolor{gray}{심사위원장 signature}\vspace{-.8em}}
+		{\SectionFont \hphantom{CCCCCCC}\textcolor{gray}{[signature]}\vspace{-.8em}}
 		\par\rule{\textwidth}{1pt} \\
-		{\hphantom{CCC}\raggedright \SubSectionFont Committee Chair: \@committeechair \\~\\ \vspace{-.5em}}
-		{\SectionFont \hphantom{CCCCCCC}\textcolor{gray}{심사위원 1 signature}\vspace{-.8em}}
+		{\raggedright \SubSectionFont Committee Chair : \@committeechair \\~\\ \vspace{-.5em}}
+		{\SectionFont \hphantom{CCCCCCC}\textcolor{gray}{[signature]}\vspace{-.8em}}
 		\par\rule{\textwidth}{1pt} \\
-		{\hphantom{CCC}\raggedright \SubSectionFont Committee Member 1: \@firstmember\\~\\\vspace{-.5em}}
-		{\SectionFont \hphantom{CCCCCCC}\textcolor{gray}{심사위원 2 signature}\vspace{-.8em}}
+		{\raggedright \SubSectionFont Committee Member : \@firstmember\\~\\\vspace{-.5em}}
+		{\SectionFont \hphantom{CCCCCCC}\textcolor{gray}{[signature]}\vspace{-.8em}}
 		\par\rule{\textwidth}{1pt} \\
-		{\hphantom{CCC}\raggedright \SubSectionFont Committee Member 2: \@secondmember \\~\\\vspace{-.5em}}
-		{\SectionFont \hphantom{CCCCCCC}\textcolor{gray}{심사위원 3 signature}\vspace{-.8em}}
+		{\raggedright \SubSectionFont Committee Member : \@secondmember \\~\\\vspace{-.5em}}
+		{\SectionFont \hphantom{CCCCCCC}\textcolor{gray}{[signature]}\vspace{-.8em}}
 		\par\rule{\textwidth}{1pt} \\
-		{\hphantom{CCC}\raggedright \SubSectionFont Committee Member 3: \@thirdmember \\~\\\vspace{-.5em}}
-		{\SectionFont \hphantom{CCCCCCC}\textcolor{gray}{지도교수 signature}\vspace{-.8em}}
+		{\raggedright \SubSectionFont Committee Member : \@thirdmember \\~\\\vspace{-.5em}}
+		{\SectionFont \hphantom{CCCCCCC}\textcolor{gray}{[signature]}\vspace{-.8em}}
 		\par\rule{\textwidth}{1pt} \\
-		{\hphantom{CCC}\raggedright \SubSectionFont Major Advisor: \@advisor \\~\\}
+		{\raggedright \SubSectionFont Major Advisor: \@advisor \\~\\}
 	\end{minipage}
 	\vfill
-	{\centering \subTitleFont The Graduate School\\
+	{\centering \setstretch{2} \subTitleFont The Graduate School\\
 		Sungkyunkwan University\\
 		\@month{} \@year\\}
 }
@@ -160,7 +168,7 @@ Major Advisor\\
 	\phantomsection %\label{chap:Abstract}
 	\addcontentsline{toc}{chapter}{Abstract}
 	\chapter*{Abstract}\label{chap:Abstract}
-	{\centering \subTitleFont \@title\\~\\}
+	{\centering \subTitleFont \bfseries \@title\\~\\}
 }
 
 % Set paper size and margins
@@ -213,10 +221,11 @@ Major Advisor\\
 
 \setmainfont{HMJ}[
 	Mapping=tex-text,
-	AutoFakeSlant=0.3,AutoFakeBold=1.5, % There are no no italic and bold faces so we fake them LOL
+	AutoFakeSlant=0.3,AutoFakeBold=4, % There are no no italic and bold faces so we fake them LOL
 	Path=./,
 	Extension=.ttf,
 	UprightFont=korean.h2mjsm,
+	% UprightFont=HYSinMunMyeongJo,
 	% BoldFont=*-Bold,
 	% ItalicFont=*-Italic,
 	% BoldItalicFont=*-BoldItalic

@@ -5,6 +5,7 @@
 \\
 
 
+
 \epigraph{
 	If you know the enemy and know yourself, you need not fear the result of a hundred battles. If you know yourself but not the enemy, for every victory gained you will also suffer a defeat. If you know neither the enemy nor yourself, you will succumb in every battle.
 }{\textit{Sun Tzu, The Art of War}}
@@ -43,22 +44,3 @@ Evaluation results demonstrate \thename's resilience against CVM attacks and sho
 % \pagenumbering{arabic}
 
 
-
-\input{sections/incognitos/intro}
-\input{sections/incognitos/background}
-\input{sections/incognitos/threat-model}
-\input{sections/incognitos/overview}
-\input{sections/incognitos/scheduling}
-\input{sections/incognitos/paging}
-\input{sections/incognitos/evaluation}
-\input{sections/incognitos/security-analysis}
-\input{sections/incognitos/related-work}
-
-
-
-\section{Conclusion}
-This paper introduced \thename, a unikernel design for full-system \gls{cvm} obfuscation that proposes a side-channel defense strategy adapted to the attacker's attack attempts.
-We explained the design of \thename that retrofits the kernel scheduling and paging subsystems.
-The scheduling subsystem enables robust VMExit rate measurement and adaptive policy enforcement.
-The paging subsystem enforces memory rerandomization through hardware MMU access and remains transparent to unmodified applications.
-We performed thorough evaluations of \thename security and performance, demonstrating its robustness, resilience against real-world attacks, and efficiency through adaptive rerandomization rate adjustment.

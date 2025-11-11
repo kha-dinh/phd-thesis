@@ -1,0 +1,221 @@
+\let\TeXyear\year
+\documentclass[a4paper,11pt]{SKKU-PhD-Thesis}
+\let\setyear\year
+\let\year\TeXyear
+
+
+
+\usepackage{IEEEtrantools}
+\usepackage{pdfpages}
+\usepackage{csquotes}
+
+\usepackage{epigraph}
+\setlength\epigraphwidth{.6\textwidth}
+
+\usepackage[a4paper]{geometry}
+\usepackage{rotating}
+\usepackage[breaklinks = true]{hyperref} % to use \phantomsection
+
+% \usepackage{enumitem}
+\usepackage{multirow}
+\usepackage{makecell} % makecell, thead
+\usepackage{nicematrix}
+% \usepackage[english]{babel}
+\usepackage{booktabs}
+\usepackage{threeparttable}
+\usepackage{subcaption}
+% \expandafter\def\csname ver@subfig.sty\endcsname{}
+
+% Highlight and stuffs
+\usepackage{soul}
+\makeatletter 
+\setbox\z@\hbox{\ttfamily\global\let\SOUL@tt\ttfamily}
+\setbox\z@\hbox{\SOUL@tt-}
+\SOUL@ttwidth\wd\z@
+\makeatother
+
+% \usepackage[
+% style=ieee
+% ]{biblatex}
+\usepackage[nocompress]{cite}
+%%-----------------------------------------
+%% required packages for writing
+\usepackage{listings}
+\usepackage{minted}
+\setminted[c]{frame=single,framesep=2mm,bgcolor=gray!10}
+\usepackage{balance}
+\usepackage{setspace}
+\usepackage{graphicx}
+%\usepackage[tight]{subfigure}
+\usepackage{caption}
+% \usepackage[caption=false]{subfig}
+\usepackage{graphics,picins}
+%\usepackage{epstopdf}
+
+% *** MATH PACKAGES ***
+% \usepackage[cmex10]{amsmath}
+% \usepackage{amsfonts}
+\usepackage{amsthm,amssymb}
+\usepackage{afterpage}
+\usepackage{amsmath}
+\usepackage{circledsteps} % ***NOT ACM***
+\usepackage{float}
+\usepackage[ruled,vlined,linesnumbered,lined,boxed,commentsnumbered]{algorithm2e}
+\usepackage{setspace}
+
+\usepackage{tabularx}
+\usepackage{color}
+\usepackage{multirow}
+\usepackage{etoolbox}
+\usepackage{mathtools}
+\usepackage{textcomp}
+\usepackage{lipsum,graphicx,multicol}
+\usepackage{caption}
+% \usepackage[caption=false]{subfig}
+%\usepackage{subfigure}
+%\usepackage{subcaption} % for subfigures
+%\usepackage[aboveskip=0pt]{subcaption}
+\usepackage{makecell}
+\usepackage{adjustbox}
+\usepackage[toc,page]{appendix}
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+
+
+
+%from ACL
+\usepackage{amssymb,amsmath,array,bm}
+
+% \usepackage{cleveref}
+\newcommand{\cref}{\autoref}
+% \renewcommand{\ref}{\autoref}
+\providecommand*{\listingautorefname}{Listing}
+\renewcommand*{\chapterautorefname}{Chapter}
+\renewcommand*{\sectionautorefname}{Section}
+\renewcommand*{\subsectionautorefname}{Subsection}
+\renewcommand*{\subsubsectionautorefname}{Subsubsection}
+
+% \usepackage{svg}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric,matrix,fit,arrows,calc}
+% Also, note that the amsmath package sets \interdisplaylinepenalty to 10000
+% thus preventing page breaks from occurring within multiline equations. Use:
+\interdisplaylinepenalty=2500
+% after loading amsmath to restore such page breaks as IEEEtran.cls normally
+% does. amsmath.sty is already installed on most LaTeX systems. The latest
+% version and documentation can be obtained at:
+% http://www.ctan.org/tex-archive/macros/latex/required/amslatex/math/
+
+%\usepackage[ruled,vlined,linesnumbered,longend,resetcount,algochapter]{algorithm2e}
+
+% *** TRACKING CHANGED PACKAGES ***
+%\usepackage[final]{changes}
+%\usepackage[addedmarkup=uwave]{changes}
+%\setdeletedmarkup{\textcolor{red}{\sout{#1}}}
+
+% \include{ldt_MBL_newcommand}
+
+
+\usepackage{glossaries}
+\usepackage{glossaries-extra}
+
+\renewcommand*{\glsentryfmt}{%
+	\ifglsused{\glslabel}{\begingroup}{\begingroup\em}\glsgenentryfmt\endgroup
+}
+
+\glsdisablehyper
+\setabbreviationstyle[acronym]{long-short}
+
+\newacronym{syscall}{syscall}{system call}
+\newacronym{pim}{PIM}{processing-in-memory}
+\newacronym{pa}{PA}{Pointer Authentication}
+\newacronym{pac}{PAC}{Pointer Authentication Code}
+\newacronym{cgroup}{cgroup}{Control Group}
+\newacronym{tbi}{TBI}{Top-Byte Ignore}
+\newacronym{ipi}{\textcolor{red}{?????IPI?????}}{Intra-Process Isolation}
+\newacronym{pku}{PKU}{Protection Keys for Userspace}
+\newacronym{cfi}{CFI}{Control-Flow Integrity}
+\newacronym{lsm}{LSM}{Linux Security Modules}
+\newacronym{aslr}{ASLR}{Address Space Layout Randomization}
+\newacronym{hmac}{HMAC}{Hash-based Message Authentication Code}
+\newacronym{acl}{ACL}{Access Control List}
+\newacronym{mte}{MTE}{Memory Tagging Extension}
+\newacronym{dst}{DST}{Domain Signature Table}
+\newacronym{uuid}{UUID}{Uniquely Identifiable IDentification}
+\newacronym{sfi}{SFI}{Software Fault Isolation}
+\newacronym{ipc}{IPC}{Inter-Process Communication}
+\newacronym{pdg}{PDG}{Program Dependence Graph}
+\newacronym{iot}{IoT}{Internet of Things}
+\newacronym{dpi}{DPI}{Data Pointer Integrity}
+\newacronym{mmu}{MMU}{Memory Management Unit}
+\newacronym{mpu}{MPU}{Memory Protection Unit}
+\newacronym{ac}{AC}{Authentication Code}
+\newacronym{ir}{IR}{Intermediate Representation}
+\newacronym{mir}{MIR}{Machine IR}
+\newacronym[plural={OSes}]{os}{OS}{Operating System}
+\newacronym{vm}{VM}{virtual machine}
+\newacronym{bpf}{BPF}{Berkley Packet Filter}
+\newacronym{ghcb}{GHCB}{Guest-Host Control Block}
+\newacronym{ebpf}{eBPF}{extended \gls{bpf}}
+\newacronym{tee}{TEE}{Trusted Execution Environment}
+\newacronym{csp}{CSP}{Cloud Service Provider}
+\newacronym{tcb}{TCB}{Trusted Computing Base}
+\newacronym{sev}{SEV}{Secure Encrypted Virtualization}
+\newacronym{tdx}{TDX}{Trust Domain Extensions}
+\newacronym{cca}{CCA}{Confidential Compute Architecture}
+\newacronym{sgx}{SGX}{Software Guard Extension}
+\newacronym{cvm}{CVM}{Confidential VM}
+\newacronym{npf}{NPF}{Nested Page Fault}
+\newacronym{pf}{PF}{Page Fault}
+\newacronym{gpf}{gPF}{Guest Page Fault}
+\newacronym{npt}{NPT}{Nested Page Table}
+\newacronym{seves}{SEV-ES}{SEV-Encrypted State}
+\newacronym{asid}{ASID}{Address Space Identifier}
+\newacronym{sevsnp}{SEV-SNP}{SEV-Secure Nested Paging}
+\newacronym{vmcb}{VMCB}{\gls{vm} Control Block}
+\newacronym{oram}{ORAM}{Oblivious RAM}
+
+% OBLIVM
+\newacronym{vmsa}{VMSA}{\gls{vm} Save Area}
+\newacronym{rmp}{RMP}{Reverse Mapping Table}
+\newacronym{gva}{gVA}{Guest Virtual Address}
+\newacronym{gpa}{gPA}{Guest Physical Address}
+\newacronym{hpa}{hPA}{Host Physical Address}
+\newacronym{sme}{SME}{Secure Memory Encryption}
+\newacronym{sp}{SP}{Secure Processor}
+\newacronym{vek}{VEK}{VM Encryption Key}
+\newacronym{gpt}{GPT}{Guest Page Table}
+\newacronym{slat}{SLAT}{Second-level Address Translation}
+\newacronym{vas}{VAS}{Virtual Address Space}
+\newacronym{vma}{VMA}{virtual Memory Area}
+\newacronym{api}{API}{Application Programming Interface}
+\newacronym{posix}{POSIX}{Portable Operating System Interface}
+\newacronym{mac}{MAC}{Mandatory Access Control}
+\newacronym{dac}{DAC}{Discretinery Access Control}
+\newacronym{cheri}{CHERI}{Capability Hardware Enhanced RISC Instructions}
+
+
+
+\newcommand{\sepim}[0]{\textsc{SE-PIM}\xspace}
+\newcommand{\capacity}[0]{\textsc{Capacity}\xspace}
+\newcommand{\incognitos}[0]{\textsc{IncognitOS}\xspace}
+\newcommand{\oblivm}[0]{\textsc{ObliVM}\xspace}
+
+\makeatletter
+\DeclareRobustCommand\onedot{\futurelet\@let@token\@onedot}
+\def\@onedot{\ifx\@let@token.\else.\null\fi\xspace}
+
+\def\eg{\emph{e.g}\onedot} \def\Eg{\emph{E.g}\onedot}
+\def\ie{\emph{i.e}\onedot} \def\Ie{\emph{I.e}\onedot}
+\def\cf{\emph{c.f}\onedot} \def\Cf{\emph{C.f}\onedot}
+\def\etc{\emph{etc}\onedot} \def\vs{\emph{vs}\onedot}
+\def\wrt{w.r.t\onedot} \def\dof{d.o.f\onedot}
+\def\etal{\emph{et al}\onedot}
+\makeatother
+% \addbibresource{references.bib}
+% \addbibresource{capacity.bib}
+% \addbibresource{sepim.bib}
+\begin{document}
+% !TeX root = ../main.tex
+%
+\end{document}

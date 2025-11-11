@@ -1,0 +1,156 @@
+\section{Related work}
+\label{sec:related-work}
+% \thename proposes a capability-based access control model by incorporating ARM's new hardware security features.
+We explain the previous works that are closely related to our work in terms of security principle (capability), use of hardware primitives (ARM \gls{pa} and \gls{mte}), and objective (compartmentalization).
+
+\hdr{Capability-based resource access control}
+\label{sec:related-work:capability}
+Capability-based access control has long been sought after due to its advantages in achieving the principle of least privilege~\cite{obj-cap,cap-addressing,eros,capsicum,cheri,cheri-risc,cheri-jni,jkernel,caja,framer,sel4}.
+Previous works explored capabilities in OS access control and memory safety.
+In the OS sphere, Capsicum~\cite{capsicum} introduced \emph{process-level} \fd capabilities to UNIX and has been adapted by FreeBSD~\cite{freebsd-capsicum}.
+The SeL4 microkernel provides secure and fine-grained access to system resources through capability tokens~\cite{sel4}.
+% There are also works on capability programming languages~\cite{jkernel,caja}.
+% However, they require a complete program rewrite, while \thename is compatible with existing C/C++ applications.
+% Framr~\cite{framer} uses tagged pointers for efficient per-memory object metadata lookup.
+% \thename instead establishes ownership of pointers through unique \gls{pa} keys and does not require per-object metadata.
+Toward applying capabilities principles for memory safety, CHERI~\cite{cheri-risc} introduced a CPU architecture with built-in support for capability-based memory access control.
+Subsequent works introduced extensions to the CHERI architecture with additional security features such as domain memory isolation~\cite{cheri,cheri-jni,cheriabi}.
+Recently, Capstone~\cite{capstone} revised CHERI's base design to support revocable delegation and an extensible privilege hierarchy.
+% In contrast to CHERI's approach, 
+% \thename constructs a capability-based \gls{ipi} by incorporating the existing ARM processor security features.
+
+Unlike previous capability systems, \thename's capabilities can be consistently applied to file and memory object references.
+Compared to Capsicum, \thename does not require isolating program components into processes; its capability model seeks to achieve least-privilege domains \emph{within} a process.
+Moreover, \thename's enforcement is much more lightweight thanks to hardware-assisted cryptographic authentication,
+% \thename also has key differences from CHERI and its successors.
+% aside from being able to work on standard ARM processors that have \gls{pa} and \gls{mte}. 
+% First, since the \emph{complete mediation} of pointer authentication is not enforced by the hardware,
+Compared to capability architectures like CHERI, \thename's design must address the security requirements of capability on existing hardware features, \eg, complete mediation of pointer uses since the processor does not enforce them automatically.
+Also, without hardware support, \thename lacks fine-grained permissions that CHERI provides over pointers, e.g., per-object read/write/execute capabilities.
+% \thename also have to whole-program instrumentation of pointers, which requires us to solve compatibility issues when adapting to complex applications 
+
+\hdr{PA and MTE-based software defenses}
+\label{sec:related-work:pa-mte-defenses}
+Many \gls{pa}-based runtime defense mechanisms have been proposed~\cite{pac-it-up,pacsan,pacstack,pactight,kernel-pac,apple-pac,qualcomm-pac,ptauth} and deployed in commodity systems~\cite{apple-pac,qualcomm-pac}.
+\gls{mte}-supported bug detecting tools have been introduced~\cite{memory-tagging,mte-kernel-support,mte-stack} with improved performance compared to software-only approaches.
+Notably, PARTS~\cite{pac-it-up} introduces a \gls{dpi} policy that protects program-wide data and code pointers, but its instrumentation framework is not evaluated on real-world applications.
+PacTight~\cite{pactight} enforces \emph{non-forgability}, \emph{non-copyability}, \emph{non-dangling} properties on only \emph{sensitive pointers} with an intricate signing and authentication scheme.
+PTauth~\cite{ptauth} introduces a \gls{pa}-based use-after-free by authenticating pointers with their pointed-to object.
+
+\thename introduces a robust framework for whole-program instrumentation of pointer authentication.
+Moreover, previous \gls{pa}-based systems rely on modifiers to establish different authentication contexts.
+On the other hand, \thename establishes authentication contexts through its key switching mechanism and uses the modifier to isolate references between domain instances.
+Hence, different types of references can share a consistent authentication method in kernel and userspace without a complicated modifier assignment scheme.
+However, \thename's use of \key{DB} for the domain key allows it to incorporate previous works on \gls{pa}-based \gls{cfi} into its design~\cite{pac-it-up,pacstack,kernel-pac,apple-pac}.
+% Hence, \thename can efficiently prevent the reusing of domain-private pointers 
+% Second, 
+
+
+% For instance, to prevent the reusing of the pointers, PacTight~\cite{pactight} relies on expensive instrumentation, hence can only practically be applied to a subset of all pointers.
+% The use of \gls{mte} has also been explored in several software sanitizers and academic works.
+% Among academic works, Liljestrand \etal~\cite{color-my-world} proposed a deterministic memory tagging method to enable stack memory safety. 
+% While software sanitizers incur relatively high runtime overheads, \thename aims to provide lightweight and in-place isolation of in-process sensitive resources.
+
+
+
+\hdr{Intra-process compartmentalization}
+\label{sec:related-work:ipi}
+% \Gls{ipi} enables in-place isolation of process components without the costly address space switches of process-level isolation or labor-intensive program rewrite into components.
+Several works have leveraged x86 architecture's \gls{pku} to protect program domains and showed that \gls{pku}-based isolation significantly lower overhead compared to process-based and \gls{sfi}-based isolation~\cite{erim,hodor,cerberus,jenny,pkrusafe}.
+Notably, ERIM~\cite{erim} and Hodor~\cite{hodor} laid the groundwork for utilizing \gls{pku} for intra-process isolation through a meticulously designed call gate between domains.
+\thename is motivated by the underexplored design space for ARM-based in-process compartmentalization and access control.
+Shred~\cite{shreds} proposed isolating the memory of in-process execution units with AArch32's Domain memory protection, but the feature has been removed in AArch64.
+% While some works have tried to introduce rudimentary memory isolation on bare-metal ARM systems~\cite{minion,epoxy,dbox}, they are not designed for commodity OSes.
+
+HAKC~\cite{hakc} is a framework for Linux device driver compartmentalization, also leveraging \gls{pa} and \gls{mte}.
+% It overcomes \gls{mte}'s limited number of tags by employing a two-level compartmentalization scheme that 
+Different from HAKC, \thename's use of \pamte is specialized for memory and system resources isolation in the userspace. In particular, with pre-defined \glspl{acl} as \gls{pa} modifiers, HAKC's pointer-use sites are tied to an access control policy,  regardless of the calling context. On the other hand, \thename's pointer authentication scheme checks if the reference is issued for the currently active domain, depending on the context (the effective \key{DB}).
+This key difference brings implications that are pivotal in \thename's design. First, it allows \gls{pa} contexts to span across the user and kernel, enabling \thename's authentication scheme without a complex user-kernel modifier sharing scheme.
+Second, functions can be called from multiple domains; the \texttt{AUT} authentication checks in the exact code location and uses different keys and therefore authenticates differently for each domain context.
+
+
+% Compared to HAKC, s \thename introduces a coherent capability-based access control scheme for kernel and userspace resources with its key switching mechanism. In addition, \thename solves compatibility issues with whole-program \gls{pa} instrumentation.
+
+
+
+
+% To further compare Capacity and HAKC specifically regarding their PA/MTE use, HAKC's pointer-use sites are tied to pre-defined ACL regardless of the context (hence, static). On the other hand, Capacity's pointer authentication checks if the reference is issued for the currently active domain, depending on the current context \key{DB} ​	 of the currently executing domain). This key difference brings implications that are pivotal in Capacity's design. First, it allows the PA context to span across the user and kernel, enabling Capacity's FD authentication scheme without a complex user-kernel modifier sharing scheme. Second, functions can be called from multiple domains; the AUT authentication checks in the exact code location and uses different keys and therefore authenticates differently for each domain context.
+
+% , as discussed in \cref{sec:overview}.
+% \gls{ipi}-aware process reference monitor has only been actively discussed in recent works~\cite{donky,pku-pitfall,jenny,cerberus}. The adversaries in the untrusted domain may launch various forms of confused deputy attacks on the trusted domain through \glspl{syscall}~\cite{pku-pitfall,jenny}. For this reason, 
+Recently, there have been proposals for reference monitors better suited for in-process isolation~\cite{donky,jenny,cerberus,muswitch}.
+Jenny~\cite{jenny} proposed a secure and efficient syscall reference monitor that delegates access control to userspace.
+$\mu$Switch~\cite{muswitch} leverages implicit context switches to delay the kernel resource context switching until a syscall is performed to achieve better performance.
+While previous works on reference monitors require developers to write filtering rules to be applied to the monitor, \thename's cryptographically-secured \fd references are coherently built into the program's semantic, and their \gls{pa}-assisted authentication is both transparent and efficient.
+
+
+%\hj{mention interface fuzzing here}
+
+\hdr{Isolation boundaries}
+\thename currently only provides intra-procedural sensitivity annotation propagation.
+Automated whole-program and inter-procedural tracking of secret propagation is a field of its own, and previous works have proposed methods towards the objective~\cite{cryptompk,ptrsplit,dynpta,aces}.
+We expect that \thename can incorporate such methods in the future, although it is currently out of the scope of this paper, which focuses on introducing a new isolation mechanism.
+On another note, a recent work~\cite{civ} discussed the perils of artificially drawn in-process boundaries and their interfaces.
+Such attack surface must be eliminated or minimized through validation and interface narrowing when porting existing programs to use \thename.
+If a program is redesigned or written from scratch with \thename, then a conscious effort can be made to have a secure interface by design.
+The evaluated prototypes focus on showing the feasibility of \thename as an isolation mechanism, and we regard the validation process to be an orthogonal issue.
+
+% \thename and HAKC have the following differences.
+% First, \thename's \gls{pa} key-identified domains fundamentally differ from HAKC's use of modifiers and provide the advantage we discussed above.
+% Second, \thename, due to its goal of isolating sensitive resources, \thename has to address compatibility challenges when adapting whole-program instrumentation to real-world programs. 
+% On the contrary, HAKC only instruments the protected kernel module and considers the core kernel as trusted.
+
+
+% Due to the absence of well-compartmentalized interfaces in typical software, integrating isolation boundaries into existing programs can potentially introduce vulnerable interfaces that may be exploited to bypass isolation.
+% This type of \emph{confused deputy} vulnerability is recently studied in a work by Lefeuvre \etal \cite{civ}, which also introduces a fuzzer to detect such vunerabilities.
+
+
+% Since software is commonly not designed with well-compartmentalized interfaces in mind, retrofitting isolation boundaries into existing software might introduce vulnerable \emph{interfaces}. 
+% Recently, Leufeuver et al. discuss showed that introducing compartmentalization to existing programs introduces vulnerabilities that leak \cite{civ}.
+
+% A recent work 
+% ~\cite{that-interface-paper} 
+
+
+% Recent work also explored the possible vulnerability from
+% \thename's capability-based \gls{ipi} design isolates \emph{both} memory and file resource and takes full advantage of the new ARM hardware features.
+
+
+
+
+
+
+% This is proven useful in \thename's file object authentication scheme.
+
+% NOTE: Removed
+% \thename utilizes \gls{mte} in conjunction with \gls{pa}.
+
+
+
+
+
+
+
+% Also, HAKC's approach allows of out-of-bounds access to same-colored memory through a successfully authenticated pointer, a weakness that \thename does not have.
+
+% \kha{Similar to other \gls{pa}-based defenses, ha with signing modifiers, \thename does it by switching keys, which provides advantages that suit \thename's design; \thename avoids a complicated modifier assignment scheme and also allows a signed reference to be shared between the user and the kernel.}
+% Compared to HAKC, \thename utilizes different techniques to achieve resource isolation in userspace. 
+
+% different set of techniques (e.g., domain key switching) to achieve its goal of resource isolation in userspace.
+
+
+% use of PA+MTE focuses on providing more than HW-provided colors in MTE through combining PA with varied modifiers, which one of the work's key design goal for dealing with the large monolithic kernel. 
+
+% Capacity, on the other hand, employs per-domain PA keys. In other words, HAKC creates *PA contexts* with signing modifiers, and Capacity does it with switching keys. The key switching method provides several advantages that suit Capacity's design. 1) it efficiently prevents the reusing of leaked signed domain-private pointers without a complicated modifier assignment scheme. 2) avoiding reliance on PA modifier contexts allows a signed reference to be shared between the user and the kernel. 3) HAKC's choice of PA+MTE usage may allow a case of out-of-bounds access to same-colored memory through a successfully authenticated pointer (mentioned in Section 4.3 of our paper). 
+
+% The last point, however, brings a design trade-off, the number of MTE colors (15). Our stance on the matter is that compartmentalization may sacrifice the *least-privilegeness* of the domains and merge domains with hat is cosimilar functionalities if necessary. 
+
+% Hodor~\cite{hodor} introduces \emph{protected libraries} that isolate dataplane libraries.hat is co
+% A similar hardware feature has also been proposed and evaluated on the RISC-V architecture~\cite{donky}.
+
+
+% Many of the proposals for bare-metal compartmentalization utilize a hardware component commonly available on low-power ARM processors called the \gls{mpu}.k
+
+% hardware-based \gls{ipi} techniques are also proposed to compartmentalize software on bare-metal systems~\cite{aces,minion,epoxy,usfi,suv}.
+% Other works only
+

@@ -1,0 +1,6 @@
+\section{Conclusion}
+This paper introduced \thename, a unikernel design for full-system \gls{cvm} obfuscation that proposes a side-channel defense strategy adapted to the attacker's attack attempts.
+We explained the design of \thename that retrofits the kernel scheduling and paging subsystems.
+The scheduling subsystem enables robust VMExit rate measurement and adaptive policy enforcement.
+The paging subsystem enforces memory rerandomization through hardware MMU access and remains transparent to unmodified applications.
+We performed thorough evaluations of \thename security and performance, demonstrating its robustness, resilience against real-world attacks, and efficiency through adaptive rerandomization rate adjustment.

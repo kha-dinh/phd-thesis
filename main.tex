@@ -7,7 +7,6 @@
 
 \usepackage{IEEEtrantools}
 \usepackage{pdfpages}
-\usepackage{csquotes}
 
 \usepackage{epigraph}
 
@@ -81,6 +80,7 @@
 
 
 
+\usepackage{csquotes}
 %from ACL
 \usepackage{amssymb,amsmath,array,bm}
 
@@ -96,7 +96,7 @@
 % \usepackage{svg}
 
 \usepackage{tikz}
-\usetikzlibrary{shapes.geometric,matrix,fit, arrows}
+\usetikzlibrary{shapes.geometric,matrix,fit, arrows,calc}
 % Also, note that the amsmath package sets \interdisplaylinepenalty to 10000
 % thus preventing page breaks from occurring within multiline equations. Use:
 \interdisplaylinepenalty=2500
@@ -236,7 +236,33 @@ Its ideas contribute to the long-term vision of secure computing infrastructures
 \include{sections/background}
 % \include{sections/sepim}
 \include{sections/capacity}
+\include{sections/capacity/introduction}
+\include{sections/capacity/background}
+\include{sections/capacity/overview}
+\include{sections/capacity/dom-auth}
+\include{sections/capacity/ref-mon}
+\include{sections/capacity/instrumentation}
+\include{sections/capacity/evaluation}
+\include{sections/capacity/discussion}
+\include{sections/capacity/related-work}
+\include{sections/capacity/conclusion}
+
+
 \include{sections/incognitos}
+\include{sections/incognitos/intro}
+\include{sections/incognitos/background}
+\include{sections/incognitos/threat-model}
+\include{sections/incognitos/overview}
+\include{sections/incognitos/scheduling}
+\include{sections/incognitos/paging}
+\include{sections/incognitos/evaluation}
+\include{sections/incognitos/security-analysis}
+\include{sections/incognitos/related-work}
+\include{sections/incognitos/conclusion}
+
+
+
+
 \include{sections/discussion}
 \include{sections/conclusion}
 

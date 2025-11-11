@@ -7,16 +7,16 @@
 	\includegraphics[width=\textwidth]{figures/capacity/capacity-overview-libertine.pdf}
 	% \includegraphics[width=0.9\textwidth]{images/capacity_overview_new.pdf}
 	% \vspace{-1em}
-	\caption{Overview of \thename's in-process domains and life-cycle objects protection. }
+	\caption{Overview of {\thename}'s in-process domains and life-cycle objects protection. }
 	\label{fig:capacity:overview}
 \end{figure*}
 
 \autoref{fig:capacity:overview} illustrates an overview of \thename.
 % \thename establishes intra-process isolation of file and memory objects through capability-based access control principles.
-\thename's design demonstrates a comprehensive capability model for file and memory objects access control that can be applied to commodity ARM systems that support \gls{pa} and \gls{mte}.
-% The design coherently incorporates these hardware security features of the recent and upcoming ARM architecture, whose principles and directions exhibit the characteristics of capability. 
+\thename's design demonstrates a comprehensive capability model for file and memory objects access control that can be applied to commodity arm systems that support \gls{pa} and \gls{mte}.
+% the design coherently incorporates these hardware security features of the recent and upcoming arm architecture, whose principles and directions exhibit the characteristics of capability. 
 \thename's primary objective is to guarantee each domain's exclusive access rights to the sensitive domain-private objects.
-It associates each domain, called \emph{a \thename domain}, with a unique \gls{pa} cryptographic key and \emph{switches} the currently activated key using an in-kernel reference monitor before entering a domain.
+it associates each domain, called \emph{a \thename domain}, with a unique \gls{pa} cryptographic key and \emph{switches} the currently activated key using an in-kernel reference monitor before entering a domain.
 % \thename then signs the object references with the per-domain keys and authenticates the domain on use, turning them into \emph{unforgable}, \emph{non-reusable} capability tokens.
 
 Consider the common pattern of sensitive object use shown in \autoref{fig:capacity:overview} (Domain B).
@@ -90,11 +90,10 @@ We do not support the nesting of domains in the current prototype.
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=0.95\columnwidth]{figures/capacity/capacity-ref-new.pdf}
-	\caption{\thename's reference encapsulation of pointers and file descriptors with cryptographic authentication code (AC).}
-	\label{fig:ref-encapsulation}
+	\caption{\thename's reference encapsulation of pointers and file descriptors with cryptographic authentication code (AC).}\label{fig:ref-encapsulation}
 \end{figure}
 
-\hdr{Object encapsulation}
+\paragraph{Object encapsulation}
 % \autoref{fig:ref-encapsulation} summarizes how \thename constructs resource references with \gls{pa} and \gls{mte} hardware acceleration.
 As summarized by \autoref{fig:ref-encapsulation}, \thename facilities employ \gls{pa} to \emph{sign} private resource references with the domain key and the per-instance modifier (e.g., a unique session ID), engraving the reference ownership into its embedded \gls{ac}.
 Before a reference is used to access some resource, \thename \emph{authenticates} its \gls{ac} with the currently activating domain key and modifier before granting the access.
