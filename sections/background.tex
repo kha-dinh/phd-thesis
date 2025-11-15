@@ -4,7 +4,52 @@
 \chapter{Background}
 % \pagenumbering{arabic}
 
+\epigraph{
+	This then is programming, both a tar pit in which many efforts have floundered and a creative activity with joys and woes all its own.
+}{\textit{Frederick P. Brooks, Jr}, The Mythical Man-month}
+
 \label{chap:background}
+
+
+\section{Legacy OS's Protection Model}
+
+\begin{table}[t]
+	\begin{center}
+		\begin{tabular}[c]{l|lll}
+			       & File 1 & File 2 & File 3 \\
+			\midrule
+			Bob & read,write &        &        \\
+			Alice &        & read,write &        \\
+			Administrator &       read,write & read,write       & read,write \\
+		\end{tabular}
+		\caption{Example access control matrix}\label{tab:example-acm}
+	\end{center}
+\end{table}
+
+\glspl{os} enforce security by implementing a system of \emph{protection}~\cite{lampsonprotection} that defines access control policies between \emph{subjects} (e.g., users and processes) and \emph{objects} (e.g., memory, files, and resource handles).
+Specifically, it determines which operations each subject may perform on a given object at any time.
+For example, a simple policy might prohibit users from accessing resources owned by others.
+In a system with three users and three files, this policy can be represented as an \emph{access control matrix}~\cite{lampsonprotection}, as shown in \autoref{tab:example-acm}.
+
+\glspl{os} map their \emph{abstractions} onto the \emph{subjects} and \emph{objects} of this protection.
+The \emph{process} abstraction, introduced in the 1960s~\cite{denning2022systems}, remains the foundation for representing subjects.
+A process encapsulates relevant functionalities and interacts with system resources.
+Commodity \glspl{os}, such as UNIX-based systems, associate processes with users and groups, enforcing protection on a per-process basis.
+
+To represent objects, \glspl{os} employ the \emph{file} abstraction, which initially referred to a block of data on disk.
+UNIX-inspired systems generalized this concept so that disk I/O, networking, and system services all appear as file operations, thereby unifying access under a consistent interface and simplifying access control.
+
+Building on these abstractions, the \gls{os} enforces two primary security boundaries: one between the kernel and \emph{userspace} processes, and another among processes themselves.
+The first boundary, maintained through hardware privilege rings, protects the \gls{os}'s components that enforce security (its \gls{tcb}) from tampering.
+The second boundary underpins multiprogramming security, enforced through memory translation and mediation of all userspace resource accesses.
+In terms of protection, two  \emph{protection domains}~\cite{lampsonprotection} are established: user space domains where applications run, and kernel domain where the kernel code executes.
+In this thesis, the \emph{legacy protection} refers to the process- and file-centric one that underpins UNIX and POSIX-compatible \gls{os}.
+
+
+\section{In-process isolation}
+
+\section{Confidential virtual machines and side-channel attacks}
+
 
 \iffalse
 	\section{Security principles}
@@ -67,7 +112,6 @@
 	Memory corruption bugs are one of the oldest software bugs in history.
 	They are caused by memory errors in programs written in low-level, \emph{memory-unsafe} languages like C and C++ to perform read/write to attacker-controlled locations in the process memory. While the root cause of this type of bug is rather straightforward, it is a difficult path toward eradicating it.
 
-\fi
 
 
 
@@ -334,3 +378,5 @@ Among system call filtering mechanisms, Linux's Linux’s Seccomp (SECure COMPut
 
 % Unikernels are known for their security, due to ...
 
+
+\fi

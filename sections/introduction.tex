@@ -1,10 +1,8 @@
+% !TeX root = ../main.tex
 \chapter{Introduction}
 \pagenumbering{arabic}
 \label{sec:intro}
 
-\epigraph{
-	This then is programming, both a tar pit in which many efforts have floundered and a creative activity with joys and woes all its own.
-}{\textit{Frederick P. Brooks, Jr}, The Mythical Man-month}
 
 \epigraph{
 	I pray daily that more of my fellow-programmers may find the means of freeing themselves from the curse of compatibility.
@@ -43,197 +41,166 @@ By restoring alignment between hardware and software protection, these methods e
 % A malicious program could compromise the confidentiality, integrity, or availability of both the \gls{os} and other applications.
 % Consequently, the \gls{os} must mediate all resource access to uphold these guarantees, even in the presence of potentially hostile users.
 
-\subsection{Legacy OS's Protection Model}
 
-\begin{table}[t]
-	\begin{center}
-		\begin{tabular}[c]{l|lll}
-			       & File 1 & File 2 & File 3 \\
-			\midrule
-			User 1 & access &        &        \\
-			User 2 &        & access &        \\
-			User 3 &        &        & access \\
-		\end{tabular}
-		\caption{Example access control matrix specifying a simple protection model}\label{tab:example-acm}
-	\end{center}
-\end{table}
 
-\glspl{os} enforce security by implementing a system of \emph{protection}~\cite{lampsonprotection} that defines access control policies between \emph{subjects} (e.g., users and processes) and \emph{objects} (e.g., memory, files, and resource handles).
-Specifically, it determines which operations each subject may perform on a given object at any time.
-For example, a simple policy might prohibit users from accessing resources owned by others.
-In a system with three users and three files, this policy can be represented as an \emph{access control matrix}~\cite{lampsonprotection}, as shown in \autoref{tab:example-acm}.
 
-\glspl{os} map their \emph{abstractions} onto the \emph{subjects} and \emph{objects} of this protection.
-The \emph{process} abstraction, introduced in the 1960s~\cite{denning2022systems}, remains the foundation for representing subjects.
-A process encapsulates relevant functionalities and interacts with system resources.
-Commodity \glspl{os}, such as UNIX-based systems, associate processes with users and groups, enforcing protection on a per-process basis.
+\subsection{Limitations of existing OS protection}
 
-To represent objects, \glspl{os} employ the \emph{file} abstraction, which initially referred to a block of data on disk.
-UNIX-inspired systems generalized this concept so that disk I/O, networking, and system services all appear as file operations, thereby unifying access under a consistent interface and simplifying access control.
+Historically, the \gls{os} has been the central figure in ensuring systems security, enforcing a \emph{protection} model~\cite{lampsonprotection}.
+This protection governs how programs access system resources, relying on long-standing abstractions such as processes to represent executing principals, and files to represent protected objects.
+Combined with hardware support, these abstractions create two fundamental isolation boundaries: one separating user applications from the privileged kernel and another isolating processes from each other.
 
-Building on these abstractions, the \gls{os} enforces two primary security boundaries: one between the kernel and \emph{userspace} processes, and another among processes themselves.
-The first boundary, maintained through hardware privilege rings, protects the \gls{os}'s components that enforce security (its \gls{tcb}) from tampering.
-The second boundary underpins multiprogramming security, enforced through memory translation and mediation of all userspace resource accesses.
-In terms of protection, two  \emph{protection domains}~\cite{lampsonprotection} are established: user space domains where applications run, and kernel domain where the kernel code executes.
-In this thesis, the \emph{legacy protection} refers to the process- and file-centric one that underpins UNIX and POSIX-compatible \gls{os}.
-This model is illustrated in \autoref{fig:legacy-prot}.
+The traditional, process-centric \emph{protection} has served as the basis of OS security for decades, but its assumptions no longer align with modern computing environments.
+Two key weaknesses are revealed by attempts to add security to modern systems.
+
+\begin{itemize}
+  \item First, the process-level isolation boundaries provided by the OS is no longer sufficient in containing bugs.
+Contemporary software systems are increasingly large and complex—a peril underscored by the infamous Heartbleed vulnerability~\cite{heartbleed}, which exploited a bug in the OpenSSL cryptographic library.
+These weaknesses call for the \emph{separation of privilege} within complex programs into smaller, isolated modules~\cite{capacity,erim,hakc,rlbox,privtrans,gudka2015clean}.
+The coarse-grained, process-level protection of traditional \glspl{os} becomes a bottleneck for this decomposition, imposing significant development and performance costs~\cite{erim,capacity}.
+\item
+  Second, emerging \emph{confidential computing paradigms}~\cite{confidential,google-confidential-computing,sgx,kaplan_amd_nodate,cca} invert traditional trust hierarchies by placing the \gls{os} \emph{outside} of the trust boundary, necessitating a reconsideration of security goals.
+Confidential computing, leveraging modern hardware features, establish \emph{secure enclaves} \dash\ containers that are isolated  from the rest of the system, even the OS or the hypervisor.
+Such paradigm shift introduces a completely different trust model that existing OS protection were not designed to expressed.
+Yet, previous systems retrofit security into this model, introducing attack surfaces such as the Iago attacks \cite{checkoway2013iago} that exploits the system call APIs to take control of secure enclaves.
+\end{itemize}
+
+
+Given these limitations, this dissertation calls for rethinking the legacy OS's protection model to better align with security and performance goals of modern systems.
 
 
 \input{figures/intro-protections}
 
+\subsection{Rise of hardware-assisted protection}
 
-\subsection{Limitations of legacy protection}
-
-Although legacy protection has provided a solid foundation for decades, its assumptions no longer align with modern computing environments.
-Contemporary software systems are increasingly large and complex—a peril underscored by the infamous Heartbleed vulnerability~\cite{heartbleed}, which exploited a bug in the OpenSSL cryptographic library.
-
-Vulnerabilities in complex systems call for the \emph{separation of privilege} within complex programs into smaller, isolated modules~\cite{capacity,erim,hakc,rlbox,privtrans,gudka2015clean}.
-The coarse-grained, process-level protection of traditional \glspl{os} becomes a bottleneck for this decomposition, imposing significant development and performance costs~\cite{erim,capacity}.
-
-At the same time, emerging \emph{confidential computing paradigms}~\cite{confidential,google-confidential-computing,sgx,kaplan_amd_nodate,cca} invert traditional trust hierarchies by placing the \gls{os} ouside of the trust boundary.
-These paradigms establish \emph{secure enclaves} \dash\ containers that are isolated  from the rest of the system, even the OS or the hypervisor.
-Such paradigm shift introduces a completely different trust model that legacy protection were not designed to expressed.
-Yet, previous systems retrofit such boundary into the legacy protection, introducing attack surfaces such as the Iago attacks \cite{checkoway2013iago} that exploits the system call APIs.
-
-
-% Recent development places the entire OS inside secure enclaves to remain compatible with nnormal workloads. now the OS large code base becomes a liability for attacks.
-
-
-% This thesis argues that sustaining strong security requires revisiting and aligning these legacy models with modern system realities.
-% 
-% [[PLACEHOLDER: specify concrete motivation for revisiting the protection model—e.g., scalability, hardware integration, or deployment feasibility.]]
-
-\subsection{Rise of modern hardware-assisted protection}
-
-Historically, the \gls{os} assumed complete mediation and exclusive control over hardware resources.
-However, given they previously described limitations of legacy protection, modern hardware increasingly implements its own protection and isolation mechanisms, often beyond the \gls{os}'s full visibility or authority.
-
-Taking advantages of these new features, a plenthora of systems has been developed and deployed, providing models of \emph{hardware-assisted protection}.
+At the same time, modern hardware increasingly implements its own protection and isolation mechanisms, often beyond the \gls{os}'s full visibility or authority.
+Taking advantages of these new features, a plethora of systems has been developed and deployed, providing models of \emph{hardware-assisted protection}.
 This thesis focuses on the two recent development in hardware-assisted protection: in-process isolation and VM-level confidential computing, or \gls{cvm}.
-These developments represent to complementary direction being pushed by the industry. 
 
 \begin{itemize}
-  \item In-process isolation \emph{compresses} the protection domains inward to create \emph{sub-process isolation domains}, leveraging CPU features like Intel \gls{pku} that enable  userspace processes to establish memory isolation policies.
-Works like ERIM and Hodor~\cite{erim,hodor} leverage these hardware extensions to created protected domain that isolate secret and contain the impact buggy code.
-\item The \gls{cvm} paradigm \emph{expands} the protection domain outward from previous process level secure enclaves to entire VM.
-This direction leverage recent advancement in TEE techonlogies introduced by Intel TDX, AMD SEV or ARM CCA to transform an entire VM, including applications and OS, into an protection domain, isolated from the untrusted hypervisor. 
-Cloud
+  \item \textbf{Domain compression.} In-process isolation (\autoref{inprocess-prot}) \emph{compresses} the protection domains inward to create \emph{sub-process isolation domains}, leveraging CPU features like Intel \gls{pku} that enable  userspace processes to establish memory isolation policies.
+Works like ERIM and Hodor~\cite{erim,hodor} leverage these hardware extensions to created protected domain that isolate secret and contain the impact buggy code, showing significantly better performance than the process-level isolation.
+\item \textbf{Domain expansion.} The \gls{cvm} paradigm (\autoref{cvm-prot}) \emph{expands} the protection domain outward from previous process level secure enclaves to entire VM.
+This direction leverage recent advancement in TEE technologies introduced by Intel TDX, AMD SEV or ARM CCA to transform an entire VM, including applications and OS, into an protection domain, isolated from the untrusted hypervisor. 
+Isolating the confidential application, along with all its supporting code and data, enables companies to deploy cutting edge workloads like LLM inference into \glspl{tee} without much adaption costs~\cite{confidential-llm}.
 \end{itemize}
 
 
 
-The two direction that are the interest of this thesis are
-
-
-For instance, Intel \gls{pku} allows  while AMD SEV, Intel TDX, and ARM CCA introduce VM-level isolation that protects guest operating systems from malicious hypervisors.
-
+It is important that modern systems should take advantage of these new hardware features to improve their security and performance. 
+Thus, exploring principles to securely incorporate these security features is the challenge for this dissertation.
 
 
 
 
-\subsection{Problem of protection misalignment}
-
-When applied in an ad hoc manner, these \emph{hardware-assisted protections} introduce \emph{misalignments} in protection models that can undermine system security (\autoref{tab:protection-models}).
-Misalignment arises when the protection domains defined by hardware and those assumed by the operating system diverge.
-
-For example, a hardware isolation feature may enforce access restrictions unknown to the OS, leading to inconsistencies in privilege enforcement, or vice versa.
-Prior work has demonstrated \emph{confused deputy} attacks on \gls{pku}-based in-process isolation systems, arising from the \gls{os}'s lack of awareness of hardware-enforced protection domains~\cite{pku-pitfalls}.
-
-Similarly, VM-level isolation (e.g., AMD-SEV) can exacerbate side-channel and interface vulnerabilities, as demonstrated by recent attacks against confidential virtual machines~\cite{wesee,heckler,ciphersteal,li2021cipherleaks}.
-Such discrepancies can undermine both the enforceability and verifiability of system-wide security guarantees.
+% For example, a hardware isolation feature may enforce access restrictions unknown to the OS, leading to inconsistencies in privilege enforcement, or vice versa.
+% When applied in an ad hoc manner, these \emph{hardware-assisted protections} introduce \emph{misalignments} in protection models that can undermine system security (\autoref{tab:protection-models}).
+% Misalignment arises when the protection domains defined by hardware and those assumed by the operating system diverge.
+%
+% \subsection{Problem of protection misalignment}
+%
+% When applied in an ad hoc manner, these \emph{hardware-assisted protections} introduce \emph{misalignments} in protection models that can undermine system security (\autoref{tab:protection-models}).
+% Misalignment arises when the protection domains defined by hardware and those assumed by the operating system diverge.
+%
+%
+% Such discrepancies can undermine both the enforceability and verifiability of system-wide security guarantees.
 
 
 
 \section{Approach}
 
+I now describe the approaches used to tackle the challenge of adopting modern hardware security features to improve security and performance of systems.
 
 \subsection{Retrofitting for security}
+First, this dissertation argues that  the practical path to introduce security is \emph{retrofitting} \dash\ integrating security features into existing protection models without breaking compatibility.
+This is also fit with the modern hardware features hardware features aim to provide compatibility.
 
-Despite substantial advances in hardware and increasingly sophisticated attacks, OS protection has remained largely unchanged in mainstream \gls{os}, since the 1970s.
+Despite substantial advances in OS composition, OS protection has remained largely unchanged in mainstream \gls{os}, since the 1970s.
+Numerous proposed systems that promised better security, like capability OS and microkernels, have not seen large-scale adoption. 
 Modern applications continue to depend on long-standing standards such as \gls{posix}~\cite{posix} and the Windows API~\cite{winapi}, which constrain compatibility with alternative designs.
-Consequently, current computing infrastructures still rely on legacy protection.
-
-Due to the prevalence of the legacy protection, the practical path to introduce security has been \emph{retrofitting} \dash\ integrating security features into existing protection models.
+This status quo leads to a belief in the community that achieving security is a hopeless quest~\cite{hopelessquest}.
+Ultimately, a majority of current computing infrastructures still rely on legacy protection.
+On the other hand, there have been several successful securities retrofit that gained large adoption.
 For example, SELinux~\cite{selinux} extends Linux’s \gls{dac} model with \gls{mac} enforcement, while Capsicum~\cite{watson2010capsicum} retrofits a capability-based \gls{api} in FreeBSD to enable fine-grained access control~\cite{freebsd-capsicum}.
 Similarly, large applications such as Chrome and Firefox are retrofitting sub-process isolation to contain vulnerabilities from compromised third-party libraries~\cite{rlbox}.
 
 
 
-\begin{table}[t]
-	\centering
-	\small
-	\begin{tabular}{p{3cm}p{3.5cm}p{2.5cm}p{4cm}}
-		\toprule
-		Legacy OS protection
-		 & Hardware feature
-		 & Hardware-defined protection
-		 & Implications of protection misalignment                                                                                 \\
-		\midrule
-		\multirow{2}{3cm}{Inter-process isolation (files \& memory), user/kernel isolation}
-		 & AMD SEV~\cite{advanced_micro_device_sev_2022}, ARM CCA~\cite{cca}, Intel TDX~\cite{tdx}
-		 & VM-hypervisor isolation
-		 & Amplified side-channel threats~\cite{ciphersteal,li2021cipherleaks}, interface vulnerabilities~\cite{civ,heckler,wesee} \\
-		\cmidrule(lr){2-4}
-		 & Intel PKU~\cite{libmpk}, ARM MTE~\cite{mte}
-		 & Intra-process isolation (memory)
-		 & Confused deputy attacks~\cite{pku-pitfalls}                                                                             \\
-		\bottomrule
-	\end{tabular}
-	\caption{Misalignments between legacy OS protection and modern hardware protection}\label{tab:protection-models}
-\end{table}
+
+\subsection{Coherent software/hardware protection}
 
 
-
-To fully capitalize on modern hardware features, systems must \emph{align} protection models between the legacy \gls{os} and hardware.
-
-For in-process isolation systems, alignment requires consistent management of both file and memory access.
-
-For VM-level enclaves, the guest \gls{os} must integrate the enclave’s threat model—including side-channel and interface attacks—into its own protection framework.
+While modern processors provide powerful protection primitives, 
 
 
-% This thesis lies at the intersection of legacy operating system design and emerging hardware security paradigms.
+their full security potential can only be realized when \glspl{os} integrate them in a coherent manner; in other words, protection enforced by the software (\gls{os}) must be coherent with the protection established with software support.
 
-% It argues that while modern processors provide powerful protection primitives, their full security potential can only be realized when \glspl{os} integrate them coherently.
-%
-% This thesis examines two layers of the protection hierarchy to illustrate the broader principle of protection alignment.
-% it argues that sustaining strong system security requires a principled *alignment* between legacy operating system protection models and emerging hardware-based isolation mechanisms.
-% It explores the  through two systems: \capacity and \incognitos.
+Previous research has demonstated that incoherency in the protection model is the bane of security.
+Systems that leverage modern hardware features in an ad hoc manner, often reveal gaps in protections that undermine any benefits provided.
+For instance, for in-process isolation systems, prior work has demonstrated \emph{confused deputy} attacks, arising from the \gls{os}'s lack of awareness of hardware-enforced protection domains~\cite{pku-pitfalls,jenny}.
+Similarly, trying to retrofitting legacy \glspl{os} into VM-level isolation (e.g., AMD-SEV) can exacerbate side-channel and interface vulnerabilities, as demonstrated by recent attacks against confidential virtual machines~\cite{wesee,heckler,ciphersteal,li2021cipherleaks}.
 
-
-\section{Contributions}
-
-This thesis positions itself at the intersection of legacy operating system design and emerging hardware security paradigms.
-It argues that while modern processors introduce powerful protection primitives, their security potential can only be realized when operating systems evolve to integrate them coherently.
-The work presented in this thesis, \capacity and \incognitos, examines two layers of the protection hierarchy to illustrate the broader principle of protection alignment
-
+This dissertation argues for aligning the protection model provided by the software hardware into a unified model. 
+This can be achieve two complementary approaches:
+(1) retrofitting security guarantees provided by hardware to the one provided by the SO, or (2) retrofitting the OS protection model to with reflect the one estalbished by hardware.
+The work presented in this thesis, \capacity and \incognitos, examines two layers of the protection hierarchy to illustrate the broader principle of protection coherency. 
 
 
 \begin{itemize}
-	\item[-]
+  \item[-] \textbf{Retrofitting hardware to incorporate OS protection.}
 	      At the intra-process level, \capacity demonstrates how intra-process domains established through modern ARM hardware acceleration can be coherently
 	      retrofitted into legacy abstractions, with a novel cryptographic capabilities mechanism.
 	      \capacity retrofits capability-based protection into legacy process abstractions, leveraging ARM Pointer Authentication (\gls{pa}) and Memory Tagging (\gls{mte}) to transform resource references into cryptographically verifiable capabilities.
-	      This design enforces consistent security semantics across file and memory accesses, bridging the gap between software abstractions and hardware enforcement.
-	\item[-]
+	      This design enforces consistent security semantics across file and memory accesses, bridging the gap between software abstractions and hardware enforcementf
+      \item[-] \textbf{Retrofitting OSes for protection of hardware domains}
 	      At the system level, \incognitos explores how \glspl{os} can collaborate with hardware-enforced VM-level isolation to enforce coherent threat models, achieving performant and robust.
 	      \incognitos redefines the role of the operating system under hardware-enforced isolation, treating it as an active participant in the threat model of trusted execution environments.
 	      By coordinating scheduling and memory layout randomization, it mitigates side-channel leakage and strengthens enclave isolation.
 \end{itemize}
 
-Together, these systems demonstrate that harmonizing OS and hardware protection models yields architectures that are both more secure and more efficient—pointing toward a new design paradigm for hardware-conscious operating system security.
+
+Together, these systems demonstrate that harmonizing OS and hardware protection models yields architectures that are both more secure and more efficient-pointing toward a new design paradigm for hardware-conscious operating system security.
 
 
 \section{Outline}
 
-\cref{chap:background} estabilshes the fundamental background
+\cref{chap:background} covers the background
 
 \cref{chap:capacity}
 
 \cref{chap:incognitos}
 
-\cref{chap:discussion} discuss
+\cref{chap:discussion} concludes
 
-\cref{chap:conclusion}
+
+
+% Adopting modern hardware security features require retrofit without breaking compatibility.
+
+% \begin{table}[t]
+% 	\centering
+% 	\small
+% 	\begin{tabular}{p{3cm}p{3.5cm}p{2.5cm}p{4cm}}
+% 		\toprule
+% 		Legacy OS protection
+% 		 & Hardware feature
+% 		 & Hardware-defined protection
+% 		 & Implications of protection misalignment                                                                                 \\
+% 		\midrule
+% 		\multirow{2}{3cm}{Inter-process isolation (files \& memory), user/kernel isolation}
+% 		 & AMD SEV~\cite{advanced_micro_device_sev_2022}, ARM CCA~\cite{cca}, Intel TDX~\cite{tdx}
+% 		 & VM-hypervisor isolation
+% 		 & Amplified side-channel threats~\cite{ciphersteal,li2021cipherleaks}, interface vulnerabilities~\cite{civ,heckler,wesee} \\
+% 		\cmidrule(lr){2-4}
+% 		 & Intel PKU~\cite{libmpk}, ARM MTE~\cite{mte}
+% 		 & Intra-process isolation (memory)
+% 		 & Confused deputy attacks~\cite{pku-pitfalls}                                                                             \\
+% 		\bottomrule
+% 	\end{tabular}
+% 	\caption{Misalignments between legacy OS protection and modern hardware protection}\label{tab:protection-models}
+% \end{table}
+
+
+% \cref{chap:conclusion}
 
 
 
