@@ -17,12 +17,13 @@ The advent of the Internet revolutionized global information exchange, while rec
 Underlying these breakthroughs are the infrastructures that enable computation—both software and hardware.
 The \gls{os}, which mediates between them, remains a cornerstone of technological innovation.
 
-Historically, the \gls{os} has served as the central authority for enforcing system security, providing a coherent protection model that governs users' access to resources.
-However, advances in processor design have introduced new hardware-level security mechanisms, such as \glspl{tee}, that enforce protection models partially outside the \gls{os}'s control.
-Consequently, system security is now jointly enforced by two distinct entities: the hardware and the \gls{os}.
-When their respective protection models diverge, gaps or \emph{misalignments} may emerge, exposing attack vectors and undermining the intended guarantees of both.
+For decades, the \gls{os} has served as the central authority for enforcing system security, providing a coherent security model that governs users' access to resources.
+However, such a model is showing limitations when used to secure the modern software.
+At the same time, advances in processor design have introduced new hardware-level security mechanisms, such as Intel \gls{pku} and \glspl{sgx} that enforce protection models partially outside the \gls{os}'s control.
+Consequently, system security is now jointly enforced by two distinct entities: the hardware and the software (\gls{os}).
+When their respective protection models diverge, gaps in protection may emerge, exposing attack vectors and undermining the intended guarantees of both.
 
-This dissertation argues that hardware-assisted protection models must be systematically aligned with those established by the \gls{os}.
+This dissertation argues that hardware-assisted security models must be systematically aligned with those established by the \gls{os}.
 Building on this principle, I explore methods to \emph{retrofit} hardware security features into existing system architectures in a principled and coherent manner.
 By restoring alignment between hardware and software protection, these methods enable systems to leverage the performance and security benefits of modern hardware while maintaining a unified protection model that is robust against modern threats.
 
