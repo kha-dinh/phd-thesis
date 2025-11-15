@@ -4,15 +4,21 @@
 \let\year\TeXyear
 
 
-
 \usepackage{IEEEtrantools}
 \usepackage{pdfpages}
 
 \usepackage{epigraph}
+\setlength{\epigraphwidth}{0.75\textwidth}
 
 \usepackage[a4paper]{geometry}
 \usepackage{rotating}
-\usepackage[breaklinks = true]{hyperref} % to use \phantomsection
+
+\usepackage{xcolor}
+\usepackage[breaklinks=true,colorlinks]{hyperref} % to use \phantomsection
+\hypersetup{
+linkcolor=blue,
+citecolor=blue
+}
 
 % \usepackage{enumitem}
 \usepackage{multirow}
@@ -75,9 +81,14 @@
 %\usepackage[aboveskip=0pt]{subcaption}
 \usepackage{makecell}
 \usepackage{adjustbox}
+
 \usepackage[toc,page]{appendix}
 \newcolumntype{Y}{>{\centering\arraybackslash}X}
 
+\usepackage{pifont}
+
+% Hack symbol
+\renewcommand{\labelitemi}{\ding{228}}
 
 
 \usepackage{csquotes}
@@ -225,8 +236,6 @@ Its ideas contribute to the long-term vision of secure computing infrastructures
 
 
 
-
-
 \textbf{Keywords:} Security, Operating System, Protection, Side channels
 
 \newcommand{\hdr}[1]{\paragraph{#1.}\xspace{}}
@@ -235,6 +244,7 @@ Its ideas contribute to the long-term vision of secure computing infrastructures
 \include{sections/introduction}
 \include{sections/background}
 % \include{sections/sepim}
+
 \include{sections/capacity}
 \include{sections/capacity/introduction}
 \include{sections/capacity/background}
@@ -276,6 +286,7 @@ Its ideas contribute to the long-term vision of secure computing infrastructures
 %\include{ldt-MBL-Pre-1-intro}
 %================================================
 
+
 %================================================
 \phantomsection
 %\addcontentsline{toc}{chapter}{Literature Review}
@@ -315,8 +326,6 @@ Its ideas contribute to the long-term vision of secure computing infrastructures
 
 
 %\pagenumbering{arabic}
-
-
 
 
 \end{document}

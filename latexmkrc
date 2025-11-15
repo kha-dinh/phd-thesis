@@ -3,8 +3,10 @@
 # $aux_dir = "build";
 # $out_dir = "out";
 
-set_tex_cmds('--interaction=nonstopmode %O %S');
+set_tex_cmds('-interaction=nonstopmode %O %S');
 
+# $pdflatex = 'ppdflatex -- -interaction=nonstopmode -shell-escape -synctex=1';
+# $pdflatex = 'ppdflatex';
 $force_mode = 1;
 $pdf_mode = 5;
-$max_repeat=20;
+$max_repeat = 20;
