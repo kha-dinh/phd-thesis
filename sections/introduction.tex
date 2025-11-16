@@ -5,6 +5,10 @@
 
 
 \epigraph{
+There is no fundamental reason why a program that you write for me should be able to delete my bank transactions file just because I can. Yet those are the permission rules imposed by the current commercial OSes for personal systems.
+}{\textit{Norman Hardy}}
+
+\epigraph{
 	I pray daily that more of my fellow-programmers may find the means of freeing themselves from the curse of compatibility.
 }{\textit{Edsger W. Dijkstra}, The Humble Programmer}
 
@@ -30,17 +34,6 @@ By restoring alignment between hardware and software protection, these methods e
 
 \section{Motivation}
 
-% Most \glspl{os} pursue three fundamental objectives.
-% First, they must provide a set of \glspl{api} that are intuitive for application developers.
-% This is achieved through \emph{abstractions} that describe high-level resource properties while concealing implementation details.
-%
-% Second, they must efficiently \emph{manage hardware resources}—including CPU time, memory, and storage—by allocating and reclaiming them as needed.
-% Disciplines such as \emph{memory management}, \emph{file system design}, and \emph{scheduling} evolved to fulfill this objective.
-%
-% Third—and the focus of this thesis—the \gls{os} must ensure the \emph{security} of computation.
-% This objective became essential with the advent of multiprogramming in the 1960s, when systems began supporting multiple concurrent users and programs.
-% A malicious program could compromise the confidentiality, integrity, or availability of both the \gls{os} and other applications.
-% Consequently, the \gls{os} must mediate all resource access to uphold these guarantees, even in the presence of potentially hostile users.
 
 
 
@@ -76,7 +69,7 @@ Given these limitations, this dissertation calls for rethinking the legacy OS's 
 
 At the same time, modern hardware increasingly implements its own protection and isolation mechanisms, often beyond the \gls{os}'s full visibility or authority.
 Taking advantages of these new features, a plethora of systems has been developed and deployed, providing models of \emph{hardware-assisted protection}.
-This thesis focuses on the two recent development in hardware-assisted protection: in-process isolation and VM-level confidential computing, or \gls{cvm}.
+This thesis focuses on the two recent development enabled  hardware-assisted protection: in-process isolation and VM-level confidential computing, or \gls{cvm}.
 
 \begin{itemize}
   \item \textbf{Domain compression.} In-process isolation (\autoref{inprocess-prot}) \emph{compresses} the protection domains inward to create \emph{sub-process isolation domains}, leveraging CPU features like Intel \gls{pku} that enable  userspace processes to establish memory isolation policies.
@@ -131,18 +124,21 @@ Similarly, large applications such as Chrome and Firefox are retrofitting sub-pr
 \subsection{Coherent software/hardware protection}
 
 
-While modern processors provide powerful protection primitives, 
+While modern processors provide powerful protection primitives, their full security potential can only be realized when \glspl{os} integrate them carefully. 
+Toward fullfiling this challenge, this thesis proposes the following:
 
+\begin{displayquote}
+  \textbf{Principle of coherent protection.} Protection enforced by the software (\gls{os}) must be coherent with the protection established with software support.
+  This means (1) the software-enforced protection must align to the threat model of any new hardware protection, and (2) the new hardware-defined protection must carefully consider the one establisehd by software.
 
-their full security potential can only be realized when \glspl{os} integrate them in a coherent manner; in other words, protection enforced by the software (\gls{os}) must be coherent with the protection established with software support.
+\end{displayquote}
 
 Previous research has demonstated that incoherency in the protection model is the bane of security.
 Systems that leverage modern hardware features in an ad hoc manner, often reveal gaps in protections that undermine any benefits provided.
 For instance, for in-process isolation systems, prior work has demonstrated \emph{confused deputy} attacks, arising from the \gls{os}'s lack of awareness of hardware-enforced protection domains~\cite{pku-pitfalls,jenny}.
 Similarly, trying to retrofitting legacy \glspl{os} into VM-level isolation (e.g., AMD-SEV) can exacerbate side-channel and interface vulnerabilities, as demonstrated by recent attacks against confidential virtual machines~\cite{wesee,heckler,ciphersteal,li2021cipherleaks}.
 
-This dissertation argues for aligning the protection model provided by the software hardware into a unified model. 
-This can be achieve two complementary approaches:
+This dissertation explores aligning the protection model provided by the software hardware into a unified model with two complementary approaches:
 (1) retrofitting security guarantees provided by hardware to the one provided by the SO, or (2) retrofitting the OS protection model to with reflect the one estalbished by hardware.
 The work presented in this thesis, \capacity and \incognitos, examines two layers of the protection hierarchy to illustrate the broader principle of protection coherency. 
 

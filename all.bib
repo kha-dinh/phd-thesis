@@ -7,6 +7,40 @@
   pages = {113--124},
   doi = {10.1109/PACT.2015.22},
 }
+
+@article{lampson1973confinement,
+  author = {Lampson, Butler W.},
+  title = {A note on the confinement problem},
+  year = {1973},
+  issue_date = {Oct. 1973},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  volume = {16},
+  number = {10},
+  issn = {0001-0782},
+  url = {https://doi.org/10.1145/362375.362389},
+  doi = {10.1145/362375.362389},
+  abstract = {onfining a program during its execution so that it cannot transmit
+              information to any other program except its caller. A set of
+              examples attempts to stake out the boundaries of the problem.
+              Necessary conditions for a solution are stated and informally
+              justified.},
+  journal = {Commun. ACM},
+  month = oct,
+  pages = {613–615},
+  numpages = {3},
+  keywords = {confinement, leakage of data, privacy, proprietary program,
+              protection, security},
+}
+@incollection{barth2008security,
+  title = {The security architecture of the chromium browser},
+  author = {Barth, Adam and Jackson, Collin and Reis, Charles and TGC Team and
+            others},
+  booktitle = {Technical report},
+  year = {2008},
+  publisher = {Stanford University},
+}
+
 @article{merkel2014docker,
   title = {Docker: lightweight linux containers for consistent development and
            deployment},
@@ -12659,19 +12693,52 @@ https://www.amd.com/en/technologies/hbm
   series = {ACSAC '23},
 }
 @inproceedings{hopelessquest,
-author = {Seltzer, Margo and Miller, Mark and Mazi\`{e}res, David and Zhou, Yuanyuan},
-title = {Is achieving security a hopeless quest?},
-year = {2015},
-isbn = {9781450340175},
-publisher = {Association for Computing Machinery},
-address = {New York, NY, USA},
-url = {https://doi.org/10.1145/2830903.2830914},
-doi = {10.1145/2830903.2830914},
-abstract = {Despite all the work in OS to provide protection and improve security, cyber crime has grown into a major social issue. There seem to be no solutions to loss of data and theft of identity. Does the OS community bear a responsibility for this mess?Mark Miller:In the 1970s, there were two main access control models: the identity-centric model of access-control lists and the authorization-centric model of capabilities. For various reasons the world went down the identity-centric path, resulting in the situation we are now in. On the identity-centric path, why is security likely a hopeless quest?When we build systems, we compose software written by different people. These composed components may cooperate as we intend, or they may destructively interfere. We have gotten very good at avoiding accidental interference by using abstraction mechanisms and designing good abstraction boundaries. By composition, we have delivered astonishing functionality to the world.Today, when we secure systems, we assign authority to identities. When I run a program, it runs as me. The square root function in my math library can delete my files. Although it does not abuse this excess authority, if it has a flaw enabling an attacker to subvert it, then anything it may do, the attacker can do. It is this excess authority that invites most of the attacks we see in the world today.By contrast, when we secure systems with capabilities, we work with the grain of how we organize software for functionality. At every level of composition, from programming language to operating systems to distributed services, we design abstraction boundaries so that a component's interface only requires arguments that are somehow relevant to its task. If such argument passing were the only source of authority, we would have already taken a huge step towards least authority. If most programs only ran with the least authority they need to do their jobs, most abuses would be minor.I do not imagine a world with fewer exploitable bugs. I imagine a world in which much less is at risk to most bugs.},
-booktitle = {SOSP History Day 2015},
-articleno = {13},
-location = {Monterey, California},
-series = {SOSP '15}
+  author = {Seltzer, Margo and Miller, Mark and Mazi\`{e}res, David and Zhou,
+            Yuanyuan},
+  title = {Is achieving security a hopeless quest?},
+  year = {2015},
+  isbn = {9781450340175},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {https://doi.org/10.1145/2830903.2830914},
+  doi = {10.1145/2830903.2830914},
+  abstract = {Despite all the work in OS to provide protection and improve
+              security, cyber crime has grown into a major social issue. There
+              seem to be no solutions to loss of data and theft of identity. Does
+              the OS community bear a responsibility for this mess?Mark Miller:In
+              the 1970s, there were two main access control models: the
+              identity-centric model of access-control lists and the
+              authorization-centric model of capabilities. For various reasons
+              the world went down the identity-centric path, resulting in the
+              situation we are now in. On the identity-centric path, why is
+              security likely a hopeless quest?When we build systems, we compose
+              software written by different people. These composed components may
+              cooperate as we intend, or they may destructively interfere. We
+              have gotten very good at avoiding accidental interference by using
+              abstraction mechanisms and designing good abstraction boundaries.
+              By composition, we have delivered astonishing functionality to the
+              world.Today, when we secure systems, we assign authority to
+              identities. When I run a program, it runs as me. The square root
+              function in my math library can delete my files. Although it does
+              not abuse this excess authority, if it has a flaw enabling an
+              attacker to subvert it, then anything it may do, the attacker can
+              do. It is this excess authority that invites most of the attacks we
+              see in the world today.By contrast, when we secure systems with
+              capabilities, we work with the grain of how we organize software
+              for functionality. At every level of composition, from programming
+              language to operating systems to distributed services, we design
+              abstraction boundaries so that a component's interface only
+              requires arguments that are somehow relevant to its task. If such
+              argument passing were the only source of authority, we would have
+              already taken a huge step towards least authority. If most programs
+              only ran with the least authority they need to do their jobs, most
+              abuses would be minor.I do not imagine a world with fewer
+              exploitable bugs. I imagine a world in which much less is at risk
+              to most bugs.},
+  booktitle = {SOSP History Day 2015},
+  articleno = {13},
+  location = {Monterey, California},
+  series = {SOSP '15},
 }
 
 @inproceedings{schwarz2024seven,

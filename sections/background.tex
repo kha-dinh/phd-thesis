@@ -1,17 +1,36 @@
 
 \glsresetall
 
-\chapter{Background}
+\chapter{Background}\label{chap:background}
 % \pagenumbering{arabic}
 
 \epigraph{
 	This then is programming, both a tar pit in which many efforts have floundered and a creative activity with joys and woes all its own.
 }{\textit{Frederick P. Brooks, Jr}, The Mythical Man-month}
 
-\label{chap:background}
+\ 
+\ 
 
 
-\section{Access Control with Software and Hardware Protection}
+Most \glspl{os} pursue three fundamental objectives.
+First, they must provide a set of \glspl{api} that are intuitive for application developers.
+This is achieved through \emph{abstractions} that describe high-level resource properties while concealing implementation details. 
+Processes, threads and files are prime examples of such abstractions that are widely used in modern applications.
+Second, they must efficiently \emph{manage hardware resources}—including CPU time, memory, and storage—by allocating and reclaiming them as needed.
+Disciplines such as \emph{memory management}, \emph{file system design}, and \emph{scheduling} evolved to fulfill this objective.
+
+Ever since the advent of multiprogramming the \gls{os} must ensure another objective: ensuring the \emph{security} of computation under potentially buggy or malicious programs.
+This is also the objective that this dissertation focuses on.
+Historically, this has been the responsibility of the OS.
+However, in the recent years, we are seeing shifts in responsibility toward (1) finer-grained, application-defined security isolation and (2) hardware-defined security boundaries enabled by modern hardware features.
+
+This section cover the fundamental background to grasp the higher-level contribution of the thesis.
+Background relavent to each of the work included in this dissertation are covered in~\cref{chap:capacity} and \cref{chap:incognitos} respectively.
+I first cover the traditional OS access control role that has been established since the 1960s in \cref{sec:intro:bg-os}.
+Then, I visit the two research direction in modern hardware-defined protection models in \cref{sec:intro:bg-ipi} and \cref{sec:intro:bg-cvm}, discussing their motivations, threat model, historical development, hardware features that enables them and open challenges.
+
+\section{OS Access control}
+\label{sec:intro:bg-os}
 
 \begin{table}[t]
 	\begin{center}
@@ -27,16 +46,18 @@
 \end{table}
 
 
-\subsection{OS Access control}
+Ensuring software security has been essential to \glspl{os} of with the advent of multiprogramming in the 1960s, when systems began supporting multiple concurrent users and programs.
+A malicious program could compromise the confidentiality, integrity, or availability of both the \gls{os} and other applications.
+Consequently, the \gls{os} must mediate all resource access to uphold these guarantees, even in the presence of potentially hostile users.
 
-\gls{os} access control 
-
-
-\glspl{os} enforce security by implementing a system of \emph{protection}~\cite{lampsonprotection} that defines access control policies between \emph{subjects} (e.g., users and processes) and \emph{objects} (e.g., memory, files, and resource handles).
+\glspl{os} security by implementing a system of \emph{protection}~\cite{lampsonprotection} that defines access control policies between \emph{subjects} (e.g., users and processes) and \emph{objects} (e.g., memory, files, and resource handles).
 Specifically, it determines which operations each subject may perform on a given object at any time.
+
 For example, a simple policy might prohibit users from accessing resources owned by others.
 In a system with three users and three files, this policy can be represented as an \emph{access control matrix}~\cite{lampsonprotection}, as shown in \autoref{tab:example-acm}.
 
+
+\subsection{Abstractions and protection}
 \glspl{os} map their \emph{abstractions} onto the \emph{subjects} and \emph{objects} of this protection.
 The \emph{process} abstraction, introduced in the 1960s~\cite{denning2022systems}, remains the foundation for representing subjects.
 A process encapsulates relevant functionalities and interacts with system resources.
@@ -70,8 +91,9 @@ Ring 3 contains the programs.
 
 
 \section{Hardware-assisted In-process isolation}
+\label{sec:intro:bg-ipi}
 
-\subsection{Motivation and goals}
+\subsection{Motivation}
 
 Modern software systems routinely consolidate large amounts of functionality into a single process.
 This monolithic design simplifies deployment and avoids the overheads of inter-process communication, but it also enlarges the trusted computing base and exposes programs to memory-safety vulnerabilities.
@@ -89,18 +111,147 @@ In this paradigm, isolation boundaries must be lightweight enough to support fre
 
 \subsection{Historical development}
 
-Early approaches to in-process isolation relied primarily on software techniques.
-Software Fault Isolation (SFI) instruments untrusted code so that memory writes and indirect jumps remain confined within predefined regions.
-Systems such as Google Native Client and RockSalt follow this tradition, providing strong isolation at the cost of binary rewriting and substantial performance overhead.
 
-Language-based isolation adopts a different strategy by confining untrusted components within language runtimes such as JavaScript engines or WebAssembly sandboxes.
-While effective for managed languages, these techniques offer weaker guarantees for low-level systems code written in C or C++, and they impose runtime constraints that complicate interaction with native libraries.
+Deciding which component to be a part of the TCB has been an on-going problem of Multic.
+
+With the advent of the Web, we see the raise of the need to execute untrusted code.
+
+On the UNIX protection model.
+
+
+There has been three concurrent threads of research.
+
+\hdr{Process-based isolation and downsides}
+In 2003 Provos et al.~\cite{provos2003preventing} discusses over-privilege in core programs, and proposed privilege separation. 
+The proposed architecutre is applied to OpenSSH.
+In 2004 Brumley et al.~\cite{privtrans} proposed a system to automatically separate an program.
+Heavily influenced by the work on OpenSSH, similar architecture is being deployed into the Chromium~\cite{barth2008security} browser since 2008, which separate the browser into two domains (processes), a browser kernel sandboxed rendering engines.
 
 A third class of techniques attempted to repurpose OS abstractions by splitting programs into multiple processes connected by IPC.
 This achieves strong isolation but comes with prohibitive costs: context switches, duplicated memory, expensive sharing protocols, and substantial changes to application architecture.
 
 Lightweight context
 
+\hdr{Language-based}
+Language-based isolation adopts a different strategy by confining untrusted components within language runtimes such as JavaScript engines.
+
+While effective for managed languages, these techniques offer weaker guarantees for low-level systems code written in C or C++, and they impose runtime constraints that complicate interaction with native libraries.
+
+\hdr{Software--based isolation}
+\gls{sfi}-based isolation instruments. 
+
+, first proposed by Wahbe et. al in 1993 ~\cite{wahbe_efficient_1993}, gain
+
+Early approaches to in-process isolation relied primarily on software techniques.
+Software Fault Isolation (SFI) instruments untrusted code so that memory writes and indirect jumps remain confined within predefined regions.
+Systems such as Google Native Client and RockSalt follow this tradition, providing strong isolation at the cost of binary rewriting and substantial performance overhead.
+
+In 2009,  \cite{yee2009native}. 
+
+The use of SFI has not seen wide adoption outside of the Web.
+PNaCl
+In 2018, Google stopped native client support in favor of webassembly.
+In 2025, LLVM 22 removes support for native client, ending its 
+
+Still, there has been attempts to leverage SFI for sandboxing native code.WASI is a system interface for webassembly, which is gaining traction.
+
+
+
+% \begin{figure}
+% % TIMELINE - simple test
+% \begin{tikzpicture}[
+%     font=\sffamily\small,
+%   ]
+%   % limits
+%   \newcount\yearOne; \yearOne=2000
+%   \def\w{12}    % width of axes
+%   \def\n{3}     % number of decades
+%   \def\lt{0.40} % ten tick length
+%   \def\lf{0.36} % five tick length
+%   \def\lo{0.30} % one tick length
+%
+%   % vertical positions of the three tracks
+%   \def\trackHW{1.5}
+%   \def\trackSFI{1.0}
+%   \def\trackPROC{0.5}
+%
+%   % generic helper: event arrow on a given lane
+%   % (year, vertOffset, arrowLen, laneY, label)
+%   \def\yearArrowOnLane(#1,#2,#3,#4,#5){%
+%     \def\xy{{(#1-\yearOne)*\w/\n/10}}%
+%     \pgfmathparse{int(#2*100)}%
+%     \ifnum \pgfmathresult<0
+%       \def\yyp{{(#4+\lt*(0.90+#2))}}%
+%       \def\yyw{{(\yyp-\lt*#3)}}%
+%       \draw[<-,thick,black,align=center]
+%         (\xy,\yyp) -- (\xy,\yyw)
+%         node[below,black] at (\xy,\yyw) {#5};
+%     \else
+%       \def\yyp{{(#4+\lt*(0.10+#2))}}%
+%       \def\yyw{{(\yyp+\lt*#3)}}%
+%       \draw[<-,thick,black,align=center]
+%         (\xy,\yyp) -- (\xy,\yyw)
+%         node[above,black,rotate=60,anchor=west,yshift=.2em] at (\xy,\yyw) {#5};
+%     \fi}
+%
+%   % per-track convenience macros
+%   % (year, vertOffset, arrowLen, label)
+%   % \def\eventSFI(#1,#2,#3,#4){\yearArrowOnLane(#1,#2,#3,\trackSFI,#4)}
+%   % \def\eventPROC(#1,#2,#3,#4){\yearArrowOnLane(#1,#2,#3,\trackPROC,#4)}
+%   % \def\eventHW(#1,#2,#3,#4){\yearArrowOnLane(#1,#2,#3,\trackHW,#4)}
+%   \def\eventSFI(#1,#2,#3,#4){\yearArrowOnLane(#1,0,#3,\trackSFI,#4)}
+%   \def\eventPROC(#1,#2,#3,#4){\yearArrowOnLane(#1,0,#3,\trackPROC,#4)}
+%   \def\eventHW(#1,#2,#3,#4){\yearArrowOnLane(#1,0,#3,\trackHW,#4)}
+%
+%   % axis (shared time axis)
+%   \draw[->,thick] (-\w*0.03,0) -- (\w*1.03,0);
+%
+%   % ticks
+%   \foreach \tick in {0,1,...,\n}{
+%     \def\x{{\tick*\w/\n}}
+%     \def\year{\the\numexpr \yearOne+\tick*10 \relax}
+%     \draw[thick] (\x,\lt) -- (\x,-\lt) node[below] {\year};
+%     \ifnum \tick<\n
+%       \draw[thick] ({(\x+\w/\n/2)},0) -- ({(\x+\w/\n/2)},\lf); % five tick
+%       \foreach \ticko in {1,2,3,4,6,7,8,9}{
+%         \def\xo{{(\x+\ticko*\w/\n/10)}}
+%         \draw[thick] (\xo,0) -- (\xo,\lo);  % one tick
+%       }
+%     \fi
+%   }
+%
+%   % lane guides + labels
+%   \draw[green] (0,\trackSFI) -- (\w,\trackSFI);
+%   \draw[red] (0,\trackPROC) -- (\w,\trackPROC);
+%   \draw[blue] (0,\trackHW) -- (\w,\trackHW);
+%
+%   \node[left] at (-\w*0.03,\trackSFI) {\small SFI};
+%   \node[left] at (-\w*0.03,\trackPROC) {\small Proc-based};
+%   \node[left] at (-\w*0.03,\trackHW) {\small HW-assisted};
+%
+%   % === EXAMPLE EVENTS (edit years/labels as you like) ===
+%
+%   % SFI track
+%   % \eventSFI(1993.9,  0.0,1.0, \cite{wahbe_efficient_1993})
+%   \eventSFI(2009.0,  0,2.5, Google's NaCl\cite{yee2009native})
+%   \eventSFI(2018.0,  0,2.5, {Wasm replaces NaCl})
+%   % \eventSFI(2025.0, -1.3,1.0, {LLVM\,22 drops NaCl})
+%
+%   % process-based isolation track
+%   \eventPROC(2003.0, 0,2.5,OpenSSH priv. separation~\cite{provos2003preventing})
+%   \eventPROC(2008.0, 0,2.5, Chromium architecture~\cite{barth2008security})
+%
+%   % hardware-assisted (fill in your own citations)
+%   \eventHW(2015.0,0,0.5, {SGX introduced})
+%   \eventHW(2017.0,0,1.5, {PKU introduced})
+%   \eventHW(2019.0,0.0,0.5, \cite{erim,hodor})
+%   \eventHW(2019.0,0.0,3.0, Arm Morello)
+%   \eventHW(2015.0,0,2.5,CHERI ISA~\cite{watson2015cheri})
+%   % \eventHW(2019.0, -1.3,1.0, {WASI + secure runtimes})
+%
+% \end{tikzpicture}
+% \end{figure}
+%
 % Capability systems such as EROS, Capsicum, and CHERI explored designs in which references to objects are represented as unforgeable, rights-bearing tokens.
 % These designs influenced later research but required substantial architectural or OS changes, limiting their deployment.
 
@@ -133,8 +284,9 @@ These challenges motivate the need for systems such as \capacity that retrofit p
 
 
 \section{Confidential virtual machines and side-channel attacks}
+\label{sec:intro:bg-cvm}
 
-\subsection{Motivation and goals}
+\subsection{Motivation}
 
 Cloud computing has transformed the deployment model of modern applications, but it also places tenants' workloads on infrastructures they do not fully trust.
 Traditional virtualization assumes that the hypervisor and host OS are trusted entities capable of accessing guest memory, inspecting execution, and mediating all resources.
@@ -147,6 +299,40 @@ Their primary goals are:
 (3) preserve compatibility with existing software stacks by keeping the guest OS unmodified or minimally modified.
 
 However, guaranteeing confidentiality at the VM boundary introduces new attack surfaces, particularly side channels, because the adversarial hypervisor still influences scheduling, memory placement, interrupts, and I/O behavior.
+
+
+Modern cloud computing allows users to deploy applications to remote machines hosted by the \gls{csp}.
+Traditionally, this deployment model requires the cloud users to fully trust the \gls{csp}.
+More specifically, while the size of the cloud applications may be limited, the \gls{tcb} for cloud applications include the operating system (that the \gls{csp} installed) and the machines that the program executes on, now under the control of the \gls{csp}.
+
+However, for modern high-assurance applications, such as private data processing, this model of trust is insufficient.
+The operating systems, given their large code base, are often the first target of many software attacks.
+With the \gls{os} privilege, attackers could easily obtain and modify the memory content of any running applications to compromise their confidentiality and integrity.
+Moreover, with control over the physical machine, a potentially malicious \gls{csp} could launch attacks such as cold boot attacks \cite{halderman_lest_2009} to extract the memory content of executing sensitive applications.
+
+\input{figures/bg-tee-trust-model-tikz}
+
+
+\Gls{tee} technologies allow remote users to discard trust in the system that runs the sensitive application.
+Instead, the \gls{tcb} of the \gls{tee}-protected applications would only include the application and the hardware. \autoref{fig:bg:trust-model-tee} demonstrates the comparison of the trust models of traditional computing and enclave-based \glspl{tee} such as Intel SGX~\cite{costan_intel_2016}.
+While traditional computing (left figure) requires that the application owner trusts the entire system that hosts the application, including the \gls{os}, the hypervisor, and the hardware, the \gls{tcb} of \gls{tee}-based applications (right side) is limited to only the \gls{tee}-enabled hardware, and a limited, trusted part of the application called the \emph{enclave} (in the case of Intel SGX).
+
+
+\subsection{Functionalities of TEEs}
+Most \gls{tee} technologies provide memory isolation primitives, such that the memory space of \gls{tee}-protected applications are isolated from each other and the rest of the system. Memory encryption is also a common feature~\cite{advanced_micro_device_sev_2022,costan_intel_2016} to thwart cold boot and memory scanning attacks.
+
+\emph{Remote attestation} is another core functionality of \glspl{tee}. It allows a remote user to verify the state of a deployed program (e.g., initial memory, developer's signature, ...) and the authenticity of a \gls{tee}-enabled CPU.
+A simplified procedure for remote attestation is as follows.
+To perform remote attestation, the CPU first measures the state of a deployed application and generates a checksum on this data.
+The checksum is then cryptographically \emph{signed} using an \emph{attestation key} only known to the CPU that is \emph{provisioned} during manufacture time.
+Attestation keys are provisioned in \emph{pairs}.
+The manufacturer burns one attestation key into a fuse of the CPU. It keeps the other to verify signatures created the one burnt into the CPU\footnote{Attestation keys are similar to the public and private key of the private key infrastructure}.
+
+The signed checksum is returned to the remote attestation requester (i.e., the \emph{challenger}).
+The challenger now sends the signed checksum to a \emph{verifier service}, hosted by the \gls{tee} manufacturer.
+This verifier service holds the other, which it can use to verify the signed checksum.
+If verification succeeds, the challenger can re-compute the expected checksum and compare it with the one returned by the \gls{tee} application.
+
 
 \subsection{Historical development}
 
@@ -165,9 +351,21 @@ SEV-SNP adds reverse-map tables to defend against memory-remapping attacks by ma
 Intel TDX isolates guest private memory and defines a narrow interface—TDX module calls—through which the hypervisor can request services without learning guest secrets.
 ARM CCA introduces \emph{realms}, isolated execution environments that coexist alongside the normal world and secure world.
 
+\input{figures/bg-cvm-tikz}
+
 These mechanisms fundamentally reshape the protection model: the guest OS becomes part of the trusted computing base, while the hypervisor becomes a potential adversary with limited visibility into the VM.
 
 \subsection{Open challenges}
+
+
+\hdr{Side-channel attacks}
+
+In 1973, Butler Lampson~\cite{lampson1973confinement} described in his seminar paper the difficulties in preventing an untrusted program from leaking secrets to other parties through \emph{covert channels}, or \emph{side channels}.
+
+Modern trusted execution suffers from a variant of such problem.
+
+
+the same challenges, at both the architectural and microarchitectural levels.
 
 Although CVMs protect memory from a malicious hypervisor, they do not prevent the hypervisor from influencing microarchitectural behavior.
 This makes CVMs vulnerable to a broad class of side-channel attacks, including page-fault channels, cache timing channels, scheduler-based attacks, and I/O interface attacks.
@@ -179,334 +377,9 @@ Finally, the OS remains responsible for resource management inside the VM, yet i
 These open challenges motivate systems such as \incognitos, which aim to align guest OS behavior with the threat model of confidential computing and to mitigate side-channel leakage through OS-guided strategies.
 [[PLACEHOLDER for linking directly to your contributions.]]
 
+\hdr{Taming the bloated TCB}
 
+CVMs has enabled companies to migrate cutting-edge applications, such as [large language model inference](https://docs.privatemode.ai/security), into TEEs with minimal performance overheads and engineering costs. On the other hand, it requires placing a significant amount of code in the TEE, on which the security for the customer's application and data depends. Notably, this code, also known as the trusted computing base (TCB) of the application, now includes the operating system (OS), and widely-used OSes like Linux and Windows often consist of [tens of millions of lines of code](https://www.stackscale.com/blog/linux-kernel-surpasses-40-million-lines-code/) that are known to have [thousands of vulnerabilities](https://tuxcare.com/blog/the-linux-kernel-cve-flood-continues-unabated-in-2025/). In summary, placing feature-rich OSes in the TEE eases adoption but also increases the risks of vulnerabilities.
 
-\iffalse
-	\section{Security principles}
-	\label{sec:bg:principles}
-	% I first explain the security principles that the systems proposed in this thesis adhere to. I will also show the research trends in applying these security principles.
 
-	\subsection{Principle of Least Privilege and Privilege Separation}
 
-	% Modern example
-
-
-	The \emph{Principle of Least Privilege} mandates that each software component should only have minimal permissions to execute its intended task.
-	The principle is commonly implemented through \emph{Privilege Separation}, or \emph{compartmentalization}, where software is separated into least-privileged components.
-	% How it helps software security
-	The intuition behind the principle is that even when the control over a software component is conceded to an adversary, the maximal damage the component could do is limited to its current privileges.
-
-	An example of both the Principle of Least Privilege and Privilege Separation in effect can be seen in the application OpenSSH~\cite{openssh}.
-
-
-
-	\begin{figure}[t]
-		\centering
-		\includesvg[width=.9\textwidth,inkscapelatex=false]{figures/ssh-privilege-separation.svg}
-		\caption[Sequence Diagram for OpenSSH Privilege Separation.]{Sequence Diagram for OpenSSH Privilege Separation\footnotemark.}
-		\label{fig:enter-label}
-	\end{figure}
-
-	\footnotetext{ \url{https://commons.wikimedia.org/wiki/File:OpenSSH-Privilege-Separation.svg} from Larsnooden, licensed under CC BY-SA 4.0 (\url{https://creativecommons.org/licenses/by-sa/4.0/})}
-
-	Following the Principle of Least Privilege, research effort has been made to develop tools to support the compartmentalization of applications~\cite{privman,privtrans,gudka_clean_2015,rlbox,ptrsplit}, and to provide efficient mechanisms for finer-grained program compartmentalization~\cite{erim,hodor,muswitch,lwc,jing_operating_2022,kolosick_isolation_2022, enclosure}. I discuss the the research trend for the former in this section, and the current research on the latter when discussion \gls{os} security mechanisms in \ref{sec:bg:os}.
-
-	\subsubsection{Research trend: Tools for software compartmentalization}
-	Splitting any moderately complex program into least-privilege components is a time-consuming and error-prone process.
-	Privman~\cite{privman} introduced a library that simplifies the task of splitting programs into a privileged server and a main application contains application logic  (similar to OpenSSH Privilege Separation model).
-
-
-	\subsection{Capability-based security}
-	\label{sec:bg:principles:capability}
-
-	Capability-based security, or \emph{capabilities}, is a security model where access control decisions are based on authenticating non-forgeable \emph{capability tokens}.
-
-
-	To demonstrate the usefulness of capability-based security, it is useful to compare it against \gls{acl}-based approaches. Let us use an example of a file system with three files and three users, Alice, Bob and Carol.
-
-	\input{figures/bg-cap-vs-acl-tikz}
-
-
-
-	\subsubsection{Capabilities in OSes}
-	UNIX file descriptors
-
-
-	\subsubsection{Research trend: Hardware-enforced capabilities}
-	There have been efforts to integrate capability principles into hardware
-
-	% \section{Compilers}
-
-	\section{Memory safety}
-
-	Memory corruption bugs are one of the oldest software bugs in history.
-	They are caused by memory errors in programs written in low-level, \emph{memory-unsafe} languages like C and C++ to perform read/write to attacker-controlled locations in the process memory. While the root cause of this type of bug is rather straightforward, it is a difficult path toward eradicating it.
-
-
-
-
-
-
-% In this section, I cover the history of attacks and defenses inside memory to provide some background. I then discuss the current research directions in making programs in legacy languages safer.
-
-
-% \subsection{Classical of memory attack and defenses}
-
-\section{Memory safety}
-\subsection{Memory corruption}
-Memory corruption bugs may be classified into \emph{spatial} - bugs that exploit out-of-bound pointers dereference - and \emph{temporal} - bugs that exploit the dereference of pointers that the memory allocator has freed. Using memory corruption as the primitive, more complex attack, such as control-flow diversion attacks, is performed, as I will show later in this section.
-
-\autoref{fig:bg-spatial-bug} shows a rudimentary example of a spatial memory bug. A case of \emph{buffer overflow} causes the memory corruption in the example. Buffer overflows are commonly caused by performing memory access in an unsafe manner. In the example, the C standard function \mintinline{c}{gets} reads the content from the standard input into a buffer in the argument. However, the function might overwrite memory \emph{outside} of the buffer since no length is specified. Even worse, since \mintinline{c}{gets} reads input from the terminal, an attacker could inject arbitrary value at specified memory locations through carefully crafted \emph{payloads}.
-
-%TODO: example of OOB 
-\begin{figure}[h]
-	\centering
-	\begin{minted}{c}
-void get_name() {
-    char name[32];
-    // Read from stdio into a buffer, but the read may overflow.
-    gets(name); 
-    printf("Hello %s!\n", name); 
-}
-    \end{minted}
-	\caption{Example of a buffer overflow spatial memory bug.}
-	\label{fig:bg-spatial-bug}
-\end{figure}
-
-\begin{figure}[h]
-	\centering
-	\begin{minted}{c}
-void use_after_free() {
-    char* buf = malloc(512);
-    if (have_error()) {
-        free(buf);
-    }
-    printf("Buffer content is %s\n", buf);
-}
-    \end{minted}
-	\caption{Example of a use-after-free temporal memory bug.}
-	\label{fig:bg-temp-bug}
-\end{figure}
-
-
-% \subsubsection{Code-injection attacks} 
-% X86 architecture stores the return address on the stack. The \texttt{ret} instruction pops the address from the stack and jumps into it.
-
-% Hence, a buffer overflow vulnerability could overwrite 
-
-% \subsubsection{Non-executable memory}
-
-% \subsubsection{Return-to-libc}
-
-% \subsubsection{Stack canaries}
-
-% \subsubsection{Code-reuse attacks}
-
-% \subsubsection{Code-reuse attacks}
-
-% \subsubsection{Probabilistic defenses}
-
-% \subsection{Sanitizers}
-
-% \subsection{Runtime mitigations}
-
-\subsection{Remedies for memory safety issues}
-Over the years, industries and researchers have made enormous progress toward solving memory safety issues.
-However, it is still a difficult problem to solve.
-
-One approach would be to rewrite legacy software into memory-safe languages like Rust.
-However, this is often an immeasurable task due to the vast core software infrastructures written in C and C++, many of which have become irreplaceable.
-
-Two prominent remedies for memory safety issues are \emph{runtime defenses} and software \emph{sanitizer} memory bugs from unsafe programs. Runtime defenses try to mitigate the effect of memory exploits, e.g., control-flow hijacking. For instance, \gls{cfi} mechanisms compute valid call sites control-flow transfer sites, and check whether the control-flow transfer is valid at runtime.
-Software sanitizers try to detect memory errors as they happen. However, it comes with substaintial performance overheads~\cite{song_sok_2019,asan}, and is often used to find bugs pre-production.
-
-
-
-
-
-% \section{Modern hardware supports}
-% Modern hardware vendors provide plethoras of hardware features, ranging from ISA extensions to dedicated hardware modules.
-
-\section{Trusted Execution Environments}
-Modern cloud computing allows users to deploy applications to remote machines hosted by the \gls{csp}.
-Traditionally, this deployment model requires the cloud users to fully trust the \gls{csp}.
-More specifically, while the size of the cloud applications may be limited, the \gls{tcb} for cloud applications include the operating system (that the \gls{csp} installed) and the machines that the program executes on, now under the control of the \gls{csp}.
-
-However, for modern high-assurance applications, such as private data processing, this model of trust is insufficient.
-The operating systems, given their large code base, are often the first target of many software attacks.
-With the \gls{os} privilege, attackers could easily obtain and modify the memory content of any running applications to compromise their confidentiality and integrity.
-Moreover, with control over the physical machine, a potentially malicious \gls{csp} could launch attacks such as cold boot attacks \cite{halderman_lest_2009} to extract the memory content of executing sensitive applications.
-
-\input{figures/bg-tee-trust-model-tikz}
-
-
-\Gls{tee} technologies allow remote users to discard trust in the system that runs the sensitive application.
-Instead, the \gls{tcb} of the \gls{tee}-protected applications would only include the application and the hardware. \autoref{fig:bg:trust-model-tee} demonstrates the comparison of the trust models of traditional computing and enclave-based \glspl{tee} such as Intel SGX~\cite{costan_intel_2016}.
-While traditional computing (left figure) requires that the application owner trusts the entire system that hosts the application, including the \gls{os}, the hypervisor, and the hardware, the \gls{tcb} of \gls{tee}-based applications (right side) is limited to only the \gls{tee}-enabled hardware, and a limited, trusted part of the application called the \emph{enclave} (in the case of Intel SGX).
-
-\subsection{Functionalities of TEEs}
-Most \gls{tee} technologies provide memory isolation primitives, such that the memory space of \gls{tee}-protected applications are isolated from each other and the rest of the system. Memory encryption is also a common feature~\cite{advanced_micro_device_sev_2022,costan_intel_2016} to thwart cold boot and memory scanning attacks.
-
-\emph{Remote attestation} is another core functionality of \glspl{tee}. It allows a remote user to verify the state of a deployed program (e.g., initial memory, developer's signature, ...) and the authenticity of a \gls{tee}-enabled CPU.
-A simplified procedure for remote attestation is as follows.
-To perform remote attestation, the CPU first measures the state of a deployed application and generates a checksum on this data.
-The checksum is then cryptographically \emph{signed} using an \emph{attestation key} only known to the CPU that is \emph{provisioned} during manufacture time.
-Attestation keys are provisioned in \emph{pairs}.
-The manufacturer burns one attestation key into a fuse of the CPU. It keeps the other to verify signatures created the one burnt into the CPU\footnote{Attestation keys are similar to the public and private key of the private key infrastructure}.
-
-The signed checksum is returned to the remote attestation requester (i.e., the \emph{challenger}).
-The challenger now sends the signed checksum to a \emph{verifier service}, hosted by the \gls{tee} manufacturer.
-This verifier service holds the other, which it can use to verify the signed checksum.
-If verification succeeds, the challenger can re-compute the expected checksum and compare it with the one returned by the \gls{tee} application.
-
-
-
-
-
-
-
-
-
-% They do so by allowing the users to establish the root of trust in the hardware that is made tamper-resistant.
-% Thus, the tr
-
-
-
-
-
-
-
-% \subsection{Processing-in-memory}
-% \label{chap:bg:pim}
-
-% \begin{figure}[t]
-% \centering
-%     \includegraphics[width=0.60\columnwidth ]{figures/pim.pdf}
-%     \caption{Processing-In-Memory layer in 3D-stacked memory.}
-%     \label{fig:pim}
-% \end{figure}
-
-% \emph{Processing-in-memory (PIM)} is a new computing paradigm that brings computation into memory. It is a \emph{data-centric} 
-
-
-% \subsubsection{Types of PIM}
-% Emerging PIM hardware either builds upon 3D-stacked memory or commodity DRAM memory.
-% The progress made in 3D-stacked memory technology enabled the embedding of logic or even processors into memory.
-% Two of the most prominent examples of 3D-stacked memory are \emph{Hybrid memory cube (HMC)}~\cite{hmc}, and \emph{High Bandwidth Memory (HBM)} \cite{amd-hbm,samsung-pim}.
-% \autoref{fig:pim} demonstrates the architecture of 3D-stacked memory and the PIM layer.
-% Stacked memory architectures vertically stack DRAM layers on top of each other and connect the vertical partitions of memory using high-bandwidth through-silicon vias (TSVs).
-% A typical 3D-stacked memory configuration can employ thousands of TSVs \cite{primer-on-pim}, which makes its internal memory bandwidth far exceed that of traditional memory systems.
-% At the bottom of the memory stacks, there is a \emph{PIM layer}, or logic layer, that can host hardware logic that can interact with both the host processor and the DRAM memory.
-% The PIM layer can be special-purpose hardware logic~\cite{aga_invisimem_2017,prim} that is embedded into the memory chip or a general-purpose processor~\cite{impica,upmem,samsung-pim,smcsim,pim-architecture} that runs software called the \emph{PIM kernels}, analogous to the kernels loaded onto GPUs.
-
-% Most 3D-stacked PIM architecture requires changes to the host-side processor~\cite{pim-architecture}, but PIM architectures that can integrate with commodity processors also exist~\cite{upmem,upmem-atc,pim-architecture}.
-% UPMEM~\cite{upmem} introduced its PIM architecture on a traditional DRAM chip.
-% Lee et al.~\cite{pim-architecture} designed and implemented a generalized PIM architecture and programming model to support PIM-accelerated DNN computation on HBM memory. 
-% These prototypes have real hardware implementations and are compatible with off-the-shelf systems~\cite{upmem-atc,pim-architecture}.
-
-% \subsection{ARM Pointer Authentication and Memory Tagging Extensions}
-% ARM \gls{pa} and \gls{mte} are new and upcoming hardware security features on the ARMv8 CPUs.
-
-% \subsubsection{Pointer Authentication (PA)}
-% \label{sec:background:pac}
-% \emph{\Glsentryfull{pa}}, introduced on ARMv8.3-A~\cite{arm-arch}, provides hardware acceleration and ISA extension for cryptographically authenticated pointers.
-% The design of \gls{pa} is inspired by previous works that protect pointers from corruption~\cite{ccfi,cpi}.
-% \gls{pa} allows attaching a \gls{pac} to a pointer in the unused bits [54:48] of a 64-bit address.
-% A \gls{pac} is generated using one of the five keys stored in the newly added registers that can only be accessed or modified with privileged instructions.
-% The five keys consist of two keys for signing code/instruction pointers (Instruction-\{A,B\}), another two for signing data (Data-\{A,B\}) pointers, and one general-purpose key (G).
-% We denote these keys as \key{IA},\key{IB}, \key{DA}, \key{DB} and \key{G}.
-% \Gls{pa} also introduces \texttt{pac} and \texttt{aut} families of instructions to \emph{sign} (i.e., calculate the \gls{pac} and attach it to the value in the operand register) and \emph{authenticate} a 64-bit value with an \emph{optional} modifier using the key indicated by the instruction name.
-% If authentication on a pointer succeeds, the authentication code in the pointer is cleared, making the pointer usable.
-% The \gls{pac} value is corrupted if the check fails, which triggers a segmentation fault when the pointer is dereferenced.
-% We denote the operations of \texttt{pac} and \texttt{aut} instructions that use the key \key{} to sign and authenticate a given data \emph{D} as \pac{}{\emph{D}}{\emph{mod}} and \aut{}{\emph{D}}{\emph{mod}}.
-
-% Many \gls{pa}-based runtime defense mechanisms have been proposed~\cite{liljestrand_pac_2019,li_pacmem_2022,pacstack,pactight,kernel-pac,apple-pac,qualcomm-pac,farkhani_ptauth_2021} and deployed in commodity systems~\cite{apple-pac,qualcomm-pac}.
-% Notably, PARTS~\cite{liljestrand_pac_2019} introduces a \gls{dpi} policy that protects program-wide data and code pointers, but its instrumentation framework is not evaluated on real-world applications.
-% PacTight~\cite{pactight} enforces \emph{non-forgability}, \emph{non-copyability}, \emph{non-dangling} properties on only \emph{sensitive pointers} with an intricate signing and authentication scheme.
-% PTauth~\cite{ptauth} introduces a \gls{pa}-based use-after-free by authenticating pointers with their pointed-to object.
-
-% \subsubsection{Memory Tagging Extension (MTE)}
-% \emph{\Glsentryfull{mte}}~\cite{mte} is another hardware-backed security feature to ARMv8.5-A~\cite{arm-arch}.
-% \Gls{mte} adapts the principles of tagged memory in the existing research proposals and implementations in other architectures~\cite{timbe,hw-tagged-memory,sparc-adi}. 
-% It facilitates memory safety by enabling the 4-bit tagging of pointers and 16-byte aligned address ranges.
-% When \gls{mte} is enabled, the processor raises an interrupt if the tags differ between the memory and the pointer, allowing vulnerabilities such as buffer overflow to be captured.
-% We denote \tagz{}{\emph{P}} as the tagging operation that first assigns the 4-bit tag \textbf{T} to the bits [59:56] of a pointer \emph{P}, then tag 16-byte-aligned memory region between \emph{P} and \emph{P}$+$size with \textbf{T}.
-
-% \gls{mte}-supported bug detecting tools have been introduced~\cite{memory-tagging,mte-kernel-support,mte-stack} with improved performance compared to software-only approaches.
-% \section{Operating systems}
-
-% \subsubsection{PA+MTE}
-% \Gls{pa} and \gls{mte} can be \emph{simultaneously} enabled.
-% Hence, a pointer can be tagged \emph{then} signed, and the resulting pointer would carry a tag in bits [60:56] and \gls{pac} in [54:48].
-
-% HAKC~\cite{hakc} is a framework for Linux device driver compartmentalization, also leveraging \gls{pa} and \gls{mte}.
-% It overcomes \gls{mte}'s limited number of tags by employing a two-level compartmentalization scheme.
-
-
-% This section explains primitives that are relevant to this dissertation.
-% \subsection{Unix file descriptors}
-
-% \subsection{Unikernels}
-
-% \subsection{Input/Output}
-
-\section{Operating System-assisted Security}
-\label{sec:bg:os}
-
-\subsection{Isolation primitives}
-Most \glspl{os} provides a \emph{process} abstraction to efficiently execute independent tasks on the underlying CPUs.
-Processes are given dedicated address spaces and \gls{os} resource handles in a \emph{sandboxed} environment.
-However, this abstraction is proven insufficient for modern high-performance applications, due to the high overheads of inter-process communication.
-
-% \subsubsection{Research trend: In-process Isolation}
-Given these limitations, recent research introduces in-process isolation primitives that utilize hardware acceleration~\cite{erim,hodor,jenny,donky}. They are easier to adapt, thanks to their smaller (page-level) granularity, and efficient domain switching primitives.
-
-\subsection{System call filtering}
-\begin{figure}[h]
-	\centering
-	\begin{minted}{c}
-struct sock_filter filter[] = {
-        ...
-        BPF_JUMP ( BPF_JMP | BPF_JEQ | BPF_K , __NR_open , 2 , 0) ,
-        BPF_JUMP ( BPF_JMP | BPF_JEQ | BPF_K , __NR_openat , 1 , 0) ,
-        BPF_STMT ( BPF_RET | BPF_K , SECCOMP_RET_ALLOW ) ,
-        BPF_STMT ( BPF_RET | BPF_K , SECCOMP_RET_KILL_PROCESS )
-        ...
-    }   
-}
-struct sock_fprog prog = {
-        .len = sizeof(filter) / sizeof(filter[0]),
-        .filter = filter,
-    };
-
-seccomp(SECCOMP_SET_MODE_FILTER, 0, &prog);
-    \end{minted}
-	\caption[An example of using seccomp-BPF to block \texttt{open} system calls.]{An example of using seccomp-BPF to block \texttt{open} system calls\footnotemark{}.}
-	\label{fig:seccomp-bpf}
-\end{figure}
-
-
-Not all applications fully utilize the full spectrum of system calls the \gls{os} provides.
-However, most system calls are available to any application through the standard library, and many remain unused throughout the lifetime of processes. These unused system calls are a form of \emph{over-privilege}, which, when left intact, would grant the attackers additional capabilities in case the application is compromised. For instance, a compression application would unlikely need access to networking system calls such as \texttt{sys\_socket} and \texttt{sys\_listen}. In another case, common applications only operate on user-specified files and do not need access to the entire file system of the user. With such access, there would be catastrophic consequences when the control is taken by attackers, such as leaking private keys or a corrupted file system. Following the Principle of Least Privilege, most modern \glspl{os}, including Linux, OpenBSD, and macOS provides \emph{filtering} mechanisms to specify the allowed system calls a process can invoke.
-
-\footnotetext{adapted from \texttt{seccomp/seccomp\_deny\_open.c} by Michael Kerrisk \url{https://man7.org/tlpi/code/online/dist/seccomp/seccomp_deny_open.c.html}, licensed under GNU GPLv3 \url{https://www.gnu.org/licenses/gpl-3.0.html}}
-
-Among system call filtering mechanisms, Linux's Linux’s Seccomp (SECure COMPuting) is the most widely adopted one, being a security stable in execution environments ranging from Android applications, \texttt{systemd} services to Docker containers, Amazon Firecracker~\cite{firecracker} and Kubernetes~\cite{kubernetes-seccomp}.
-
-% Let's take a look at Linux's seccomp-BPF~\cite{} system call filter, one of the most widely used one. A user of seccomp-BPF would prepare a \emph{policy} definition for the filtered application that specifies allowed system calls and their possible arguments. Seccomp employs policy definitions written in the \gls{bpf} language  which are to be interpreted with a \emph{\gls{bpf} intepreter} in the kernel.
-
-
-
-% \subsubsection{Research trend: More programmable filter definition}
-% Given the highly restrictive nature of \gls{bpf} there has been a \gls{ebpf}.
-% \cite{jia_programmable_2023}.
-
-% \subsubsection{Research trend: Efficient and secure system call filter for in-process isolation}
-
-
-% \subsection{Unikernels}
-
-% Unikernels are known for their security, due to ...
-
-
-\fi
