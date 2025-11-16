@@ -11,7 +11,7 @@
 \label{chap:background}
 
 
-\section{Legacy OS's Protection Model}
+\section{Access Control with Software and Hardware Protection}
 
 \begin{table}[t]
 	\begin{center}
@@ -26,6 +26,12 @@
 	\end{center}
 \end{table}
 
+
+\subsection{OS Access control}
+
+\gls{os} access control 
+
+
 \glspl{os} enforce security by implementing a system of \emph{protection}~\cite{lampsonprotection} that defines access control policies between \emph{subjects} (e.g., users and processes) and \emph{objects} (e.g., memory, files, and resource handles).
 Specifically, it determines which operations each subject may perform on a given object at any time.
 For example, a simple policy might prohibit users from accessing resources owned by others.
@@ -36,8 +42,13 @@ The \emph{process} abstraction, introduced in the 1960s~\cite{denning2022systems
 A process encapsulates relevant functionalities and interacts with system resources.
 Commodity \glspl{os}, such as UNIX-based systems, associate processes with users and groups, enforcing protection on a per-process basis.
 
+
 To represent objects, \glspl{os} employ the \emph{file} abstraction, which initially referred to a block of data on disk.
 UNIX-inspired systems generalized this concept so that disk I/O, networking, and system services all appear as file operations, thereby unifying access under a consistent interface and simplifying access control.
+
+\hdr{Unix protection model}
+
+\subsection{Hardware protection}
 
 Building on these abstractions, the \gls{os} enforces two primary security boundaries: one between the kernel and \emph{userspace} processes, and another among processes themselves.
 The first boundary, maintained through hardware privilege rings, protects the \gls{os}'s components that enforce security (its \gls{tcb}) from tampering.
@@ -46,9 +57,128 @@ In terms of protection, two  \emph{protection domains}~\cite{lampsonprotection} 
 In this thesis, the \emph{legacy protection} refers to the process- and file-centric one that underpins UNIX and POSIX-compatible \gls{os}.
 
 
-\section{In-process isolation}
+
+\hdr{History of Hardware protection}
+
+The  Multic system developed at introduced the concept of protection rings to express privilege levels.
+
+Ring 0 contains the kernel
+
+Ring 3 contains the programs.
+
+
+
+
+\section{Hardware-assisted In-process isolation}
+
+\subsection{Motivation and goals}
+
+Modern software systems routinely consolidate large amounts of functionality into a single process.
+This monolithic design simplifies deployment and avoids the overheads of inter-process communication, but it also enlarges the trusted computing base and exposes programs to memory-safety vulnerabilities.
+% The Heartbleed vulnerability in OpenSSL is a well-known example in which a single memory bug compromised confidentiality across a widely deployed process.
+
+These pressures have renewed interest in \emph{in-process isolation}, in which components of an application execute within the same virtual address space but do not share the same privileges.
+The goals of in-process isolation are threefold:
+(1) enable fine-grained separation of privilege without restructuring applications into multiple processes,
+(2) minimize the trusted computing base of security-critical components, and
+(3) provide low-overhead enforcement suitable for performance-sensitive applications such as browsers, cryptographic libraries, and data-processing pipelines.
+
+In this paradigm, isolation boundaries must be lightweight enough to support frequent domain switches, expressive enough to protect both code and data, and compatible with legacy OS abstractions based on processes and files.
+
+[[PLACEHOLDER for any workload-specific motivation.]]
+
+\subsection{Historical development}
+
+Early approaches to in-process isolation relied primarily on software techniques.
+Software Fault Isolation (SFI) instruments untrusted code so that memory writes and indirect jumps remain confined within predefined regions.
+Systems such as Google Native Client and RockSalt follow this tradition, providing strong isolation at the cost of binary rewriting and substantial performance overhead.
+
+Language-based isolation adopts a different strategy by confining untrusted components within language runtimes such as JavaScript engines or WebAssembly sandboxes.
+While effective for managed languages, these techniques offer weaker guarantees for low-level systems code written in C or C++, and they impose runtime constraints that complicate interaction with native libraries.
+
+A third class of techniques attempted to repurpose OS abstractions by splitting programs into multiple processes connected by IPC.
+This achieves strong isolation but comes with prohibitive costs: context switches, duplicated memory, expensive sharing protocols, and substantial changes to application architecture.
+
+Lightweight context
+
+% Capability systems such as EROS, Capsicum, and CHERI explored designs in which references to objects are represented as unforgeable, rights-bearing tokens.
+% These designs influenced later research but required substantial architectural or OS changes, limiting their deployment.
+
+\subsection{Modern hardware support}
+
+Recent processors introduce primitives that directly enable efficient in-process memory isolation.
+Intel Memory Protection Keys (PKU) allow user-space code to assign access rights to groups of pages and to change those rights without modifying page tables.
+ARM Memory Tagging Extension (MTE) associates pointers and memory with tags, enabling fine-grained, hardware-checked bounds on memory accesses.
+
+% ARM Pointer Authentication (PA) provides cryptographic integrity for control-flow targets, defending against code-reuse attacks and protecting internal references.
+
+These mechanisms reduce the runtime cost of switching between protection domains and allow isolation boundaries to be implemented without entering the kernel.
+They also shift part of the isolation policy into user space, creating new interactions—sometimes conflicting—with legacy OS protection models.
+
+\subsection{Limitations of current approaches}
+
+Despite their promise, modern in-process isolation mechanisms suffer from several limitations.
+First, they do not integrate cleanly with OS abstractions.
+For example, PKU-based systems can be vulnerable to confused-deputy attacks because the OS remains unaware of the application’s internal protection domains and enforces access control only at process granularity.
+Second, current mechanisms primarily protect memory and control flow, but they do not account for file handles, sockets, or other resources traditionally mediated by the OS.
+This mismatch leads to inconsistent enforcement across the software stack.
+
+Third, hardware primitives often provide low-level mechanisms but not high-level policies; developers must manually combine them to construct isolation boundaries, an error-prone and non-portable process.
+These challenges motivate the need for systems such as \capacity that retrofit principled, OS-aligned semantics onto modern hardware support.
+[[PLACEHOLDER for referencing your design principles.]]
+
+
+
+
+
 
 \section{Confidential virtual machines and side-channel attacks}
+
+\subsection{Motivation and goals}
+
+Cloud computing has transformed the deployment model of modern applications, but it also places tenants' workloads on infrastructures they do not fully trust.
+Traditional virtualization assumes that the hypervisor and host OS are trusted entities capable of accessing guest memory, inspecting execution, and mediating all resources.
+This assumption no longer holds in multi-tenant, adversarial, or outsourced execution environments.
+
+Confidential virtual machines (CVMs) seek to address this challenge by enabling workloads to run securely on untrusted cloud platforms.
+Their primary goals are:
+(1) protect guest memory and state from the hypervisor and host OS,
+(2) provide attestable integrity of the execution environment, and
+(3) preserve compatibility with existing software stacks by keeping the guest OS unmodified or minimally modified.
+
+However, guaranteeing confidentiality at the VM boundary introduces new attack surfaces, particularly side channels, because the adversarial hypervisor still influences scheduling, memory placement, interrupts, and I/O behavior.
+
+\subsection{Historical development}
+
+Trusted Execution Environments (TEEs) represent the earliest mainstream effort to isolate computation from privileged software.
+Intel SGX pioneered enclave-based isolation, providing protected regions of memory with strong confidentiality guarantees.
+However, SGX introduced new challenges: constrained enclave memory, limited system-call capabilities, and numerous interface-level attacks stemming from the need to interact with the untrusted OS.
+
+CVMs emerged as a response to these limitations by scaling TEE-style protection from enclaves to entire virtual machines.
+AMD SEV and its successors (SEV-ES, SEV-SNP) introduced memory encryption and integrity protection for VM pages, reducing reliance on hypervisor trust.
+Intel TDX and ARM CCA further extended these ideas by formalizing attestation protocols and enforcing stricter separation between host and guest resources.
+
+\subsection{Modern hardware support}
+
+Modern confidential computing platforms provide hardware-managed memory encryption, integrity protection, and attestation.
+SEV-SNP adds reverse-map tables to defend against memory-remapping attacks by malicious hypervisors.
+Intel TDX isolates guest private memory and defines a narrow interface—TDX module calls—through which the hypervisor can request services without learning guest secrets.
+ARM CCA introduces \emph{realms}, isolated execution environments that coexist alongside the normal world and secure world.
+
+These mechanisms fundamentally reshape the protection model: the guest OS becomes part of the trusted computing base, while the hypervisor becomes a potential adversary with limited visibility into the VM.
+
+\subsection{Open challenges}
+
+Although CVMs protect memory from a malicious hypervisor, they do not prevent the hypervisor from influencing microarchitectural behavior.
+This makes CVMs vulnerable to a broad class of side-channel attacks, including page-fault channels, cache timing channels, scheduler-based attacks, and I/O interface attacks.
+Furthermore, the guest OS—historically not designed to treat the hypervisor as adversarial—lacks mechanisms to defend against these channels.
+
+Another challenge stems from the narrow interface between the guest and hypervisor; misunderstanding or misusing this interface can lead to vulnerabilities, as shown in prior work on interface attacks.
+Finally, the OS remains responsible for resource management inside the VM, yet it lacks visibility into which operations strengthen or weaken enclave security.
+
+These open challenges motivate systems such as \incognitos, which aim to align guest OS behavior with the threat model of confidential computing and to mitigate side-channel leakage through OS-guided strategies.
+[[PLACEHOLDER for linking directly to your contributions.]]
+
 
 
 \iffalse
