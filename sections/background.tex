@@ -2,91 +2,147 @@
 \glsresetall
 
 \chapter{Background}\label{chap:background}
-% \pagenumbering{arabic}
 
 \epigraph{
 	This then is programming, both a tar pit in which many efforts have floundered and a creative activity with joys and woes all its own.
 }{\textit{Frederick P. Brooks, Jr}, The Mythical Man-month}
 
-\ 
-\ 
+\
 
+\
 
 Most \glspl{os} pursue three fundamental objectives.
 First, they must provide a set of \glspl{api} that are intuitive for application developers.
-This is achieved through \emph{abstractions} that describe high-level resource properties while concealing implementation details. 
-Processes, threads and files are prime examples of such abstractions that are widely used in modern applications.
+This is achieved through \emph{abstractions} that describe high-level resource properties while concealing implementation details.
+Processes, threads, and files are prime examples of such abstractions used in modern applications.
 Second, they must efficiently \emph{manage hardware resources}—including CPU time, memory, and storage—by allocating and reclaiming them as needed.
-Disciplines such as \emph{memory management}, \emph{file system design}, and \emph{scheduling} evolved to fulfill this objective.
+Disciplines such as \emph{memory management}, \emph{file system design}, and \emph{scheduling} emerged to fulfill this objective.
 
-Ever since the advent of multiprogramming the \gls{os} must ensure another objective: ensuring the \emph{security} of computation under potentially buggy or malicious programs.
-This is also the objective that this dissertation focuses on.
-Historically, this has been the responsibility of the OS.
-However, in the recent years, we are seeing shifts in responsibility toward (1) finer-grained, application-defined security isolation and (2) hardware-defined security boundaries enabled by modern hardware features.
+Since the advent of multiprogramming, the \gls{os} has also been responsible for ensuring the \emph{security} of computation under potentially buggy or malicious programs.
+This is the focus of this dissertation.
+Historically, security enforcement has been primarily the responsibility of the OS.
+However, in recent years we have seen a shift toward (1) finer-grained, application-defined isolation and (2) hardware-defined security boundaries enabled by modern architectural features.
 
-This section cover the fundamental background to grasp the higher-level contribution of the thesis.
-Background relavent to each of the work included in this dissertation are covered in~\cref{chap:capacity} and \cref{chap:incognitos} respectively.
-I first cover the traditional OS access control role that has been established since the 1960s in \cref{sec:intro:bg-os}.
-Then, I visit the two research direction in modern hardware-defined protection models in \cref{sec:intro:bg-ipi} and \cref{sec:intro:bg-cvm}, discussing their motivations, threat model, historical development, hardware features that enables them and open challenges.
+This chapter covers the fundamental background required to understand the higher-level contributions of this thesis.
+Background relevant to each major component appears in \cref{chap:capacity} and \cref{chap:incognitos}.
+I first review traditional OS protection model in \cref{sec:intro:bg-os}.
+I then examine two modern directions in hardware-defined protection models—\cref{sec:intro:bg-ipi} and \cref{sec:intro:bg-cvm}—discussing their motivations, threat models, historical development, enabling hardware features, and remaining challenges.
 
-\section{OS Access control}
+\section{OS Protection}
 \label{sec:intro:bg-os}
 
-\begin{table}[t]
+
+Ensuring software security became essential for \glspl{os} with the emergence of multiprogramming in the 1960s, when systems began supporting multiple concurrent users and programs.
+A malicious program could compromise the confidentiality, integrity, or availability of both the \gls{os} and other applications.
+Consequently, the \gls{os} must mediate all resource accesses to maintain these guarantees, even in the presence of potentially hostile users.
+
+\subsection{Access control}
+
+\begin{table}[h]
 	\begin{center}
 		\begin{tabular}[c]{l|lll}
-			       & File 1 & File 2 & File 3 \\
+			              & Operating System     & Password file & Accounting files \\
 			\midrule
-			Bob & read,write &        &        \\
-			Alice &        & read,write &        \\
-			Administrator &       read,write & read,write       & read,write \\
+			Bob           & execute              &               & read             \\
+			Alice         & execute              &               & write            \\
+			Administrator & read, write, execute & read, write   & read, write      \\
 		\end{tabular}
 		\caption{Example access control matrix}\label{tab:example-acm}
 	\end{center}
 \end{table}
 
 
-Ensuring software security has been essential to \glspl{os} of with the advent of multiprogramming in the 1960s, when systems began supporting multiple concurrent users and programs.
-A malicious program could compromise the confidentiality, integrity, or availability of both the \gls{os} and other applications.
-Consequently, the \gls{os} must mediate all resource access to uphold these guarantees, even in the presence of potentially hostile users.
+\glspl{os} enforce security by implementing a system of \emph{protection}~\cite{lampsonprotection} that defines access control policies between \emph{subjects} (e.g., users and processes) and \emph{objects} (e.g., memory, files, and resource handles).
+These policies determine which operations each subject may perform on each object at any given time.
+A common representation is the \emph{access control matrix}~\cite{lampsonprotection}, whose rows represent subjects and whose columns represent protected objects.
+\autoref{tab:example-acm} illustrates such a matrix with three subjects: Bob, Alice, and an Administrator.
+Each entry specifies the operations (read, write, execute) permitted to that subject on a given object.
+A \emph{protection domain} corresponds to a row in this matrix, defining all privileges held by a subject.
+For example, Bob’s protection domain allows execution of the \gls{os} through the system call interface and read access to accounting files.
 
-\glspl{os} security by implementing a system of \emph{protection}~\cite{lampsonprotection} that defines access control policies between \emph{subjects} (e.g., users and processes) and \emph{objects} (e.g., memory, files, and resource handles).
-Specifically, it determines which operations each subject may perform on a given object at any time.
+\subsection{OS Abstractions and Protection}
 
-For example, a simple policy might prohibit users from accessing resources owned by others.
-In a system with three users and three files, this policy can be represented as an \emph{access control matrix}~\cite{lampsonprotection}, as shown in \autoref{tab:example-acm}.
-
-
-\subsection{Abstractions and protection}
-\glspl{os} map their \emph{abstractions} onto the \emph{subjects} and \emph{objects} of this protection.
+\glspl{os} map their abstractions onto the subjects and objects of the protection system.
 The \emph{process} abstraction, introduced in the 1960s~\cite{denning2022systems}, remains the foundation for representing subjects.
-A process encapsulates relevant functionalities and interacts with system resources.
-Commodity \glspl{os}, such as UNIX-based systems, associate processes with users and groups, enforcing protection on a per-process basis.
+A process encapsulates program execution and interacts with system resources.
+Commodity \glspl{os} associate processes with users and groups, enforcing protection at the process level.
 
+Objects are commonly represented using the \emph{file} abstraction, which originally denoted a block of data on disk.
+Some systems (notably UNIX-based ones) generalize this concept so that disk I/O, networking, and system services all appear as file operations.
+This unification simplifies access control and provides a consistent interface to applications.
 
-To represent objects, \glspl{os} employ the \emph{file} abstraction, which initially referred to a block of data on disk.
-UNIX-inspired systems generalized this concept so that disk I/O, networking, and system services all appear as file operations, thereby unifying access under a consistent interface and simplifying access control.
+\hdr{Example: Unix protection}
 
-\hdr{Unix protection model}
+One widely adopted access control model is UNIX protection, adopted in most modern \glspl{os} likes Linux, macOS and FreeBSD.
+UNIX enforce access control at the granularity of processes.
+Each process is assigned a user ID and one or more group IDs.
+Each file is also assigned an owner and associated groups.
+File permissions are stored using a three-letter string specifying rights to \textbf{r}ead, \textbf{w}rite, or e\textbf{x}ecute.
+Unix systems define three permission sets: (1) for the owner, (2) for the group, and (3) for all other users.
 
-\subsection{Hardware protection}
+\begin{verbatim}
+     user   group   other  owner      group          name
+    -rwx    rwx     rwx    Bob        Managers ...   file.txt
+\end{verbatim}
 
-Building on these abstractions, the \gls{os} enforces two primary security boundaries: one between the kernel and \emph{userspace} processes, and another among processes themselves.
-The first boundary, maintained through hardware privilege rings, protects the \gls{os}'s components that enforce security (its \gls{tcb}) from tampering.
-The second boundary underpins multiprogramming security, enforced through memory translation and mediation of all userspace resource accesses.
-In terms of protection, two  \emph{protection domains}~\cite{lampsonprotection} are established: user space domains where applications run, and kernel domain where the kernel code executes.
-In this thesis, the \emph{legacy protection} refers to the process- and file-centric one that underpins UNIX and POSIX-compatible \gls{os}.
+When a process accesses a file, the \gls{os} enforces permissions by checking:
 
+\begin{enumerate}
+	\item If the process’s user ID matches the file’s owner ID, apply the \texttt{user} permissions.
+	\item Else, if any of the process’s groups match the file’s group, apply the \texttt{group} permissions.
+	\item Else, apply the \texttt{other} permissions.
+\end{enumerate}
 
+\subsection{Hardware protection and its development}
 
-\hdr{History of Hardware protection}
+Most modern \glspl{os} assumes certain hardware-enabled protection features to enforce security.
+These hardware features evolved alongside the \gls{os} designs over more than six decades, and converged into current architecture that continues to underpin commodity \glspl{os}: a dual-mode privilege hierarchy, kernel-mediated access control, and virtual memory–based isolation.
 
-The  Multic system developed at introduced the concept of protection rings to express privilege levels.
+\hdr{Protection rings for privilege separation}
 
-Ring 0 contains the kernel
+One of the first security requirement of the \gls{os} is that it must protect itself from untrsuted programs.
+Since \gls{os} is in charge of enforcing the access control model, any malicious program take bypass it by taking taking control of the \gls{os} (e.g., through altering its critical data structurtes).
 
-Ring 3 contains the programs.
+Modern OSes employs the protection rings to achieve this, establishing two mode of execution: kernel and user.
+Kernel mode hosts the \gls{os} code and runs in the most privileged ring, ring 0, which is allowed access to sensitive instructions and access to hardware devices.
+User mode programs runs in ring 3, and is restricted from accessing sensitive instructions and resources.
+Requests to system resources must be mediated by the kernel through a restricted interface called the system call.
 
+The design of protection rings dated back to the 1970s; the Multics~\cite{multics} system pioneered a hierarchical model of privilege separation through protection rings.
+Multics supported up to eight rings, with the \gls{os} functionalities placed in rings 0 and 1, while the remaining rings host the other applications.
+x86 retained four rings for compatibility but mainstream OSes largely used only ring 0 for the \gls{os} and ring 3 for the user programs.
+\footnote{While there exists other protection modes, like ring -2 for System Management Mode in X86, they are reserved for the firmware.}
+This simplification reflected a pragmatic tradeoff: fewer privilege levels made system software easier to design while maintaining strong process isolation.
+
+\hdr{Hardware virtualization support}
+
+Virtualization technologies further extended the original protection-ring model by inserting an additional software layer, the \emph{hypervisor}, beneath or alongside the traditional operating system.
+A hypervisor (or Virtual Machine Monitor, VMM) executes in a higher-privilege level than the guest OS, often referred to as ring –1 on x86 hardware.
+This privileged position allows the hypervisor to mediate access to hardware resources and intercept sensitive operations issued by guest operating systems, ensuring that each virtual machine (VM) remains isolated from others.
+
+Early x86 processors were not fully visualizable because some sensitive instructions failed to trap when executed outside ring 0.
+To address this, hypervisors such as VMware initially relied on dynamic binary translation to rewrite problematic instructions~\cite{}.
+Later, hardware extensions—Intel VT-x and AMD-V—introduced explicit support for virtualization, providing a new privilege mode for the hypervisor and mechanisms such as VM exits and VM entries to securely switch between guest and host contexts.
+In this model, the guest operating system continues to believe it is executing in ring 0, even though the hypervisor ultimately controls privileged operations.
+
+% This preserves the classical abstraction of kernel and user modes while enabling multiple isolated OS instances to coexist on the same physical machine.
+Virtualization thus enhances both security and resource efficiency by creating strong isolation boundaries between VMs, enforcing a higher-level form of protection stacking atop the traditional ring model.
+
+\hdr{Process memory isolation with memory translation}
+
+While letting the kernel mediate all accesses to system resources is sufficient for correctness, it is far too costly for memory operations, which occur extremely frequently.
+Instead, hardware must provide a mechanism that allows efficient memory access while still enforcing strong cross-process isolation.
+This responsibility falls to the memory management unit (MMU).
+
+Early multiprogramming systems introduced minimal hardware support—most notably base and bounds registers—to guarantee that each program could access only its allocated memory region.
+As systems increased in complexity, segmentation emerged to offer finer-grained protection.
+Segments allowed programs to maintain logically distinct regions for code, data, and stack, each with its own size and access permissions.
+
+Paged virtual memory eventually became the dominant approach for both memory management and isolation.
+With hardware-supported page tables, operating systems could enforce per-page read, write, and execute permissions, achieving significantly finer-grained control than segmentation alone.
+Commodity architectures such as VAX, early Motorola 68000 variants, and later x86 processors adopted paged virtual memory as a standard feature.
+
+This evolution culminated in the modern abstraction of a process: a protected execution environment defined primarily by its virtual address space.
 
 
 
@@ -107,9 +163,8 @@ The goals of in-process isolation are threefold:
 
 In this paradigm, isolation boundaries must be lightweight enough to support frequent domain switches, expressive enough to protect both code and data, and compatible with legacy OS abstractions based on processes and files.
 
-[[PLACEHOLDER for any workload-specific motivation.]]
+	[[PLACEHOLDER for any workload-specific motivation.]]
 
-\subsection{Historical development}
 
 
 Deciding which component to be a part of the TCB has been an on-going problem of Multic.
@@ -119,26 +174,26 @@ With the advent of the Web, we see the raise of the need to execute untrusted co
 On the UNIX protection model.
 
 
-There has been three concurrent threads of research.
-
 \hdr{Process-based isolation and downsides}
-In 2003 Provos et al.~\cite{provos2003preventing} discusses over-privilege in core programs, and proposed privilege separation. 
+In 2003 Provos et al.~\cite{provos2003preventing} discusses over-privilege in core programs, and proposed privilege separation.
 The proposed architecutre is applied to OpenSSH.
 In 2004 Brumley et al.~\cite{privtrans} proposed a system to automatically separate an program.
 Heavily influenced by the work on OpenSSH, similar architecture is being deployed into the Chromium~\cite{barth2008security} browser since 2008, which separate the browser into two domains (processes), a browser kernel sandboxed rendering engines.
 
-A third class of techniques attempted to repurpose OS abstractions by splitting programs into multiple processes connected by IPC.
-This achieves strong isolation but comes with prohibitive costs: context switches, duplicated memory, expensive sharing protocols, and substantial changes to application architecture.
+% A third class of techniques attempted to repurpose OS abstractions by splitting programs into multiple processes connected by IPC.
+% This achieves strong isolation but comes with prohibitive costs: context switches, duplicated memory, expensive sharing protocols, and substantial changes to application architecture.
 
-Lightweight context
+Lightweight context proposed retrofittign sub-process principal.
 
-\hdr{Language-based}
+\subsection{Alternative approoaches}
+
+\hdr{Language-based isolation}
 Language-based isolation adopts a different strategy by confining untrusted components within language runtimes such as JavaScript engines.
 
-While effective for managed languages, these techniques offer weaker guarantees for low-level systems code written in C or C++, and they impose runtime constraints that complicate interaction with native libraries.
+While effective for managed languages, these techniques cannot be applied to low-level systems code written in C or C++, and they impose runtime constraints that complicate interaction with native libraries.
 
-\hdr{Software--based isolation}
-\gls{sfi}-based isolation instruments. 
+\hdr{Software fault isolation}
+\gls{sfi}-based isolation instruments.
 
 , first proposed by Wahbe et. al in 1993 ~\cite{wahbe_efficient_1993}, gain
 
@@ -146,120 +201,22 @@ Early approaches to in-process isolation relied primarily on software techniques
 Software Fault Isolation (SFI) instruments untrusted code so that memory writes and indirect jumps remain confined within predefined regions.
 Systems such as Google Native Client and RockSalt follow this tradition, providing strong isolation at the cost of binary rewriting and substantial performance overhead.
 
-In 2009,  \cite{yee2009native}. 
+In 2009,  \cite{yee2009native}.
 
 The use of SFI has not seen wide adoption outside of the Web.
 PNaCl
 In 2018, Google stopped native client support in favor of webassembly.
-In 2025, LLVM 22 removes support for native client, ending its 
+In 2025, LLVM 22 removes support for native client, ending its
 
 Still, there has been attempts to leverage SFI for sandboxing native code.WASI is a system interface for webassembly, which is gaining traction.
 
-
-
-% \begin{figure}
-% % TIMELINE - simple test
-% \begin{tikzpicture}[
-%     font=\sffamily\small,
-%   ]
-%   % limits
-%   \newcount\yearOne; \yearOne=2000
-%   \def\w{12}    % width of axes
-%   \def\n{3}     % number of decades
-%   \def\lt{0.40} % ten tick length
-%   \def\lf{0.36} % five tick length
-%   \def\lo{0.30} % one tick length
-%
-%   % vertical positions of the three tracks
-%   \def\trackHW{1.5}
-%   \def\trackSFI{1.0}
-%   \def\trackPROC{0.5}
-%
-%   % generic helper: event arrow on a given lane
-%   % (year, vertOffset, arrowLen, laneY, label)
-%   \def\yearArrowOnLane(#1,#2,#3,#4,#5){%
-%     \def\xy{{(#1-\yearOne)*\w/\n/10}}%
-%     \pgfmathparse{int(#2*100)}%
-%     \ifnum \pgfmathresult<0
-%       \def\yyp{{(#4+\lt*(0.90+#2))}}%
-%       \def\yyw{{(\yyp-\lt*#3)}}%
-%       \draw[<-,thick,black,align=center]
-%         (\xy,\yyp) -- (\xy,\yyw)
-%         node[below,black] at (\xy,\yyw) {#5};
-%     \else
-%       \def\yyp{{(#4+\lt*(0.10+#2))}}%
-%       \def\yyw{{(\yyp+\lt*#3)}}%
-%       \draw[<-,thick,black,align=center]
-%         (\xy,\yyp) -- (\xy,\yyw)
-%         node[above,black,rotate=60,anchor=west,yshift=.2em] at (\xy,\yyw) {#5};
-%     \fi}
-%
-%   % per-track convenience macros
-%   % (year, vertOffset, arrowLen, label)
-%   % \def\eventSFI(#1,#2,#3,#4){\yearArrowOnLane(#1,#2,#3,\trackSFI,#4)}
-%   % \def\eventPROC(#1,#2,#3,#4){\yearArrowOnLane(#1,#2,#3,\trackPROC,#4)}
-%   % \def\eventHW(#1,#2,#3,#4){\yearArrowOnLane(#1,#2,#3,\trackHW,#4)}
-%   \def\eventSFI(#1,#2,#3,#4){\yearArrowOnLane(#1,0,#3,\trackSFI,#4)}
-%   \def\eventPROC(#1,#2,#3,#4){\yearArrowOnLane(#1,0,#3,\trackPROC,#4)}
-%   \def\eventHW(#1,#2,#3,#4){\yearArrowOnLane(#1,0,#3,\trackHW,#4)}
-%
-%   % axis (shared time axis)
-%   \draw[->,thick] (-\w*0.03,0) -- (\w*1.03,0);
-%
-%   % ticks
-%   \foreach \tick in {0,1,...,\n}{
-%     \def\x{{\tick*\w/\n}}
-%     \def\year{\the\numexpr \yearOne+\tick*10 \relax}
-%     \draw[thick] (\x,\lt) -- (\x,-\lt) node[below] {\year};
-%     \ifnum \tick<\n
-%       \draw[thick] ({(\x+\w/\n/2)},0) -- ({(\x+\w/\n/2)},\lf); % five tick
-%       \foreach \ticko in {1,2,3,4,6,7,8,9}{
-%         \def\xo{{(\x+\ticko*\w/\n/10)}}
-%         \draw[thick] (\xo,0) -- (\xo,\lo);  % one tick
-%       }
-%     \fi
-%   }
-%
-%   % lane guides + labels
-%   \draw[green] (0,\trackSFI) -- (\w,\trackSFI);
-%   \draw[red] (0,\trackPROC) -- (\w,\trackPROC);
-%   \draw[blue] (0,\trackHW) -- (\w,\trackHW);
-%
-%   \node[left] at (-\w*0.03,\trackSFI) {\small SFI};
-%   \node[left] at (-\w*0.03,\trackPROC) {\small Proc-based};
-%   \node[left] at (-\w*0.03,\trackHW) {\small HW-assisted};
-%
-%   % === EXAMPLE EVENTS (edit years/labels as you like) ===
-%
-%   % SFI track
-%   % \eventSFI(1993.9,  0.0,1.0, \cite{wahbe_efficient_1993})
-%   \eventSFI(2009.0,  0,2.5, Google's NaCl\cite{yee2009native})
-%   \eventSFI(2018.0,  0,2.5, {Wasm replaces NaCl})
-%   % \eventSFI(2025.0, -1.3,1.0, {LLVM\,22 drops NaCl})
-%
-%   % process-based isolation track
-%   \eventPROC(2003.0, 0,2.5,OpenSSH priv. separation~\cite{provos2003preventing})
-%   \eventPROC(2008.0, 0,2.5, Chromium architecture~\cite{barth2008security})
-%
-%   % hardware-assisted (fill in your own citations)
-%   \eventHW(2015.0,0,0.5, {SGX introduced})
-%   \eventHW(2017.0,0,1.5, {PKU introduced})
-%   \eventHW(2019.0,0.0,0.5, \cite{erim,hodor})
-%   \eventHW(2019.0,0.0,3.0, Arm Morello)
-%   \eventHW(2015.0,0,2.5,CHERI ISA~\cite{watson2015cheri})
-%   % \eventHW(2019.0, -1.3,1.0, {WASI + secure runtimes})
-%
-% \end{tikzpicture}
-% \end{figure}
-%
-% Capability systems such as EROS, Capsicum, and CHERI explored designs in which references to objects are represented as unforgeable, rights-bearing tokens.
-% These designs influenced later research but required substantial architectural or OS changes, limiting their deployment.
 
 \subsection{Modern hardware support}
 
 Recent processors introduce primitives that directly enable efficient in-process memory isolation.
 Intel Memory Protection Keys (PKU) allow user-space code to assign access rights to groups of pages and to change those rights without modifying page tables.
 ARM Memory Tagging Extension (MTE) associates pointers and memory with tags, enabling fine-grained, hardware-checked bounds on memory accesses.
+
 
 % ARM Pointer Authentication (PA) provides cryptographic integrity for control-flow targets, defending against code-reuse attacks and protecting internal references.
 
@@ -268,22 +225,24 @@ They also shift part of the isolation policy into user space, creating new inter
 
 \subsection{Limitations of current approaches}
 
-Despite their promise, modern in-process isolation mechanisms suffer from several limitations.
+Despite their promise, modern in-process isolation mechanisms suffer from several limitations that motivates the solutions proposed in this thesis.
+
+\hdr{Kernel as a confused deputy}
+
 First, they do not integrate cleanly with OS abstractions.
 For example, PKU-based systems can be vulnerable to confused-deputy attacks because the OS remains unaware of the application’s internal protection domains and enforces access control only at process granularity.
 Second, current mechanisms primarily protect memory and control flow, but they do not account for file handles, sockets, or other resources traditionally mediated by the OS.
 This mismatch leads to inconsistent enforcement across the software stack.
 
-Third, hardware primitives often provide low-level mechanisms but not high-level policies; developers must manually combine them to construct isolation boundaries, an error-prone and non-portable process.
 These challenges motivate the need for systems such as \capacity that retrofit principled, OS-aligned semantics onto modern hardware support.
-[[PLACEHOLDER for referencing your design principles.]]
+
+\hdr{Automatically retrofitting security}
+
+Hardware primitives often provide low-level mechanisms but not high-level policies; developers must manually combine them to construct isolation boundaries, an error-prone and non-portable process.
 
 
 
-
-
-
-\section{Confidential virtual machines and side-channel attacks}
+\section{Confidential virtual machines}
 \label{sec:intro:bg-cvm}
 
 \subsection{Motivation}
@@ -375,11 +334,25 @@ Another challenge stems from the narrow interface between the guest and hypervis
 Finally, the OS remains responsible for resource management inside the VM, yet it lacks visibility into which operations strengthen or weaken enclave security.
 
 These open challenges motivate systems such as \incognitos, which aim to align guest OS behavior with the threat model of confidential computing and to mitigate side-channel leakage through OS-guided strategies.
-[[PLACEHOLDER for linking directly to your contributions.]]
+
+\hdr{Trusted IO}
+The protection boundary setup by the CPU does not cover accelerators, which is ... .
 
 \hdr{Taming the bloated TCB}
 
-CVMs has enabled companies to migrate cutting-edge applications, such as [large language model inference](https://docs.privatemode.ai/security), into TEEs with minimal performance overheads and engineering costs. On the other hand, it requires placing a significant amount of code in the TEE, on which the security for the customer's application and data depends. Notably, this code, also known as the trusted computing base (TCB) of the application, now includes the operating system (OS), and widely-used OSes like Linux and Windows often consist of [tens of millions of lines of code](https://www.stackscale.com/blog/linux-kernel-surpasses-40-million-lines-code/) that are known to have [thousands of vulnerabilities](https://tuxcare.com/blog/the-linux-kernel-cve-flood-continues-unabated-in-2025/). In summary, placing feature-rich OSes in the TEE eases adoption but also increases the risks of vulnerabilities.
+CVMs has enabled companies to migrate cutting-edge applications, such as large language model inference, into TEEs with minimal performance overheads and engineering costs.
+On the other hand, it requires placing a significant amount of code in the TEE, on which the security for the customer's application and data depends.
+Notably, this code, also known as the trusted computing base (TCB) of the application, now includes the operating system (OS), and widely-used OSes like Linux and Windows often consist of tens of millions of lines of code that are known to have thousands of vulnerabilities.
+In summary, placing feature-rich OSes in the TEE eases adoption but also increases the risks of vulnerabilities.
+
+Toward this, there has been efforts in TCB reduction.
+\cite{shinde_panoply_2017} decompose enclave applications into smaller least-privilege components.
+\cite{mansour2025rakis}.
+
+\cite{dimitrii2024graminetdx}
+
+\cite{jiacheng2025serverless}
 
 
+However, these systems incur heavy performance penalty.
 

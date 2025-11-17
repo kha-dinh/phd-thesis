@@ -264,7 +264,8 @@ Major Advisor\\
 
 
 % switch to double spacing
-\renewcommand{\baselinestretch}{1.54} %{1.66}
+% \renewcommand{\baselinestretch}{1.54} %{1.66}
+\renewcommand{\baselinestretch}{2} %{1.66}
 
 \renewcommand{\figurename}{Figure}
 \renewcommand{\tablename}{Table}

@@ -5,10 +5,6 @@
 
 
 \epigraph{
-There is no fundamental reason why a program that you write for me should be able to delete my bank transactions file just because I can. Yet those are the permission rules imposed by the current commercial OSes for personal systems.
-}{\textit{Norman Hardy}}
-
-\epigraph{
 	I pray daily that more of my fellow-programmers may find the means of freeing themselves from the curse of compatibility.
 }{\textit{Edsger W. Dijkstra}, The Humble Programmer}
 
@@ -48,15 +44,15 @@ The traditional, process-centric \emph{protection} has served as the basis of OS
 Two key weaknesses are revealed by attempts to add security to modern systems.
 
 \begin{itemize}
-  \item First, the process-level isolation boundaries provided by the OS is no longer sufficient in containing bugs.
-Contemporary software systems are increasingly large and complex—a peril underscored by the infamous Heartbleed vulnerability~\cite{heartbleed}, which exploited a bug in the OpenSSL cryptographic library.
-These weaknesses call for the \emph{separation of privilege} within complex programs into smaller, isolated modules~\cite{capacity,erim,hakc,rlbox,privtrans,gudka2015clean}.
-The coarse-grained, process-level protection of traditional \glspl{os} becomes a bottleneck for this decomposition, imposing significant development and performance costs~\cite{erim,capacity}.
-\item
-  Second, emerging \emph{confidential computing paradigms}~\cite{confidential,google-confidential-computing,sgx,kaplan_amd_nodate,cca} invert traditional trust hierarchies by placing the \gls{os} \emph{outside} of the trust boundary, necessitating a reconsideration of security goals.
-Confidential computing, leveraging modern hardware features, establish \emph{secure enclaves} \dash\ containers that are isolated  from the rest of the system, even the OS or the hypervisor.
-Such paradigm shift introduces a completely different trust model that existing OS protection were not designed to expressed.
-Yet, previous systems retrofit security into this model, introducing attack surfaces such as the Iago attacks \cite{checkoway2013iago} that exploits the system call APIs to take control of secure enclaves.
+	\item First, the process-level isolation boundaries provided by the OS is no longer sufficient in containing bugs.
+	      Contemporary software systems are increasingly large and complex—a peril underscored by the infamous Heartbleed vulnerability~\cite{heartbleed}, which exploited a bug in the OpenSSL cryptographic library.
+	      These weaknesses call for the \emph{separation of privilege} within complex programs into smaller, isolated modules~\cite{capacity,erim,hakc,rlbox,privtrans,gudka2015clean}.
+	      The coarse-grained, process-level protection of traditional \glspl{os} becomes a bottleneck for this decomposition, imposing significant development and performance costs~\cite{erim,capacity}.
+	\item
+	      Second, emerging \emph{confidential computing paradigms}~\cite{confidential,google-confidential-computing,sgx,kaplan_amd_nodate,cca} invert traditional trust hierarchies by placing the \gls{os} \emph{outside} of the trust boundary, necessitating a reconsideration of security goals.
+	      Confidential computing, leveraging modern hardware features, establish \emph{secure enclaves} \dash\ containers that are isolated  from the rest of the system, even the OS or the hypervisor.
+	      Such paradigm shift introduces a completely different trust model that existing OS protection were not designed to expressed.
+	      Yet, previous systems retrofit security into this model, introducing attack surfaces such as the Iago attacks \cite{checkoway2013iago} that exploits the system call APIs to take control of secure enclaves.
 \end{itemize}
 
 
@@ -72,16 +68,16 @@ Taking advantages of these new features, a plethora of systems has been develope
 This thesis focuses on the two recent development enabled  hardware-assisted protection: in-process isolation and VM-level confidential computing, or \gls{cvm}.
 
 \begin{itemize}
-  \item \textbf{Domain compression.} In-process isolation (\autoref{inprocess-prot}) \emph{compresses} the protection domains inward to create \emph{sub-process isolation domains}, leveraging CPU features like Intel \gls{pku} that enable  userspace processes to establish memory isolation policies.
-Works like ERIM and Hodor~\cite{erim,hodor} leverage these hardware extensions to created protected domain that isolate secret and contain the impact buggy code, showing significantly better performance than the process-level isolation.
-\item \textbf{Domain expansion.} The \gls{cvm} paradigm (\autoref{cvm-prot}) \emph{expands} the protection domain outward from previous process level secure enclaves to entire VM.
-This direction leverage recent advancement in TEE technologies introduced by Intel TDX, AMD SEV or ARM CCA to transform an entire VM, including applications and OS, into an protection domain, isolated from the untrusted hypervisor. 
-Isolating the confidential application, along with all its supporting code and data, enables companies to deploy cutting edge workloads like LLM inference into \glspl{tee} without much adaption costs~\cite{confidential-llm}.
+	\item \textbf{Domain compression.} In-process isolation (\autoref{inprocess-prot}) \emph{compresses} the protection domains inward to create \emph{sub-process isolation domains}, leveraging CPU features like Intel \gls{pku} that enable  userspace processes to establish memory isolation policies.
+	      Works like ERIM and Hodor~\cite{erim,hodor} leverage these hardware extensions to created protected domain that isolate secret and contain the impact buggy code, showing significantly better performance than the process-level isolation.
+	\item \textbf{Domain expansion.} The \gls{cvm} paradigm (\autoref{cvm-prot}) \emph{expands} the protection domain outward from previous process level secure enclaves to entire VM.
+	      This direction leverage recent advancement in TEE technologies introduced by Intel TDX, AMD SEV or ARM CCA to transform an entire VM, including applications and OS, into an protection domain, isolated from the untrusted hypervisor.
+	      Isolating the confidential application, along with all its supporting code and data, enables companies to deploy cutting edge workloads like LLM inference into \glspl{tee} without much adaption costs~\cite{confidential-llm}.
 \end{itemize}
 
 
 
-It is important that modern systems should take advantage of these new hardware features to improve their security and performance. 
+It is important that modern systems should take advantage of these new hardware features to improve their security and performance.
 Thus, exploring principles to securely incorporate these security features is the challenge for this dissertation.
 
 
@@ -110,7 +106,7 @@ First, this dissertation argues that  the practical path to introduce security i
 This is also fit with the modern hardware features hardware features aim to provide compatibility.
 
 Despite substantial advances in OS composition, OS protection has remained largely unchanged in mainstream \gls{os}, since the 1970s.
-Numerous proposed systems that promised better security, like capability OS and microkernels, have not seen large-scale adoption. 
+Numerous proposed systems that promised better security, like capability OS and microkernels, have not seen large-scale adoption.
 Modern applications continue to depend on long-standing standards such as \gls{posix}~\cite{posix} and the Windows API~\cite{winapi}, which constrain compatibility with alternative designs.
 This status quo leads to a belief in the community that achieving security is a hopeless quest~\cite{hopelessquest}.
 Ultimately, a majority of current computing infrastructures still rely on legacy protection.
@@ -124,12 +120,12 @@ Similarly, large applications such as Chrome and Firefox are retrofitting sub-pr
 \subsection{Coherent software/hardware protection}
 
 
-While modern processors provide powerful protection primitives, their full security potential can only be realized when \glspl{os} integrate them carefully. 
+While modern processors provide powerful protection primitives, their full security potential can only be realized when \glspl{os} integrate them carefully.
 Toward fullfiling this challenge, this thesis proposes the following:
 
 \begin{displayquote}
-  \textbf{Principle of coherent protection.} Protection enforced by the software (\gls{os}) must be coherent with the protection established with software support.
-  This means (1) the software-enforced protection must align to the threat model of any new hardware protection, and (2) the new hardware-defined protection must carefully consider the one establisehd by software.
+	\textbf{Principle of coherent protection.} Protection enforced by the software (\gls{os}) must be coherent with the protection established with software support.
+	This means (1) the software-enforced protection must align to the threat model of any new hardware protection, and (2) the new hardware-defined protection must carefully consider the one establisehd by software.
 
 \end{displayquote}
 
@@ -140,16 +136,16 @@ Similarly, trying to retrofitting legacy \glspl{os} into VM-level isolation (e.g
 
 This dissertation explores aligning the protection model provided by the software hardware into a unified model with two complementary approaches:
 (1) retrofitting security guarantees provided by hardware to the one provided by the SO, or (2) retrofitting the OS protection model to with reflect the one estalbished by hardware.
-The work presented in this thesis, \capacity and \incognitos, examines two layers of the protection hierarchy to illustrate the broader principle of protection coherency. 
+The work presented in this thesis, \capacity and \incognitos, examines two layers of the protection hierarchy to illustrate the broader principle of protection coherency.
 
 
 \begin{itemize}
-  \item[-] \textbf{Retrofitting hardware to incorporate OS protection.}
+	\item[-] \textbf{Retrofitting hardware to incorporate OS protection.}
 	      At the intra-process level, \capacity demonstrates how intra-process domains established through modern ARM hardware acceleration can be coherently
 	      retrofitted into legacy abstractions, with a novel cryptographic capabilities mechanism.
 	      \capacity retrofits capability-based protection into legacy process abstractions, leveraging ARM Pointer Authentication (\gls{pa}) and Memory Tagging (\gls{mte}) to transform resource references into cryptographically verifiable capabilities.
 	      This design enforces consistent security semantics across file and memory accesses, bridging the gap between software abstractions and hardware enforcementf
-      \item[-] \textbf{Retrofitting OSes for protection of hardware domains}
+	\item[-] \textbf{Retrofitting OSes for protection of hardware domains}
 	      At the system level, \incognitos explores how \glspl{os} can collaborate with hardware-enforced VM-level isolation to enforce coherent threat models, achieving performant and robust.
 	      \incognitos redefines the role of the operating system under hardware-enforced isolation, treating it as an active participant in the threat model of trusted execution environments.
 	      By coordinating scheduling and memory layout randomization, it mitigates side-channel leakage and strengthens enclave isolation.
