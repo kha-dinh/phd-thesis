@@ -8,8 +8,8 @@
 }{\textit{Frederick P. Brooks, Jr}, The Mythical Man-month}
 
 \
-
 \
+
 
 Most \glspl{os} pursue three fundamental objectives.
 First, they must provide a set of \glspl{api} that are intuitive for application developers.
@@ -153,62 +153,46 @@ This evolution culminated in the modern abstraction of a process: a protected ex
 
 Modern software systems routinely consolidate large amounts of functionality into a single process.
 This monolithic design simplifies deployment and avoids the overheads of inter-process communication, but it also enlarges the trusted computing base and exposes programs to memory-safety vulnerabilities.
-% The Heartbleed vulnerability in OpenSSL is a well-known example in which a single memory bug compromised confidentiality across a widely deployed process.
+The Heartbleed vulnerability in OpenSSL, discovered in april 2014, is a well-known example in which a single memory bug compromised confidentiality of all its users.
+The incident affected million of users, and raise the dire need for finer-grained isolation 
 
-These pressures have renewed interest in \emph{in-process isolation}, in which components of an application execute within the same virtual address space but do not share the same privileges.
+The need for fined-grained isolation has been long recognized by the research and industry.
+In 2003 Provos et al.~\cite{provos2003preventing} discusses over-privilege in core OS services, and proposed a privilege separation architecture that is then applied to OpenSSH server.
+Heavily influenced by the work on OpenSSH, similar architecture is being deployed into the Chromium~\cite{barth2008security} browser since 2008, which separate the browser into two domains (processes), a browser kernel sandboxed rendering engines.
+
+These pressures have interest emph{in-process isolation}, in which components of an application execute within the same virtual address space but do not share the same privileges.
+
+\hdr{Limitation of existing isolation primitives}
+
+There are  several approaches of achieving isolation.
+
+The first approach repurpose the OS process abstraction to decompose exisitng program into components that ~\cite{privtrans}.
+This achieves strong isolation but comes with prohibitive costs: context switches, duplicated memory, expensive sharing protocols, and substantial changes to application architecture.
+
+
+\gls{sfi}, first proposed by Wahbe et. al in 1993~\cite{wahbe_efficient_1993}, instruments untrusted code so that memory writes and indirect jumps remain confined within predefined regions.
+
+\gls{sfi} first gain mainstream adoption inside web browsers.
+In 2009, Google introduces Native Client (NaCl) \cite{yee2009native} with the goal of executing native code, written in C or C++ inside the browser. 
+Follow suit, Mozilla introduces \texttt{asm.js} in 2011 that aims to achieve the same goal.
+Later, Google introduces an extension called Portable Native Client (PNaCl), that compiles programs into architectural-independent bytecode that can be verified at the client side.
+In 2017, WebAssembly is introduced, which superceed the developement of other \gls{sfi} implementations.
+
+Outside of the web, \gls{sfi} sees less adoption outside of the research community.
+There has been attempts to leverage \gls{sfi} to sandbox native code of kernel drivers~\cite{mao2011software,castro_fast_2009}. 
+NaCl has been used to sandbox untrusted libraries~\cite{rlbox} in browsers.
+
+Due to the large adoption and standardization efforts of WebAssembly,  recently, there has a push toward using WebAssembly for sandboxing native code.
+WASI is a system interface for webassembly.
+
+
+
 The goals of in-process isolation are threefold:
 (1) enable fine-grained separation of privilege without restructuring applications into multiple processes,
 (2) minimize the trusted computing base of security-critical components, and
 (3) provide low-overhead enforcement suitable for performance-sensitive applications such as browsers, cryptographic libraries, and data-processing pipelines.
 
 In this paradigm, isolation boundaries must be lightweight enough to support frequent domain switches, expressive enough to protect both code and data, and compatible with legacy OS abstractions based on processes and files.
-
-	[[PLACEHOLDER for any workload-specific motivation.]]
-
-
-
-Deciding which component to be a part of the TCB has been an on-going problem of Multic.
-
-With the advent of the Web, we see the raise of the need to execute untrusted code.
-
-On the UNIX protection model.
-
-
-\hdr{Process-based isolation and downsides}
-In 2003 Provos et al.~\cite{provos2003preventing} discusses over-privilege in core programs, and proposed privilege separation.
-The proposed architecutre is applied to OpenSSH.
-In 2004 Brumley et al.~\cite{privtrans} proposed a system to automatically separate an program.
-Heavily influenced by the work on OpenSSH, similar architecture is being deployed into the Chromium~\cite{barth2008security} browser since 2008, which separate the browser into two domains (processes), a browser kernel sandboxed rendering engines.
-
-% A third class of techniques attempted to repurpose OS abstractions by splitting programs into multiple processes connected by IPC.
-% This achieves strong isolation but comes with prohibitive costs: context switches, duplicated memory, expensive sharing protocols, and substantial changes to application architecture.
-
-Lightweight context proposed retrofittign sub-process principal.
-
-\subsection{Alternative approoaches}
-
-\hdr{Language-based isolation}
-Language-based isolation adopts a different strategy by confining untrusted components within language runtimes such as JavaScript engines.
-
-While effective for managed languages, these techniques cannot be applied to low-level systems code written in C or C++, and they impose runtime constraints that complicate interaction with native libraries.
-
-\hdr{Software fault isolation}
-\gls{sfi}-based isolation instruments.
-
-, first proposed by Wahbe et. al in 1993 ~\cite{wahbe_efficient_1993}, gain
-
-Early approaches to in-process isolation relied primarily on software techniques.
-Software Fault Isolation (SFI) instruments untrusted code so that memory writes and indirect jumps remain confined within predefined regions.
-Systems such as Google Native Client and RockSalt follow this tradition, providing strong isolation at the cost of binary rewriting and substantial performance overhead.
-
-In 2009,  \cite{yee2009native}.
-
-The use of SFI has not seen wide adoption outside of the Web.
-PNaCl
-In 2018, Google stopped native client support in favor of webassembly.
-In 2025, LLVM 22 removes support for native client, ending its
-
-Still, there has been attempts to leverage SFI for sandboxing native code.WASI is a system interface for webassembly, which is gaining traction.
 
 
 \subsection{Modern hardware support}
@@ -239,6 +223,9 @@ These challenges motivate the need for systems such as \capacity that retrofit p
 \hdr{Automatically retrofitting security}
 
 Hardware primitives often provide low-level mechanisms but not high-level policies; developers must manually combine them to construct isolation boundaries, an error-prone and non-portable process.
+
+\subsection{Alternative approoaches}
+
 
 
 
