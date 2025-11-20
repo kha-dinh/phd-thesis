@@ -3659,10 +3659,242 @@ https://www.amd.com/en/technologies/hbm
   title = {DroidCap: OS Support for Capability-based Permissions in Android},
   author = {Abdallah Dawoud and Sven Bugiel},
   year = 2019,
-  booktitle = {26th Annual Network & Distributed System Security Symposium (NDSS
-               '19)},
+  booktitle = {26th Annual Network and Distributed System Security Symposium
+               (NDSS '19)},
   publisher = {ISOC},
 }
+
+@article{enck2014taintdroid,
+  title = {Taintdroid: an information-flow tracking system for realtime privacy
+           monitoring on smartphones},
+  author = {Enck, William and Gilbert, Peter and Han, Seungyeop and Tendulkar,
+            Vasant and Chun, Byung-Gon and Cox, Landon P and Jung, Jaeyeon and
+            McDaniel, Patrick and Sheth, Anmol N},
+  journal = {ACM Transactions on Computer Systems (TOCS)},
+  volume = {32},
+  number = {2},
+  pages = {1--29},
+  year = {2014},
+  publisher = {ACM New York, NY, USA},
+}
+@article{mohit2009complete,
+  author = {Tiwari, Mohit and Wassel, Hassan M.G. and Mazloom, Bita and Mysore,
+            Shashidhar and Chong, Frederic T. and Sherwood, Timothy},
+  title = {Complete information flow tracking from the gates up},
+  year = {2009},
+  issue_date = {March 2009},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  volume = {37},
+  number = {1},
+  issn = {0163-5964},
+  url = {https://doi.org/10.1145/2528521.1508258},
+  doi = {10.1145/2528521.1508258},
+  abstract = {For many mission-critical tasks, tight guarantees on the flow of
+              information are desirable, for example, when handling important
+              cryptographic keys or sensitive financial data. We present a novel
+              architecture capable of tracking all information flow within the
+              machine, including all explicit data transfers and all implicit
+              flows (those subtly devious flows caused by not performing
+              conditional operations). While the problem is impossible to solve
+              in the general case, we have created a machine that avoids the
+              general-purpose programmability that leads to this impossibility
+              result, yet is still programmable enough to handle a variety of
+              critical operations such as public-key encryption and
+              authentication. Through the application of our novel gate-level
+              information flow tracking method, we show how all flows of
+              information can be precisely tracked. From this foundation, we then
+              describe how a class of architectures can be constructed, from the
+              gates up, to completely capture all information flows and we
+              measure the impact of doing so on the hardware implementation, the
+              ISA, and the programmer.},
+  journal = {SIGARCH Comput. Archit. News},
+  month = mar,
+  pages = {109–120},
+  numpages = {12},
+  keywords = {provably sound, information flow tracking, gate level},
+}
+
+@inproceedings{10.1145/1508244.1508258,
+  author = {Tiwari, Mohit and Wassel, Hassan M.G. and Mazloom, Bita and Mysore,
+            Shashidhar and Chong, Frederic T. and Sherwood, Timothy},
+  title = {Complete information flow tracking from the gates up},
+  year = {2009},
+  isbn = {9781605584065},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {https://doi.org/10.1145/1508244.1508258},
+  doi = {10.1145/1508244.1508258},
+  abstract = {For many mission-critical tasks, tight guarantees on the flow of
+              information are desirable, for example, when handling important
+              cryptographic keys or sensitive financial data. We present a novel
+              architecture capable of tracking all information flow within the
+              machine, including all explicit data transfers and all implicit
+              flows (those subtly devious flows caused by not performing
+              conditional operations). While the problem is impossible to solve
+              in the general case, we have created a machine that avoids the
+              general-purpose programmability that leads to this impossibility
+              result, yet is still programmable enough to handle a variety of
+              critical operations such as public-key encryption and
+              authentication. Through the application of our novel gate-level
+              information flow tracking method, we show how all flows of
+              information can be precisely tracked. From this foundation, we then
+              describe how a class of architectures can be constructed, from the
+              gates up, to completely capture all information flows and we
+              measure the impact of doing so on the hardware implementation, the
+              ISA, and the programmer.},
+  booktitle = {Proceedings of the 14th International Conference on Architectural
+               Support for Programming Languages and Operating Systems},
+  pages = {109–120},
+  numpages = {12},
+  keywords = {provably sound, information flow tracking, gate level},
+  location = {Washington, DC, USA},
+  series = {ASPLOS XIV},
+}
+
+@article{denning1977certification,
+  author = {Denning, Dorothy E. and Denning, Peter J.},
+  title = {Certification of programs for secure information flow},
+  year = {1977},
+  issue_date = {July 1977},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  volume = {20},
+  number = {7},
+  issn = {0001-0782},
+  url = {https://doi.org/10.1145/359636.359712},
+  doi = {10.1145/359636.359712},
+  abstract = {Certification mechanism for verifying the secure flow of
+              information through a program. Because it exploits the properties
+              of a lattice structure among security classes, the procedure is
+              sufficiently simple that it can easily be included in the analysis
+              phase of most existing compilers. Appropriate semantics are
+              presented and proved correct. An important application is the
+              confinement problem: The mechanism can prove that a program cannot
+              cause supposedly nonconfidential results to depend on confidential
+              input data.},
+  journal = {Commun. ACM},
+  month = jul,
+  pages = {504–513},
+  numpages = {10},
+  keywords = {confinement, information flow, lattice, program certification,
+              protection, security, security classes},
+}
+
+@inproceedings{mccullough1987specifications,
+  title = {Specifications for multi-level security and a hook-up},
+  author = {McCullough, Daryl},
+  booktitle = {1987 IEEE Symposium on Security and Privacy},
+  pages = {161--161},
+  year = {1987},
+  organization = {IEEE},
+}
+
+@article{histar,
+  author = {Zeldovich, Nickolai and Boyd-Wickizer, Silas and Kohler, Eddie and
+            Mazi\`{e}res, David},
+  title = {Making information flow explicit in HiStar},
+  year = {2011},
+  issue_date = {November 2011},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  volume = {54},
+  number = {11},
+  issn = {0001-0782},
+  url = {https://doi.org/10.1145/2018396.2018419},
+  doi = {10.1145/2018396.2018419},
+  abstract = {HiStar is a new operating system designed to minimize the amount
+              of code that must be trusted. HiStar provides strict information
+              flow control, which allows users to specify precise data security
+              policies without unduly limiting the structure of applications.
+              HiStar's security features make it possible to implement a
+              Unix-like environment with acceptable performance almost entirely
+              in an untrusted user-level library. The system has no notion of
+              superuser and no fully trusted code other than the kernel. HiStar's
+              features permit several novel applications, including
+              privacy-preserving, untrusted virus scanners and a dynamic Web
+              server with only a few thousand lines of trusted code.},
+  journal = {Commun. ACM},
+  month = nov,
+  pages = {93–101},
+  numpages = {9},
+}
+@misc{li2024blindfold,
+  title = {Blindfold: Confidential Memory Management by Untrusted Operating
+           System},
+  author = {Caihua Li and Seung-seob Lee and Lin Zhong},
+  year = {2024},
+  eprint = {2412.01059},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.CR},
+  url = {https://arxiv.org/abs/2412.01059},
+}
+
+@inproceedings{dinglan2025pegasus,
+  author = {Peng, Dinglan and Liu, Congyu and Palit, Tapti and
+            Vahldiek-Oberwagner, Anjo and Vij, Mona and Fonseca, Pedro},
+  title = {Pegasus: Transparent and Unified Kernel-Bypass Networking for Fast
+           Local and Remote Communication},
+  year = {2025},
+  isbn = {9798400711961},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {https://doi.org/10.1145/3689031.3696083},
+  doi = {10.1145/3689031.3696083},
+  abstract = {Modern software architectures in cloud computing are highly
+              reliant on interconnected local and remote services. Popular
+              architectures, such as the service mesh, rely on the use of
+              independent services or sidecars for a single application. While
+              such modular approaches simplify application development and
+              deployment, they also introduce significant communication overhead
+              since now even local communication that is handled by the kernel
+              becomes a performance bottleneck. This problem has been identified
+              and partially solved for remote communication over fast NICs
+              through the use of kernel-bypass data plane systems. However,
+              existing kernel-bypass mechanisms challenge their practical
+              deployment by either requiring code modification or supporting only
+              a small subset of the network interface.In this paper, we propose
+              Pegasus, a framework for transparent kernel bypass for local and
+              remote communication. By transparently fusing multiple applications
+              into a single process, Pegasus provides an in-process fast path to
+              bypass the kernel for local communication. To accelerate remote
+              communication over fast NICs, Pegasus uses DPDK to directly access
+              the NIC. Pegasus supports transparent kernel bypass for unmodified
+              binaries by implementing core OS services in user space, such as
+              scheduling and memory management, thus removing the kernel from the
+              critical path. Our experiments on a range of real-world
+              applications show that, compared with Linux, Pegasus improves the
+              throughput by 19\% to 33\% for local communication and 178\% to 442
+              \% for remote communication, without application changes.
+              Furthermore, Pegasus achieves 222\% higher throughput than Linux
+              for co-located, IO-intensive applications that require both local
+              and remote communication, with each communication optimization
+              contributing significantly.},
+  booktitle = {Proceedings of the Twentieth European Conference on Computer
+               Systems},
+  pages = {360–378},
+  numpages = {19},
+  keywords = {kernel-bypass networking, operating systems},
+  location = {Rotterdam, Netherlands},
+  series = {EuroSys '25},
+}
+  @article{kiss,
+  title = {{{KISS}} --- Keep It Simple Stupid},
+  author = {Wolfe, Hanke},
+  year = 2004,
+  journal = {Computer Fraud \& Security},
+  volume = {2004},
+  number = {5},
+  pages = {11},
+  issn = {1361-3723},
+  doi = {10.1016/s1361-3723(04)00065-x},
+  abstract = {Secure programming needs to strip down the extra features.},
+  annotation = {TLDR: The following case highlights the point that proceeding
+                with a more complex option may have lead to a poor final result,
+                as well as an unpredictable long term prognosis and outcome for a
+                young patient.},
+}
+
 @inproceedings{semperos,
   title = {{SemperOS}: A Distributed Capability System},
   author = {Matthias Hille and Nils Asmussen and Pramod Bhatotia and Hermann H{
@@ -3770,6 +4002,137 @@ https://www.amd.com/en/technologies/hbm
   year = 2022,
   urldate = {2022-10-01},
   howpublished = {\url{https://musl.libc.org}},
+}
+
+@inproceedings{terra,
+  author = {Garfinkel, Tal and Pfaff, Ben and Chow, Jim and Rosenblum, Mendel
+            and Boneh, Dan},
+  title = {Terra: a virtual machine-based platform for trusted computing},
+  year = {2003},
+  isbn = {1581137575},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {https://doi.org/10.1145/945445.945464},
+  doi = {10.1145/945445.945464},
+  abstract = {We present a flexible architecture for trusted computing, called
+              Terra, that allows applications with a wide range of security
+              requirements to run simultaneously on commodity hardware.
+              Applications on Terra enjoy the semantics of running on a separate,
+              dedicated, tamper-resistant hardware platform, while retaining the
+              ability to run side-by-side with normal applications on a
+              general-purpose computing platform. Terra achieves this synthesis
+              by use of a trusted virtual machine monitor (TVMM) that partitions
+              a tamper-resistant hardware platform into multiple, isolated
+              virtual machines (VM), providing the appearance of multiple boxes
+              on a single, general-purpose platform. To each VM, the TVMM
+              provides the semantics of either an "open box," i.e. a
+              general-purpose hardware platform like today's PCs and workstations
+              , or a "closed box," an opaque special-purpose platform that
+              protects the privacy and integrity of its contents like today's
+              game consoles and cellular phones. The software stack in each VM
+              can be tailored from the hardware interface up to meet the security
+              requirements of its application(s). The hardware and TVMM can act
+              as a trusted party to allow closed-box VMs to cryptographically
+              identify the software they run, i.e. what is in the box, to remote
+              parties. We explore the strengths and limitations of this
+              architecture by describing our prototype implementation and several
+              applications that we developed for it.},
+  booktitle = {Proceedings of the Nineteenth ACM Symposium on Operating Systems
+               Principles},
+  pages = {193–206},
+  numpages = {14},
+  keywords = {VMM, attestation, authentication, trusted computing, virtual
+              machine, virtual machine monitor},
+  location = {Bolton Landing, NY, USA},
+  series = {SOSP '03},
+}
+
+@article{10.1145/1165389.945464,
+  author = {Garfinkel, Tal and Pfaff, Ben and Chow, Jim and Rosenblum, Mendel
+            and Boneh, Dan},
+  title = {Terra: a virtual machine-based platform for trusted computing},
+  year = {2003},
+  issue_date = {December 2003},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  volume = {37},
+  number = {5},
+  issn = {0163-5980},
+  url = {https://doi.org/10.1145/1165389.945464},
+  doi = {10.1145/1165389.945464},
+  abstract = {We present a flexible architecture for trusted computing, called
+              Terra, that allows applications with a wide range of security
+              requirements to run simultaneously on commodity hardware.
+              Applications on Terra enjoy the semantics of running on a separate,
+              dedicated, tamper-resistant hardware platform, while retaining the
+              ability to run side-by-side with normal applications on a
+              general-purpose computing platform. Terra achieves this synthesis
+              by use of a trusted virtual machine monitor (TVMM) that partitions
+              a tamper-resistant hardware platform into multiple, isolated
+              virtual machines (VM), providing the appearance of multiple boxes
+              on a single, general-purpose platform. To each VM, the TVMM
+              provides the semantics of either an "open box," i.e. a
+              general-purpose hardware platform like today's PCs and workstations
+              , or a "closed box," an opaque special-purpose platform that
+              protects the privacy and integrity of its contents like today's
+              game consoles and cellular phones. The software stack in each VM
+              can be tailored from the hardware interface up to meet the security
+              requirements of its application(s). The hardware and TVMM can act
+              as a trusted party to allow closed-box VMs to cryptographically
+              identify the software they run, i.e. what is in the box, to remote
+              parties. We explore the strengths and limitations of this
+              architecture by describing our prototype implementation and several
+              applications that we developed for it.},
+  journal = {SIGOPS Oper. Syst. Rev.},
+  month = oct,
+  pages = {193–206},
+  numpages = {14},
+  keywords = {VMM, attestation, authentication, trusted computing, virtual
+              machine, virtual machine monitor},
+}
+
+
+@inproceedings{yifan2025pipellm,
+  author = {Tan, Yifan and Tan, Cheng and Mi, Zeyu and Chen, Haibo},
+  title = {PipeLLM: Fast and Confidential Large Language Model Services with
+           Speculative Pipelined Encryption},
+  year = {2025},
+  isbn = {9798400706981},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {https://doi.org/10.1145/3669940.3707224},
+  doi = {10.1145/3669940.3707224},
+  abstract = {Confidential computing on GPUs, like NVIDIA H100, mitigates the
+              security risks of outsourced Large Language Models (LLMs) by
+              implementing strong isolation and data encryption. Nonetheless,
+              this encryption incurs a significant performance overhead, reaching
+              up to 52.8\% and 88.2\% throughput drop when serving OPT-30B and
+              OPT-66B, respectively. To address this challenge, we introduce
+              PipeLLM, a user-transparent runtime system. PipeLLM removes the
+              overhead by overlapping the encryption and GPU computation through
+              pipelining-an idea inspired by the CPU instruction
+              pipelining-thereby effectively concealing the latency increase
+              caused by encryption. The primary technical challenge is that,
+              unlike CPUs, the encryption module lacks prior knowledge of the
+              specific data needing encryption until it is requested by the GPUs.
+              To this end, we propose speculative pipelined encryption to predict
+              the data requiring encryption by analyzing the serving patterns of
+              LLMs. Further, we have developed an efficient, low-cost pipeline
+              relinquishing approach for instances of incorrect predictions. Our
+              experiments show that compared with vanilla systems without
+              confidential computing (e.g., vLLM, PEFT, and FlexGen), PipeLLM
+              incurs modest overhead ( < 19.6\% in throughput) across various LLM
+              sizes, from 13B to 175B. PipeLLM's source code is available at
+              https://github.com/SJTU-IPADS/PipeLLM.},
+  booktitle = {Proceedings of the 30th ACM International Conference on
+               Architectural Support for Programming Languages and Operating
+               Systems, Volume 1},
+  pages = {843–857},
+  numpages = {15},
+  keywords = {confidential virtual machine, large language model, nvidia
+              confidential computing},
+  location = {Rotterdam, Netherlands},
+  series = {ASPLOS '25},
 }
 @article{caja,
   title = {Caja: Safe active content in sanitized JavaScript},
@@ -12673,6 +13036,46 @@ https://www.amd.com/en/technologies/hbm
   location = {Princeton, New Jersey},
   series = {SOSP '69},
 }
+@inproceedings{yang2025endokernel,
+  author = {Fangfei Yang and Bumjin Im and Weijie Huang and Kelly Kaoudis and
+            Anjo Vahldiek-Oberwagner and Chia-che Tsai and Nathan Dautenhahn},
+  title = {Endokernel: A Thread Safe Monitor for Lightweight Subprocess
+           Isolation},
+  booktitle = {33rd USENIX Security Symposium (USENIX Security 24)},
+  year = {2024},
+  isbn = {978-1-939133-44-1},
+  address = {Philadelphia, PA},
+  pages = {145--162},
+  url = {
+         https://www.usenix.org/conference/usenixsecurity24/presentation/yang-fangfei
+         },
+  publisher = {USENIX Association},
+  month = aug,
+}
+
+@article{uhlig2005intel,
+  title = {Intel virtualization technology},
+  author = {Uhlig, Rich and Neiger, Gil and Rodgers, Dion and Santoni, Amy L and
+            Martins, Fernando CM and Anderson, Andrew V and Bennett, Steven M and
+            Kagi, Alain and Leung, Felix H and Smith, Larry},
+  journal = {Computer},
+  volume = {38},
+  number = {5},
+  pages = {48--56},
+  year = {2005},
+  publisher = {IEEE},
+}
+
+@misc{devine2002virtualization,
+  title = {Virtualization system including a virtual machine monitor for a
+           computer with a segmented architecture},
+  author = {Devine, Scott W and Bugnion, Edouard and Rosenblum, Mendel},
+  year = {2002},
+  month = may # "~28",
+  publisher = {Google Patents},
+  note = {US Patent 6,397,242},
+}
+
 @inproceedings{jiacheng2025serverless,
   author = {Shi, Jiacheng and Gu, Jinyu and Xia, Yubin and Chen, Haibo},
   title = {Serverless functions made confidential and efficient with split

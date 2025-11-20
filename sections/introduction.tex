@@ -1,7 +1,6 @@
 % !TeX root = ../main.tex
-\chapter{Introduction}
+\chapter{Introduction} \label{chap:intro}
 \pagenumbering{arabic}
-\label{sec:intro}
 
 
 \epigraph{
@@ -72,7 +71,7 @@ This thesis focuses on the two recent development enabled  hardware-assisted pro
 	      Works like ERIM and Hodor~\cite{erim,hodor} leverage these hardware extensions to created protected domain that isolate secret and contain the impact buggy code, showing significantly better performance than the process-level isolation.
 	\item \textbf{Domain expansion.} The \gls{cvm} paradigm (\autoref{cvm-prot}) \emph{expands} the protection domain outward from previous process level secure enclaves to entire VM.
 	      This direction leverage recent advancement in TEE technologies introduced by Intel TDX, AMD SEV or ARM CCA to transform an entire VM, including applications and OS, into an protection domain, isolated from the untrusted hypervisor.
-	      Isolating the confidential application, along with all its supporting code and data, enables companies to deploy cutting edge workloads like LLM inference into \glspl{tee} without much adaption costs~\cite{confidential-llm}.
+	      Isolating the confidential application, along with all its supporting code and data, enables companies to deploy cutting edge workloads like LLM inference into \glspl{tee} without much adaption costs~\cite{yifan2025pipellm}.
 \end{itemize}
 
 
@@ -102,40 +101,41 @@ Thus, exploring principles to securely incorporate these security features is th
 I now describe the approaches used to tackle the challenge of adopting modern hardware security features to improve security and performance of systems.
 
 \subsection{Retrofitting for security}
-First, this dissertation argues that  the practical path to introduce security is \emph{retrofitting} \dash\ integrating security features into existing protection models without breaking compatibility.
-This is also fit with the modern hardware features hardware features aim to provide compatibility.
 
-Despite substantial advances in OS composition, OS protection has remained largely unchanged in mainstream \gls{os}, since the 1970s.
-Numerous proposed systems that promised better security, like capability OS and microkernels, have not seen large-scale adoption.
+First, this dissertation argues that  the practical path to introduce security is \emph{retrofitting} \dash\ integrating security features into existing protection models without breaking compatibility.
+This approach also aligns with the goal of modern hardware features provide compatibility with existing systems.
+
+Despite substantial advances in security architectures and OS composition, the status quo has remained largely unchanged since the 1970s.
+There have been numerous proposals that promised better security, like capability architectures~\cite{cap-addressing,cambridge-cap} and OSes~\cite{hydra,eros,cambridge-cap}, microkernels~\cite{sel4}, and secure programming languages~\cite{matsakis_rust_2014,caja}.
+Unfortunately, these approaches have not seen large-scale adoption.
 Modern applications continue to depend on long-standing standards such as \gls{posix}~\cite{posix} and the Windows API~\cite{winapi}, which constrain compatibility with alternative designs.
 This status quo leads to a belief in the community that achieving security is a hopeless quest~\cite{hopelessquest}.
-Ultimately, a majority of current computing infrastructures still rely on legacy protection.
-On the other hand, there have been several successful securities retrofit that gained large adoption.
+Ultimately, a majority of current computing infrastructures still rely on the process-level protection established by the OS.
+
+
+On the other hand, there have been several successful securities retrofit that gained adoption, showing the efficacy of the approach.
 For example, SELinux~\cite{selinux} extends Linux’s \gls{dac} model with \gls{mac} enforcement, while Capsicum~\cite{watson2010capsicum} retrofits a capability-based \gls{api} in FreeBSD to enable fine-grained access control~\cite{freebsd-capsicum}.
+Especially, SELinux is now a core component of Android, running on millions of devices~\cite{droidcap}.
 Similarly, large applications such as Chrome and Firefox are retrofitting sub-process isolation to contain vulnerabilities from compromised third-party libraries~\cite{rlbox}.
-
-
 
 
 \subsection{Coherent software/hardware protection}
 
-
 While modern processors provide powerful protection primitives, their full security potential can only be realized when \glspl{os} integrate them carefully.
-Toward fullfiling this challenge, this thesis proposes the following:
+This thesis proposes the following principle when integrating hardware-assisted security features:
 
 \begin{displayquote}
-	\textbf{Principle of coherent protection.} Protection enforced by the software (\gls{os}) must be coherent with the protection established with software support.
-	This means (1) the software-enforced protection must align to the threat model of any new hardware protection, and (2) the new hardware-defined protection must carefully consider the one establisehd by software.
-
+	\textbf{Principle of coherent protection.} Protection enforced by the software (\gls{os}) must be coherent with the protection established with modern hardware support, toward a unified protection model
+	This means (1) the software-enforced protection must align to the threat model of any new hardware protection, and (2) the new hardware-defined protection must carefully consider the one established by software.
 \end{displayquote}
 
-Previous research has demonstated that incoherency in the protection model is the bane of security.
-Systems that leverage modern hardware features in an ad hoc manner, often reveal gaps in protections that undermine any benefits provided.
-For instance, for in-process isolation systems, prior work has demonstrated \emph{confused deputy} attacks, arising from the \gls{os}'s lack of awareness of hardware-enforced protection domains~\cite{pku-pitfalls,jenny}.
-Similarly, trying to retrofitting legacy \glspl{os} into VM-level isolation (e.g., AMD-SEV) can exacerbate side-channel and interface vulnerabilities, as demonstrated by recent attacks against confidential virtual machines~\cite{wesee,heckler,ciphersteal,li2021cipherleaks}.
+Previous research has demonstrated that incoherencies in the protection model lead to insecurity -- systems that leverage modern hardware features in an ad hoc manner, often reveal gaps in protections that undermine benefits provided.
+For instance, for hardware-assisted in-process isolation systems, prior work has demonstrated \emph{confused deputy} attacks, arising from the \gls{os}'s lack of awareness of hardware-enforced protection domains~\cite{pku-pitfalls,jenny}.
+Similarly, trying to retrofit legacy \glspl{os} into VM-level isolation (e.g., AMD-SEV) can exacerbate side-channel and interface vulnerabilities, as demonstrated by recent attacks against confidential virtual machines~\cite{wesee,heckler,ciphersteal,li2021cipherleaks}.
+\cref{chap:capacity} and \cref{chap:incognitos} will go over more details the problems caused by incoherencies in the protection.
 
-This dissertation explores aligning the protection model provided by the software hardware into a unified model with two complementary approaches:
-(1) retrofitting security guarantees provided by hardware to the one provided by the SO, or (2) retrofitting the OS protection model to with reflect the one estalbished by hardware.
+This dissertation explores the principle of coherent protection in with two complementary approaches:
+(1) retrofitting security guarantees provided by hardware to the one provided by the SO, or (2) retrofitting the OS protection model to with reflect the one established by hardware.
 The work presented in this thesis, \capacity and \incognitos, examines two layers of the protection hierarchy to illustrate the broader principle of protection coherency.
 
 

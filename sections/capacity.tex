@@ -1,6 +1,6 @@
 % !TeX root = ../main.tex
 %
-\chapter{Capacity: Retrofitting Capability-Based Access Control within In-Process Domains}\label{chap:capacity}
+\chapter{Capacity: Cryptographically-Enforced In-Process Capabilities for Modern ARM Architectures}\label{chap:capacity}
 
 
 
@@ -15,19 +15,60 @@
 
 \
 
-Modern hardware increasingly embeds security primitives that, if properly integrated, can enforce fine-grained protection within software.
-Yet, mainstream operating systems continue to rely on legacy abstractions and trust assumptions that position the kernel as the sole arbiter of protection.
-This creates a \emph{trust-model misalignment}: while hardware features such as ARM’s \emph{Pointer Authentication} (PA) and \emph{Memory Tagging Extension} (MTE) provide verifiable guarantees at the hardware level, the OS continues to mediate access through coarse-grained, software-defined policies.
-This chapter presents \capacity, a hardware-assisted intra-process access control framework that reconciles these trust and protection misalignments by retrofitting capability-based security into existing OS abstractions.
-By transforming memory and file references into cryptographically verifiable capabilities, \capacity extends trust enforcement beyond the kernel boundary and establishes hardware-backed integrity across in-process domains.
-The remainder of this chapter details the design, implementation, and evaluation of \capacity, demonstrating how principled retrofitting enables efficient and trustworthy in-process isolation on modern ARM systems.
+\pagebreak
 
-Modern hardware increasingly provides security primitives that, if properly integrated, can enforce fine-grained protection within software.
-However, most operating systems remain limited by legacy abstractions that were never designed to leverage such features.
-This chapter presents \capacity, a hardware-assisted intra-process access control framework that retrofits capability-based security principles into existing OS protection models.
-\capacity explores how ARM’s \emph{Pointer Authentication} (PA) and \emph{Memory Tagging Extension} (MTE)---features originally intended for memory safety and exploit mitigation---can be systematically adapted to support in-process compartmentalization.
-By transforming file descriptors and memory references into cryptographically authenticated capabilities, \capacity enforces coherent, hardware-backed protection across a domain’s entire lifecycle.
-The remainder of this chapter details the design, implementation, and evaluation of \capacity, demonstrating how principled retrofitting enables efficient and compatible in-process isolation on modern ARM systems.
+
+Modern hardware increasingly embeds security primitives that, if properly integrated, can enforce fine-grained protection within software.
+Yet, mainstream \glspl{os} continue to rely on process-based protection, introducing \emph{protection incoherencies}: while hardware features such as Intel PKU, ARM PA and MTE provides security guarantee in the userspace, the OS continues to mediate access at a coarse-grained, process-level.
+
+This chapter presents \capacity, a hardware-assisted intra-process protection framework that reconciles these incoherencies by retrofitting a hardware-assisted capability-based protection into existing OS abstractions.
+By transforming memory and file references into cryptographically verifiable capabilities, \capacity extends trust enforcement beyond the kernel boundary and establishes hardware-backed integrity across in-process domains.
+
+In the following, I first explain how \capacity composes within the framework of coherent protection established in~\cref{chap:intro}.
+Then, the remainder of the chapter details the design, implementation, and evaluation of \capacity, demonstrating how principled retrofitting enables efficient and coherent in-process isolation on modern ARM systems.
+
+
+\input{figures/bg-ipi}
+
+\section{Toward coherent in-process isolation}
+
+Despite the promise of fine-grained security and low performance overheads, modern hardware mechanisms do not integrate cleanly with existing \gls{os} abstractions.
+The reason is that most focus primarily on memory isolation, whereas the \gls{os} enforces access control across all resource types (e.g., files and sockets).
+
+
+% In \cref{chap:intro}, we proposed the principle of coherenet protection.
+% This chapter, we visit a problem caused by incoherences in the protection model established by hardware and the one by software.
+
+\hdr{Kernel as a confused deputy}
+
+The seminar paper by Connor et al. ~\cite{connor2020pku} demonstrates the perils of this problem, highlighting the risk of \emph{confused-deputy attacks}~\cite{hardy_confused_1988} targeting the kernel~\cite{pku-pitfall}.
+
+For example, on PKU-based systems, the \gls{os} is unaware of an application's internal protection domains and continues to enforce access control only at process granularity.
+A domain, for instance, may use the \texttt{mmap} system call to \emph{remove} \gls{pku} protection on a target page.
+Even worse, some system calls such as \texttt{process\_vm\_readv} and \texttt{send} read from userspace memory without regard for in-process domains, enabling one domain to bypass memory isolation~\cite{pku-pitfall,yang2025endokernel}
+Due to the semantic gap between the \gls{os} protection model, is proven challenging
+
+
+\hdr{Incoherency in protection}
+
+I posit that the root cause for the confused deputy problem, is the \emph{incoherency of protection}, introduced when when trying to retrofit a hardware-assisted protection model into the existing process-based one established by the OS.
+
+\hdr{Capacity's approach}
+
+Observing that features of PA and MTE on moder ARM processors exhibit characteristics of capability-based security, \capacity propose a capability-based protection scheme that coherently protect both userspace references (i.e., pointers), and references to the systems objects.
+This approach enable protection of sensitive resources throughout their life-cycles.
+
+\capacity enjoy hardware acceleration for reference authentication to achieve reasonably low overheads, and at the same time, cryptographically-authenticated reference mechanism significantly simplifying the enforcement mechanism (KISS principle~\cite{kiss}); both userspace and system resource references are authenticated with a single instructions.
+
+
+\clearpage
+
+
+
+
+
+
+
 
 
 % \pagenumbering{arabic}

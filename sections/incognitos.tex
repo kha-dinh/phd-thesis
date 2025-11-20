@@ -18,6 +18,7 @@
 
 \
 
+\clearpage
 
 As cloud computing increasingly adopts \emph{Confidential Virtual Machines} (CVMs) for trusted execution, the system’s traditional trust hierarchy is being inverted.
 Where the operating system once resided within the trusted computing base (\gls{tcb}), it now operates alongside or even below untrusted hypervisors and shared hardware resources.
@@ -26,6 +27,58 @@ Consequently, even with hardware-provided isolation, side-channel attacks contin
 This chapter introduces \incognitos, a unikernel-based operating system that restores coherence between trust and protection by reimagining the OS as a self-obfuscating execution environment within a CVM.
 By retrofitting scheduling and memory management with adaptive obfuscation mechanisms, \incognitos transforms the OS from a potential attack surface into an active contributor to system-level confidentiality.
 The remainder of this chapter presents the motivation, design, and evaluation of \incognitos, demonstrating how trust can be reestablished through self-obfuscation and dynamic adaptation in hardware-enforced environments.
+
+
+\section{Toward coherent OS-CVM protection}
+
+
+The new \gls{cvm} deployment model inherit challenges of trusted execution, namely the .
+
+At the same time, it also introduce the new challenges.
+
+\hdr{Side-channel attacks}
+
+In 1973, Butler Lampson~\cite{lampson1973confinement} described the difficulties of preventing an untrusted program from leaking secrets through \emph{covert channels} or \emph{side channels}.
+
+Modern trusted execution systems suffer from related challenges at both architectural and microarchitectural levels.
+
+Side channels were a significant problem with Intel SGX, and continue to persist in the \gls{cvm} model.
+CVMs remain vulnerable to a broad class of side-channel attacks, including page-fault channels, cache-timing channels, scheduler-based channels, and I/O interface attacks.
+
+Another challenge arises from the narrow interface between the guest and hypervisor; misunderstanding or misusing this interface can introduce vulnerabilities, as prior work has demonstrated through interface-level attacks.
+Finally, the OS remains responsible for resource management inside the VM yet lacks visibility into how specific operations strengthen or weaken enclave-level security.
+
+% \hdr{Trusted I/O}
+%
+% The protection boundary established by the CPU does not extend to accelerators or I/O devices, which remain outside the TEE.
+% 	[[PLACEHOLDER: describe why this is a problem or give an example attack scenario]]
+
+\hdr{Taming the bloated TCB}
+
+CVMs have enabled organizations to migrate large, modern applications—such as LLM inference workloads—into TEEs with minimal performance overhead and engineering cost.
+However, doing so places a significant amount of code inside the TEE, and the security of the user's data now depends on large, feature-rich OSes such as Linux or Windows.
+These OSes contain tens of millions of lines of code and thousands of known vulnerabilities.
+Thus, while placing full OSes in the TEE simplifies deployment, it also increases the risk of compromise.
+
+Toward reducing the TCB, prior work has explored several approaches.
+Panoply~\cite{shinde_panoply_2017} decomposes enclave applications into smaller least-privilege components.
+Gramine-TDX~\cite{dimitrii2024graminetdx}, and serverless enclave systems~\cite{jiacheng2025serverless} offlload non-essential functionalities from the guest into the host to reduce the code size.
+
+
+
+
+\hdr{\incognitos: coherent OS-CVM protection}
+
+These challenges motivate \incognitos, which aligns the protection goal of the OS the threat model of confidential computing.
+
+\incognitos rethinks the traditional protection model of \gls{os} (\cref{sec:intro:bg-os}), to also incorporate side-channel attacks into its threat model.
+
+Further, with a unikerne design, it significantly reduce the \gls{tcb} of the system.
+
+\incognitos shows that, aligning the OS protection model with the threat model of CVM protection established by hardware enable powerful security properties.
+
+\clearpage
+
 
 \input{sections/incognitos/terminologies}
 
