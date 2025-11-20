@@ -15,7 +15,7 @@
 
 \
 
-\pagebreak
+\clearpage
 
 
 Modern hardware increasingly embeds security primitives that, if properly integrated, can enforce fine-grained protection within software.
@@ -27,10 +27,11 @@ By transforming memory and file references into cryptographically verifiable cap
 In the following, I first explain how \capacity composes within the framework of coherent protection established in~\cref{chap:intro}.
 Then, the remainder of the chapter details the design, implementation, and evaluation of \capacity, demonstrating how principled retrofitting enables efficient and coherent in-process isolation on modern ARM systems.
 
+\clearpage
 
 \input{figures/bg-ipi}
 
-\section{Toward coherent in-process isolation}
+\section{Toward Coherent In-process Isolation}
 
 Despite the promise of fine-grained security and low performance overheads, modern hardware mechanisms do not integrate cleanly with existing \gls{os} abstractions.
 The reason is that most focus primarily on memory isolation, whereas the \gls{os} enforces access control across all resource types (e.g., files and sockets).

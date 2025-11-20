@@ -110,11 +110,12 @@ Major Advisor\\
 	\thispagestyle{empty}
 	{\centering \setstretch{2} \subTitleFont This certifies that the Ph.D. Dissertation of \\
 		\@author\ is approved.\vfill}
-	\begin{minipage}{0.50\linewidth}
+	\begin{minipage}{0.45\linewidth}
 		~
 	\end{minipage}
-	\begin{minipage}{0.50\linewidth}
+	\begin{minipage}{0.55\linewidth}
 		% Somehow only hphantom works here
+		\setstretch{1.75}
 		{\SectionFont \hphantom{CCCCCCC}\textcolor{gray}{[signature]}\vspace{-.8em}}
 		\par\rule{\textwidth}{1pt} \\
 		{\raggedright \SubSectionFont Committee Chair : \@committeechair \\~\\ \vspace{-.5em}}

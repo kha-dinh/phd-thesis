@@ -16,7 +16,9 @@
 \capacity and \incognitos, the systems presented in this dissertation, address different layers of the stack but share a common theme: reestablishing coherence between newly defined protection mechanisms and the legacy models that underpin modern computing.
 This chapter systhesizes the lessons learned from these systems for  \gls{os} security in the era of hardware-defined protection, and conclude.
 
-\section{Lessons learned}
+\clearpage
+
+\section{Lessons Learned}
 
 \hdr{Retrofitting demands principled abstraction design}
 
@@ -40,6 +42,7 @@ To avoid pitfalls and gaps in protection, future systems should continue to adop
 \hdr{Security and compatibility can coexist through retrofitting}
 
 Important ideas in security, although often phased out of mainstream systems in favor of compatibility, remain relevant.
+
 Capability-based security, in particular, aligns surprisingly well with the programming model of many existing software interfaces, enabling fine-grained access control through retrofitting.
 
 Inspired by approaches such as DroidCap~\cite{droidcap} and Capsicum~\cite{capsicum}, \capacity's cryptographic capability mechanism integrates cleanly with UNIX file descriptors, which already behave as capability-like interfaces~\cite{miller2003capability}.
@@ -50,6 +53,7 @@ Blindfold~\cite{li2024blindfold} demonstrates that capability-based security can
 The success of these systems leads me to believe that other influential security ideas, such as multi-level security~\cite{mccullough1987specifications} and information flow control/tracking~\cite{histar,denning1977certification,mohit2009complete}, can meaningfully improve the security of modern systems through retrofitting.
 For instance, \emph{information flow tracking}~\cite{denning1977certification,mohit2009complete,enck2014taintdroid} could track the propagation of secrets across the stack, allowing \incognitos to efficiently randomize only those accesses involving sensitive data.
 
+\clearpage
 
 \section{Conclusion}
 This dissertation examined how modern hardware reshapes the long-standing protection models established by \glspl{os} and argued that maintaining coherent protection across hardware and software is essential for secure system design.
