@@ -3,7 +3,7 @@
 # $aux_dir = "build";
 # $out_dir = "out";
 
-set_tex_cmds('-interaction=nonstopmode %O %S');
+set_tex_cmds('-shell-escape -interaction=nonstopmode %O %S');
 
 # $pdflatex = 'ppdflatex -- -interaction=nonstopmode -shell-escape -synctex=1';
 # $pdflatex = 'ppdflatex';

@@ -20,9 +20,14 @@
 
 \clearpage
 
-As cloud computing increasingly adopts \emph{Confidential Virtual Machines} (CVMs) for trusted execution, the system’s traditional trust hierarchy is being inverted.
+
+To regain customers' trust in cloud, cloud providers are increasingly adopting specialized hardware from compute vendors (e.g., Intel, AMD).
+These are new processors with secure primitives built into the silicon that can create a \gls{tee}, which protects sensitive data and programs from the rest of the platform, including compromised cloud administrators.
+
+\gls{cvm} is the the next development in \gls{tee} technologies.
+As cloud computing increasingly adopts  for trusted execution, the system’s traditional trust hierarchy is being inverted.
 Where the operating system once resided within the trusted computing base (\gls{tcb}), it now operates alongside or even below untrusted hypervisors and shared hardware resources.
-This evolution exposes a fundamental \emph{trust-model misalignment}: the OS still assumes a position of privilege and control, yet hardware-level isolation confines it outside the core trust boundary.
+
 Consequently, even with hardware-provided isolation, side-channel attacks continue to undermine confidentiality guarantees.
 This chapter introduces \incognitos, a unikernel-based operating system that restores coherence between trust and protection by reimagining the OS as a self-obfuscating execution environment within a CVM.
 By retrofitting scheduling and memory management with adaptive obfuscation mechanisms, \incognitos transforms the OS from a potential attack surface into an active contributor to system-level confidentiality.
@@ -31,24 +36,33 @@ The remainder of this chapter presents the motivation, design, and evaluation of
 \clearpage
 
 
-\section{Toward coherent OS-CVM protection}
+\section{Toward coherent OS-assisted CVM protection}
 
 
-The new \gls{cvm} deployment model inherit challenges of trusted execution, namely the .
-
-At the same time, it also introduce the new challenges.
+\gls{cvm} brings unprecedented compatibility for cloud workloads, allowing users make an existing workload confidential.
+This improves usability, reduces the adoption costs, enabling trivial protection of existing applications without modification, and cutting-edge applications like AI inference~\cite{yifan2025pipellm}.
+Unfortunately, the \gls{cvm} also model inherit existing side-channel attacks challenges from the previous model of intel SGX, while also introducing unique challenges, due to the expanded \gls{tcb}.
 
 \hdr{Side-channel attacks}
+In 1973, Butler Lampson~\cite{lampson1973confinement} described in his seminar work, the difficulties of preventing an untrusted program from leaking secrets through \emph{covert channels} or \emph{side channels}.
+These channels, such as the time an operation takes, while not designed for information transfer, allow a program to communicate with other programs.
 
-In 1973, Butler Lampson~\cite{lampson1973confinement} described the difficulties of preventing an untrusted program from leaking secrets through \emph{covert channels} or \emph{side channels}.
 
-Modern trusted execution systems suffer from related challenges at both architectural and microarchitectural levels.
-
+In modern computing systems, side channels are major challenges in ensuring the security of \glspl{tee} and \gls{cvm}.
+Previous research has demonstrate feasibilty of microarchitectural attacks such as cache attacks~\cite{yarom_flushreload_nodate,liu_last-level_2015},
+that can be used to extract sensitive information.
+\gls{tee} deployments excabates the problem with a much stronger threat model compare to traditional protections (\cref{sec:intro:bg-os}).
+The attackers, now given access to powerful capabilities like page access interception~\cite{xu2015controlledchannel} and interrupt timers ~\cite{sgx-step,bulck2018nemesis,cachezoom}, are able extract sensitive from much more effectively.
 Side channels were a significant problem with Intel SGX, and continue to persist in the \gls{cvm} model.
-CVMs remain vulnerable to a broad class of side-channel attacks, including page-fault channels, cache-timing channels, scheduler-based channels, and I/O interface attacks.
+CVMs remain vulnerable to a broad class of side-channel attacks, including page-fault channels, cache-timing channels.
+Worse, newer \gls{cvm}-specific side-channels, such as the ciphertext side channel~\cite{li_cipherleaks_nodate,ciphersteal}, continued to be discovered.
 
-Another challenge arises from the narrow interface between the guest and hypervisor; misunderstanding or misusing this interface can introduce vulnerabilities, as prior work has demonstrated through interface-level attacks.
-Finally, the OS remains responsible for resource management inside the VM yet lacks visibility into how specific operations strengthen or weaken enclave-level security.
+
+% On the other hand, microarchitectural side-channel attacks leverages the subtle difference in the microarchitectural state that are produced when processing secret information.
+
+
+% Another challenge arises from the narrow interface between the guest and hypervisor; misunderstanding or misusing this interface can introduce vulnerabilities, as prior work has demonstrated through interface-level attacks.
+% Finally, the OS remains responsible for resource management inside the VM yet lacks visibility into how specific operations strengthen or weaken enclave-level security.
 
 % \hdr{Trusted I/O}
 %
@@ -62,22 +76,23 @@ However, doing so places a significant amount of code inside the TEE, and the se
 These OSes contain tens of millions of lines of code and thousands of known vulnerabilities.
 Thus, while placing full OSes in the TEE simplifies deployment, it also increases the risk of compromise.
 
-Toward reducing the TCB, prior work has explored several approaches.
-Panoply~\cite{shinde_panoply_2017} decomposes enclave applications into smaller least-privilege components.
-Gramine-TDX~\cite{dimitrii2024graminetdx}, and serverless enclave systems~\cite{jiacheng2025serverless} offlload non-essential functionalities from the guest into the host to reduce the code size.
+% Toward reducing the TCB, prior work has explored several approaches.
+% Panoply~\cite{shinde_panoply_2017} decomposes enclave applications into smaller least-privilege components.
+% Gramine-TDX~\cite{dimitrii2024graminetdx}, and serverless enclave systems~\cite{jiacheng2025serverless} offlload non-essential functionalities from the guest into the host to reduce the code size.
 
 
 
 
-\hdr{\incognitos: coherent OS-CVM protection}
+\hdr{\incognitos: coherent OS-asssited CVM protection}
 
-These challenges motivate \incognitos, which aligns the protection goal of the OS the threat model of confidential computing.
+\incognitos is designed to tackles the above challenges.
+It explores the principle of coherent protection (\cref{chap:intro}) by rethinking the traditional protection model of \gls{os} (\cref{sec:intro:bg-os}), to align with the protection estalished by \gls{cvm} hardware like AMD SEV and Intel TDX.
 
-\incognitos rethinks the traditional protection model of \gls{os} (\cref{sec:intro:bg-os}), to also incorporate side-channel attacks into its threat model.
-
-Further, with a unikerne design, it significantly reduce the \gls{tcb} of the system.
-
-\incognitos shows that, aligning the OS protection model with the threat model of CVM protection established by hardware enable powerful security properties.
+This shift in perspective has two implications.
+First, this means that the \gls{os} must now incorporate side-channel attacks from untrusted hypervisors into its threat model.
+with the \gls{os}'s access to low-level capabilities like memory management and scheduling, is able to \emph{efficiently} and \emph{transparently} protect the memory accesses from side-channel attack.
+Second,  it motivates the exploration of alternative OS designs to achieve the security goals.
+With a unikernel design, \thename render whole-system protection feasible, while also keeping the TCB minimal.
 
 \clearpage
 

@@ -2,6 +2,22 @@
 \documentclass[a4paper,11pt]{SKKU-PhD-Thesis}
 \let\setyear\year
 \let\year\TeXyear
+% \usepackage[recompile]{memoize}
+% \mmzset{
+% % deactivate={\tikz, tikzpicture}, % deactivate automemoization of all TikZ pictures
+% % deactivate=\tikz, % deactivate only the command
+% deactivate=tikzpicture, % deactivate only the environment
+% }
+
+\usepackage{robust-externalize}
+\robExtConfigure{
+% To display instructions in the PDF to manually compile pictures if
+% you forgot/do not want to compile with -shell-escape
+enable fallback to manual mode,
+}
+\cacheTikz
+
+
 
 
 \usepackage{IEEEtrantools}
@@ -107,6 +123,8 @@ citecolor=blue
 
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric,matrix,fit,arrows,arrows.meta,calc}
+
+
 % Also, note that the amsmath package sets \interdisplaylinepenalty to 10000
 % thus preventing page breaks from occurring within multiline equations. Use:
 \interdisplaylinepenalty=2500
@@ -116,6 +134,11 @@ citecolor=blue
 % http://www.ctan.org/tex-archive/macros/latex/required/amslatex/math/
 
 %\usepackage[ruled,vlined,linesnumbered,longend,resetcount,algochapter]{algorithm2e}
+%
+%
+
+% Hypenation looks terrible
+\usepackage[none]{hyphenat}
 
 % *** TRACKING CHANGED PACKAGES ***
 %\usepackage[final]{changes}
@@ -129,6 +152,10 @@ citecolor=blue
 % \addbibresource{references.bib}
 % \addbibresource{capacity.bib}
 % \addbibresource{sepim.bib}
+%
+%
+% HACK: for some reason diviopdfmx crashes with higher compression levels
+\special{dvipdfmx:config z 0}
 \begin{document}
 % \catcode`\-=\active
 % \newcommand-{hallo}
@@ -147,6 +174,7 @@ citecolor=blue
 \department{Computer Science and Engineering}
 % \title{Retrofitting Modern Operating System Security with Hardware Supports}
 \title{Retrofitting Operating System Security for Modern Hardware Protections}
+
 \setyear{2025}
 \month{November}
 \advisor{Hojoon Lee}
