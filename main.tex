@@ -138,7 +138,11 @@ citecolor=blue
 %
 
 % Hypenation looks terrible
-\usepackage[none]{hyphenat}
+% \usepackage[none]{hyphenat}
+\tolerance=1
+\emergencystretch=\maxdimen
+\hyphenpenalty=10000
+\hbadness=10000
 
 % *** TRACKING CHANGED PACKAGES ***
 %\usepackage[final]{changes}

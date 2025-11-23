@@ -74,7 +74,7 @@
 		Department of \@department\\
 	}
 	\newpage
-	\thispagestyle{empty}~
+	\thispagestyle{empty}
 }
 
 \newcommand{\makeinsidecover}{
@@ -91,7 +91,7 @@
 }
 
 \newcommand{\makesubmissionform}{
-\thispagestyle{empty}~
+\thispagestyle{empty}
 {\centering \TitleFont \@title\vfill}
 {\centering \subTitleFont \@author\vfill}
 {\centering \setstretch{2} \subsubTitleFont
@@ -197,8 +197,8 @@ Major Advisor\\
 % \iffontchar\font "2e3a \else {%
 % \newunicodechar{^^^^2e3a}{—\,—}%
 % } \fi
-% \newfontfamily\fallbackfont{cmunrm.ttf}
-\newfontfamily\fallbackfont{Noto Serif CJK KR}
+\newfontfamily\fallbackfont{cmunrm.ttf}
+% \newfontfamily\fallbackfont{Noto Serif CJK KR}
 % \DeclareTextFontCommand{\textfallback}{\fallbackfont}
 \newcommand{\fallbackchar}[2][\textfallback]{%
 	\newunicodechar{#2}{#1{#2}}%
