@@ -11,6 +11,8 @@
 
 \
 
+\clearpage
+
 The past century has witnessed rapid technological progress, with computing systems among its most transformative developments.
 The advent of the Internet revolutionized global information exchange, while recent advances in artificial intelligence have accelerated scientific discovery at an unprecedented pace.
 Underlying these breakthroughs are the infrastructures that enable computation—both software and hardware.
@@ -22,10 +24,13 @@ At the same time, advances in processor design have introduced new hardware-leve
 Consequently, system security is now jointly enforced by two distinct entities: the hardware and the software (\gls{os}).
 When their respective protection models diverge, gaps in protection may emerge, exposing attack vectors and undermining the intended guarantees of both.
 
-This dissertation argues that hardware-assisted security models must be systematically aligned with those established by the \gls{os}.
-Building on this principle, I explore methods to \emph{retrofit} hardware security features into existing system architectures in a principled and coherent manner.
-By restoring alignment between hardware and software protection, these methods enable systems to leverage the performance and security benefits of modern hardware while maintaining a unified protection model that is robust against modern threats.
+This dissertation argues that hardware-assisted protection models must be systematically coherent with those established by the software (\gls{os}).
+Through the len of coherent protection, it explores two modern challenges in systems security: hardware-assisted in-process isolation and side-channel mitigation in \gls{vm}-level \glspl{tee}.
+To address these challenges, the dissertation presents two systems: \capacity and \incognitos, which \emph{retrofit}  \gls{os} security for modern hardware security features in a principled and coherent manner.
 
+They provide blueprints for building future systems that leverage the performance and security benefits of modern hardware while maintaining a protection model that is robust against modern threats.
+
+\clearpage
 
 \section{Motivation}
 
