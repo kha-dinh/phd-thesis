@@ -4,16 +4,16 @@
 
 \epigraph{It's not the destination, it's the journey.}{\emph{Ralph Waldo Emerson}}
 
-\
+\ 
 
-\
+\ 
 
 
 % \clearpage
 
 %must
 % \capacity and \incognitos, the systems presented in this dissertation, address different layers of the stack but share a common theme: reestablishing coherence between newly defined protection mechanisms and the legacy models that underpin modern computing. This chapter systhesizes the lessons learned from these systems for  \gls{os} security in the era of hardware-defined protection, and conclude.
-\clearpage
+
 
 \section{Lessons Learned}
 
@@ -41,7 +41,6 @@ To avoid pitfalls and gaps in protection, future systems should continue to adop
 Important ideas in security, although often phased out of mainstream systems in favor of compatibility, remain relevant.
 
 Capability-based security, in particular, aligns surprisingly well with the programming model of many existing software interfaces, enabling fine-grained access control through retrofitting.
-
 Inspired by approaches such as DroidCap~\cite{droidcap} and Capsicum~\cite{capsicum}, \capacity's cryptographic capability mechanism integrates cleanly with UNIX file descriptors, which already behave as capability-like interfaces~\cite{miller2003capability}.
 Other recent systems follow similar principles.
 For embedded system compartmentalization, D-Box~\cite{dbox} leverages capability-based techniques to specify access control for DMA devices.
