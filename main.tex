@@ -122,7 +122,16 @@ citecolor=blue
 % \usepackage{svg}
 
 \usepackage{tikz}
-\usetikzlibrary{shapes.geometric,matrix,fit,arrows,arrows.meta,calc}
+\usetikzlibrary{shapes.geometric,
+positioning,
+matrix,
+fit,
+arrows,arrows.meta,calc,decorations.pathreplacing
+}
+
+\usepackage{pgfplots}
+\usepgfplotslibrary{fillbetween}
+\usetikzlibrary{intersections}
 
 
 % Also, note that the amsmath package sets \interdisplaylinepenalty to 10000
@@ -244,25 +253,23 @@ citecolor=blue
 %\include{ldt-MBL-Pre-0-abstract}
 \makeabstracttitle
 
-Computing systems have evolved dramatically, yet the security foundations of mainstream operating systems (OSes) remain rooted in protection models conceived decades ago.
-Traditional OSes enforce security through process- and file-based abstractions, mediating access between subjects and objects under a monolithic kernel trusted computing base.
-While this legacy model has proven durable, it no longer aligns with modern software complexity and emerging hardware protection mechanisms.
-Contemporary processors introduce primitives such as sub-process isolation (e.g., Intel PKU, ARM MTE, CHERI) and trusted execution environments (TEEs, Confidential VMs), which redefine the boundaries of trust and isolation.
-However, these advances often operate independently of OS enforcement, creating misalignments and new attack surfaces.
+Modern hardware increasingly provides powerful security mechanisms that operate partially outside the operating system’s traditional authority.
+At the same time, the long-standing OS protection model, built around coarse-grained process isolation, struggles to address the security and performance demands of modern software.
+This divergence leads to incoherent protection models, where hardware and software enforce security independently, leaving gaps that attackers can exploit.
 
-This thesis argues that sustainable system security requires systematically integrating hardware-backed protection into existing OS architectures.
-It explores two key challenges: (1) principled retrofitting of hardware-based security into legacy OS abstractions, and (2) redefining OS responsibilities under hardware-enforced isolation.
-To this end, the thesis presents \capacity, which retrofits capability-based security into in-process domains using hardware features such as pointer authentication and memory tagging; and \incognitos, which reimagines the OS as a self-obfuscating entity within Confidential VMs to mitigate side-channel leakage.
-These systems illustrate how principled retrofitting enables better security within and beyond traditional process boundaries.
+This dissertation argues that effective system security requires coherent protection: hardware-assisted protection models must align systematically with those implemented by the OS.
+Through this lens, the dissertation examines two emerging challenges: (1) hardware-assisted in-process isolation, and (2) side-channel mitigation in VM-level trusted execution environments.
+To address these challenges, it presents two systems, \capacity and \incognitos, which retrofit OS security mechanisms to modern hardware features without sacrificing compatibility.
 
-This thesis contributes to bridging the widening gap between legacy operating system architectures and the evolving landscape of hardware-enforced security.
-By demonstrating how hardware protection mechanisms can be systematically retrofitted into established OS abstractions, it offers a practical pathway for strengthening system security without disrupting decades of software compatibility.
+\capacity demonstrates how intra-process isolation domains established through ARM hardware primitives—such as Pointer Authentication and Memory Tagging—can be made coherent with legacy OS abstractions by transforming resource references into cryptographically authenticated capabilities.
 
+\incognitos addresses the challenge of aligning OS-level behavior with hardware-enforced VM isolation. 
+It redesigns OS capabilities \dash\ scheduling, and memory management \dash\ to mitigate side-channel leakage in confidential VMs while preserving compatibility and performance.
 
-These approaches influence both research and practice: they provide a blueprint for extending the lifespan and trustworthiness of existing OSes, inform the design of future security architectures that align with modern hardware, and advance the broader goal of achieving provable security guarantees in commodity systems.
+Together, these systems provide practical blueprints for reconciling modern hardware security primitives with long-standing OS protection models.
+They demonstrate that, through principled retrofitting, contemporary systems can leverage new hardware capabilities without sacrificing performance, compatibility, or security.
 
-
-Its ideas contribute to the long-term vision of secure computing infrastructures where hardware and software collaborate seamlessly to defend against contemporary and emerging threats.
+The ideas from this dissertation contribute to the vision of secure computing infrastructures where hardware and software collaborate seamlessly to defend against current and emerging threats.
 
 
 

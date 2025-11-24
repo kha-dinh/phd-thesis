@@ -12,15 +12,15 @@ minimum height=0.5cm,font=\scriptsize]
 \tikzstyle{boundary}=[draw=blue,very thick]
 	\begin{tikzpicture}[node distance=1.1cm]
 
-		\node[tcb,
-			text height=2.7cm,
-			minimum height=2.7cm,
-		] (os) {Operating System};
+		% \node[tcb,
+		% 	text height=2.7cm,
+		% 	minimum height=2.7cm,
+		% ] (os) {Operating System};
 		% \node[tcb] (hyp) {Hypervisor};                           \\
 
 
 		\node[proc,
-			above of=os,minimum width=\boxwidth,
+			minimum width=\boxwidth,
 			minimum height=3.6cm,
 			yshift=2.7cm
 		] (p1) {};
@@ -44,7 +44,7 @@ minimum height=0.5cm,font=\scriptsize]
 		\node[below of=comps,yshift=.4cm,font=\small]{Compartments};
 
 
-		\draw [draw,<->, very thick] (p1) --  (os)  node(test)[midway]{} node[midway,right]{System calls};
+		% \draw [draw,<->, very thick] (p1) --  (os)  node(test)[midway]{} node[midway,right]{System calls};
 		% \node[below of=p1,yshift=-1cm]{System calls};
 		% \draw [draw,thick,dashed] (p1.south west)++(2cm,0cm) -- (os.north west)++(4cm,0cm);
 		% Files below OS
@@ -53,46 +53,46 @@ minimum height=0.5cm,font=\scriptsize]
 		% \node[file, below of=p2,yshift=-.3cm] (f3) {File 3};
 
 
-		\matrix (resources) [above of=os,column sep=8pt,yshift=-.8cm,minimum width=\boxwidth - 0.3cm] {
-			\node[memblock,fill=gray!20] (r1) {Files};                          &
-			\node[memblock,fill=gray!20] (r2) {Sockets};                        &
-			\node[memblock,fill=gray!20,text width=2cm] (r3) {Memory Mappings}; &
-			\node[memblock,fill=gray!20] (r4) {Signals};                          \\
-		};
-		\node[above of=resources,yshift=-.3cm,font=\small]{System resources};
+		% \matrix (resources) [above of=os,column sep=8pt,yshift=-.8cm,minimum width=\boxwidth - 0.3cm] {
+		% 	\node[memblock,fill=gray!20] (r1) {Files};                          &
+		% 	\node[memblock,fill=gray!20] (r2) {Sockets};                        &
+		% 	\node[memblock,fill=gray!20,text width=2cm] (r3) {Memory Mappings}; &
+		% 	\node[memblock,fill=gray!20] (r4) {Signals};                          \\
+		% };
+		% \node[above of=resources,yshift=-.3cm,font=\small]{System resources};
 
 		%
 		\node[thick,draw=blue,fit=(c1)(m1),inner sep=2pt] (b1) {};
 		\node[thick,draw=blue,fit=(c2)(m2),inner sep=2pt] (b2) {};
 		\node[thick,draw=blue,fit=(c3)(m3),inner sep=2pt] (b3) {};
 		\node[thick,draw=blue,fit=(c4)(m4),inner sep=2pt] (b3) {};
-
-
-		\tikzstyle{resourcesmatrix}=[draw,column sep=5pt,yshift=.2cm];
-		\matrix(files) [below of=r2, resourcesmatrix] {
-			\node[draw,fill=blue!20](s1) {}; \\
-		};
-
-		\matrix(files) [below of=r1,resourcesmatrix] {
-			\node[draw,fill=orange!20](f1) {}; &
-			\node[draw,fill=green!20](f2) {};  &
-			\node[draw,fill=blue!20](f3) {};     \\
-		};
-
-		\matrix(files) [below of=r3,resourcesmatrix] {
-			\node[draw,fill=green!20](mm1) {}; &
-			\node[draw,fill=blue!20](mm2) {};  &
-			\node[draw,fill=gray!20](mm3) {};    \\
-		};
-
-		\matrix(files) [below of=r4,resourcesmatrix] {
-			\node[draw,fill=green!20]() {}; &
-			\node[draw,fill=orange!20]() {};  \\
-		};
-
-
-		\draw[very thick, -latex,red] (c1) to[out=270,in=90] (test) to[out=270,in=90] (f3);
-		\draw[very thick, -latex,  red](test) to[out=270,in=90] (mm2);
+		%
+		%
+		% \tikzstyle{resourcesmatrix}=[draw,column sep=5pt,yshift=.2cm];
+		% \matrix(files) [below of=r2, resourcesmatrix] {
+		% 	\node[draw,fill=blue!20](s1) {}; \\
+		% };
+		%
+		% \matrix(files) [below of=r1,resourcesmatrix] {
+		% 	\node[draw,fill=orange!20](f1) {}; &
+		% 	\node[draw,fill=green!20](f2) {};  &
+		% 	\node[draw,fill=blue!20](f3) {};     \\
+		% };
+		%
+		% \matrix(files) [below of=r3,resourcesmatrix] {
+		% 	\node[draw,fill=green!20](mm1) {}; &
+		% 	\node[draw,fill=blue!20](mm2) {};  &
+		% 	\node[draw,fill=gray!20](mm3) {};    \\
+		% };
+		%
+		% \matrix(files) [below of=r4,resourcesmatrix] {
+		% 	\node[draw,fill=green!20]() {}; &
+		% 	\node[draw,fill=orange!20]() {};  \\
+		% };
+		%
+		%
+		% \draw[very thick, -latex,red] (c1) to[out=270,in=90] (test) to[out=270,in=90] (f3);
+		% \draw[very thick, -latex,  red](test) to[out=270,in=90] (mm2);
 		% \draw [red,->,thick] plot [smooth ] coordinates {(c1.south) (test) (f3.north)};
 
 

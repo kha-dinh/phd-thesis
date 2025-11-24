@@ -1,0 +1,162 @@
+	\begin{tikzpicture}[
+		teeBlue/.style={fill=blue!10,draw=blue!60,thick,rounded corners=2pt},
+		box/.style    ={draw=black!70,rounded corners=2pt,thick,align=center},
+		arrow/.style  ={->,>={latex},thick},
+    font=\small
+		]
+
+		\tikzset{
+			pics/padlock/.style={
+					code={
+							\draw[line width=2pt,draw=blue!60]
+							(-0.15,0) arc (180:0:0.15 and 0.1) -- ++(0,-0.2) -- ++(-0.3,0) -- cycle;
+							\draw[line width=1pt,fill=blue!40,draw=blue!60]
+							(-0.25,-0.2) rectangle (0.25,-0.6);
+						}
+				}
+		}
+
+
+		% ---------- Parameters (all unit-less, treated as cm later) ----------
+		\def\W{6.0}    % total width
+		\def\Htop{3.5}  % TEE height
+		\def\Hbot{2.0}  % platform height
+		\def\gap{0.4}   % vertical gap
+		\def\pad{0.4}   % inner padding
+
+		\def\leftW{4.7} % left column width inside TEE
+		\def\rowH{1.2}  % row height for left-column boxes
+             
+		% Derived widths (unit-less numbers)
+		\pgfmathsetmacro{\cpuW}{\W - 7.2 - 2*\pad - 0.5}
+
+		% ---------- Top: VM-Level TEE ----------
+		\node[teeBlue, minimum width=\W cm, minimum height=\Htop cm, anchor=north west] (TEE) at (0,0) {};
+		\node[anchor=north] at ([xshift=0pt,yshift=-0pt]TEE.north) {Confidential Virtual Machine};
+
+			%        e
+			% \matrix (apps) [above of=os, column sep=7pt,yshift=0.3cm] {
+			% 	\node[proc] (p1) {Proc. 1}; &
+			% 	\node[proc] (p2) {Proc. 2}; &
+			% 	\node[proc] (p3) {Proc. 3};   \\
+			% };
+
+		% Left column (three stacked boxes)
+		\node[box, minimum width=2 cm, minimum height=\rowH cm, draw=red!70,line width=1pt, anchor=north west, fill=white]
+		(SD) at ([xshift=\pad cm,yshift=-0.6cm]TEE.north west) {Sensitive\\Data};
+		\node[box, minimum width=2 cm, minimum height=\rowH cm,  fill=white, anchor=west]
+		(APP) at ([xshift=\pad cm]SD.east) {Customer\\Application};
+		\node[box, minimum width=3 cm, minimum height=\rowH cm, anchor=north, fill=white]
+		(OS) at ([xshift=.3cm, yshift=-0.25cm]SD.south east) {Operating\\System};
+
+		% Right region: Encrypted Memory
+		\node[anchor=south east, align=right,font=\itshape\small\sffamily]
+      (ENC) at (TEE.south east){} ;
+
+		% ---------- Bottom: Untrusted Cloud Platform ----------
+		\node[draw=black!80,fill=red!10,thick,minimum width=\W cm, minimum height=\Hbot cm, anchor=north west]
+		(PLAT) at ([yshift= -.8 cm]TEE.south west) {};
+
+		\node[anchor=south] at ([yshift=2pt]PLAT.south) {Untrusted Cloud Platform};
+
+		% VMM (left)
+		\node[box, fill=red!10, minimum width=2.4cm, minimum height=\rowH cm, anchor=north]
+		(VMM) at ([xshift=-1 cm,yshift=-1.2 cm]OS.south) {Hypervisor};
+
+		% Trusted CPU Features  + padlock
+		\node[box, fill=blue!5, minimum width=2.4 cm, minimum height=\rowH cm,                             
+			anchor=west, draw=blue, thick]
+		(CPU) at ([xshift=\pad cm,yshift=0 cm]VMM.east) {Trusted CPU\\Features};                           
+
+
+
+		% ---------- Hardware Interfaces (double arrow & label) ----------
+		\path let \p1 = (OS.south), \p2 = (VMM.north)
+		in node (mid) at ($(\p1)!.5!(\p2)$) {};
+
+		% \draw[arrow,dotted] (SP) -- (APP) node[midway,sloped,above]{provides};
+		% \draw [-{Latex[length=1.5mm]},dotted] (leaf_1) to [bend left=30]  node [above, sloped]  (TextNode2) {$d_1$} (biomass_pool);
+		\draw[arrow,>={latex},color=red, densely dashed]
+		([xshift=.5cm]PLAT.north west)  to [bend left=10]
+		node[xshift=.2cm,above,sloped,align=left,font=\footnotesize\sffamily](TEXT){blocked}
+		(SD.220)
+		;
+
+		\draw[arrow] (OS) -- ($(mid)+(0,0.20)$);
+		\draw[arrow] (VMM) -- ($(mid)+(0,-0.20)$);
+		\node[fill=white,inner sep=1.6pt, draw=black!50, rounded corners=2pt] at (mid) {Hardware Interfaces};
+
+		% Padlocks
+		\pic at ([xshift=-12pt,yshift=20pt]ENC.north east) {padlock};
+		\pic at ([xshift=-2 pt,yshift=15pt]CPU.south east) {padlock};
+
+
+    % Side-channel issue
+    \matrix (states) [
+    xshift=-2.5cm,
+    yshift=-1.5cm,
+    draw,
+    anchor=east,
+    row sep=5pt,
+    minimum width=2cm,
+    text width=3cm,
+    align=center,
+    label=Hardware states
+    ] at (TEE.west) {
+        \node[draw,teeBlue] (dram) {DRAM Memory (Encrypted)};\\
+        \node[draw,teeBlue] (pt) {Host Page Table (Protected)}; \\
+        \node[draw,teeBlue] (tlb) {TLB (Protected)}; \\
+        \node[draw] (bp) {Branch Predictor}; \\
+        \node[draw] {Execution Unit}; \\
+        \node[draw] (cache){L1/L2/L3 Cache}; \\
+        \node[draw] (other) {Other States}; \\
+    };
+
+
+% \path[fill=red!10,draw=red,very thick,dashed]
+%   (states.north east)
+%     -- (PLAT.north west)
+%     -- (PLAT.south west)
+%     -- (states.south east)
+% node[midway,yshift=-.2cm,color=red]{side-channel attacks}
+%     -- cycle;
+
+
+\path[fill=blue!10,opacity=0.5]
+  (states.north east)
+    -- (TEE.north west)
+    -- (TEE.south west)
+    -- (states.south east)
+    -- cycle;
+
+\path[fill=red!20,opacity=0.5]
+  (states.north east)
+    -- (PLAT.north west)
+    -- (PLAT.south west)
+    -- (states.south east)
+    -- cycle;
+
+
+  \draw [decorate,thick,decoration={brace,amplitude=3mm, raise=.7mm}] 
+    (tlb.south west) -- (dram.north west) 
+    node[midway,xshift=-.4cm,anchor=east]{Architectural};
+
+  \draw [decorate,thick,decoration={brace,amplitude=3mm, raise=.7mm}] 
+    (other.south west) -- (bp.north west) 
+    node[midway,xshift=-.4cm,anchor=east]{Microarch.};
+% \draw [decorate,decoration={brace,amplitude=3mm,mirror, raise=.5mm}] (states.south west) -- (states.north west);
+
+\tikzstyle{connect}=[dashed, thick];
+\draw [connect](states.north east) -- (TEE.north west);
+\draw [connect](states.south east) -- (TEE.south west);
+
+
+
+\draw [connect,draw=red](states.north east) -- (PLAT.north west);
+\draw [connect, draw=red](states.south east) -- node[midway,yshift=-.2cm,color=red,draw,fill=white]{side-channel attacks} (PLAT.south west);
+
+  \draw[very thick,draw=red,<-] (pt.east) to[in=180,out=0]
+    node[midway,sloped,color=red,fill=white,text width=3cm,draw,]{controlled-channel attacks} (VMM.west); 
+
+
+	\end{tikzpicture}

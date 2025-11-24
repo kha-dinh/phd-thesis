@@ -16,17 +16,21 @@
 \clearpage
 
 Modern hardware increasingly embeds security primitives that, if properly integrated, can enforce fine-grained protection within software.
-Yet mainstream \glspl{os} continue to rely on process-based protection, introducing \emph{protection incoherencies}: while hardware features such as Intel PKU, ARM PA, and MTE provide security guarantees in userspace, the \gls{os} continues to mediate access at the coarse, process level.
+Yet mainstream \glspl{os} continue to rely on process-based protection, introducing \emph{protection incoherencies}: while hardware features such as Intel PKU, ARM PA, and MTE provide security guarantees in userspace, the \ glspl {os} continues to mediate access at the coarse, process level.
 
 This chapter presents \capacity, a hardware-assisted intra-process protection framework that reconciles these incoherencies by retrofitting a capability-based protection model into existing \gls{os} abstractions.
 By transforming memory and file references into cryptographically verifiable capabilities, \capacity extends trust enforcement beyond the kernel boundary and establishes hardware-backed integrity across in-process domains.
 
-The chater first explains how \capacity composes within the framework of coherent protection introduced in~\cref{chap:intro}.
+The chapter first explains how \capacity composes within the framework of coherent protection introduced in~\cref{chap:intro}.
 The remainder of the chapter then details the design, implementation, and evaluation of \capacity, showing how principled retrofitting enables efficient and coherent in-process isolation on modern ARM systems.
 
 \clearpage
 
+\begin{figure}[t]
+	\centering
 \input{figures/bg-ipi}
+	\caption{The system call interface allows a compromised compartment to access other domains' system resources.}\label{ipi-misalignment}
+\end{figure}
 
 \section{Toward Coherent In-process Isolation}
 
@@ -35,27 +39,30 @@ Despite the promise of fine-grained security and low performance overheads, mode
 \hdr{Kernel as a confused deputy}
 
 The seminal paper by Connor et al.~\cite{connor2020pku} demonstrates this problem for PKU-based systems, highlighting the risk of \emph{confused-deputy attacks}~\cite{hardy_confused_1988} targeting the kernel~\cite{pku-pitfall}.
-Specifically, in these system, the \gls{os} is unaware of an application's internal protection domains and therefore continues to enforce access control only at process granularity.
+Such attack vector is shown in \autoref{ipi-misalignment}.
+The \gls{os} is unaware of a process's userspace protection domains and therefore continues to enforce access control only at \emph{process} granularity, inadvertently compromising the in-process isolation scheme.
 For instance, a domain may use the \texttt{mmap} system call to \emph{remove} \gls{pku} protection on a target page.
 Even worse, system calls such as \texttt{process\_vm\_readv} and \texttt{send}, and kernel mechanisms like signals, read from userspace memory without regard for in-process domains, enabling a domain to bypass memory isolation~\cite{pku-pitfall,yang2025endokernel}.
 
-Recent work proposes addressing this problem by introducing an in-process \emph{reference monitor} to vet resource accesses.
+Recent work proposes addressing the confused deputy problem by introducing an in-process \emph{reference monitor}.
+The reference monitor interceps all system calls made by the protected application, then enforce access control on domains' accesses to resources.
 However, defining correct and comprehensive policies for in-process isolation is difficult.
 Due to the semantic gap between \gls{os}-level protection and in-process enforcement, policies defined by such monitors are often incomplete, missing information flows on many system calls~\cite{yang2025endokernel,schrammel2022jenny}.
 A principled approach to retrofitting security remains an open challenge.
 
 I posit that the root cause of the confused-deputy problem is the \emph{incoherency of protection} introduced when attempting to retrofit hardware-assisted isolation into the existing process-level model enforced by the \gls{os}.
-Most in-process mechanisms focus primarily on memory isolation, whereas the \gls{os} enforces access control across all resource types (e.g., memory \emph{and} files).
-This incoherency introduces gaps in protection that can be exploited by attackers.
+Most in-process mechanisms focus primarily on memory isolation. 
+In contrast, the \gls{os} enforces access control across all resource types (e.g., memory \emph{and} files).
+This incoherence introduces gaps in protection that attackers can exploit.
 
 \hdr{Capacity: coherent in-process isolation}
 
 \capacity adopts the principle of coherent protection (\cref{chap:intro}) by ensuring that hardware-assisted in-process isolation remains coherent—covering \emph{all} resource types.
 Observing that PA and MTE on modern ARM processors exhibit characteristics of a capability-based protection model, \capacity proposes a capability-based scheme that coherently protects both userspace references (i.e., pointers) and references to system objects.
-This approach enables protection of sensitive resources throughout their life cycles.
+This approach enables the protection of sensitive resources throughout their life cycles.
 
-This coherency also enables efficiency.
-\capacity benefits from hardware acceleration for reference authentication, achieving low overhead, while cryptographically authenticated references simplify enforcement (KISS principle~\cite{kiss}): both userspace and system resource references are authenticated with a single instruction.
+This coherence also enables efficiency.
+\capacity benefits from hardware-accelerated reference authentication, achieving low overhead, while cryptographically authenticated references simplify enforcement (KISS principle~\cite{kiss}): both userspace and system resource references are authenticated with a single instruction.
 
 \clearpage
 
@@ -78,7 +85,7 @@ Newer ARM architectures introduce Pointer Authentication (PA) and Memory Tagging
 Despite their potential, these features are underexplored in the context of userspace program compartmentalization.
 
 This paper presents \thename, a novel hardware-assisted intra-process access control design that embraces capability-based security principles.
-\thename coherently incorporates the new hardware security features on ARM, based on the insight that the features already exhibit inherent capability characteristics.
+\thename coherently incorporates the new hardware security features on ARM, based on the insight that these features already exhibit inherent capabilities.
 It supports the life-cycle protection of the domain's sensitive objects \dash\ starting from their import from the file system to their place in memory.
 With intra-process domains authenticated with unique PA keys, \thename transforms file descriptors and memory pointers into cryptographically-authenticated references and completely mediates reference usage with its program instrumentation framework and an efficient system call monitor.
 We evaluate our \thename-enabled NGINX web server prototype and other common applications in which sensitive resources are isolated into different domains. Our evaluation shows that \thename incurs a low-performance overhead of approximately $17\%$ for the single-threaded and $13.54\%$ for the multi-threaded webserver.
