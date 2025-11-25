@@ -17,3 +17,8 @@ build
 main.pdf
 main.filtered
 *robExt*
+main.auxlock
+main.mmz
+main_vimtex_selected.pdf
+main_vimtex_selected.tex
+n
