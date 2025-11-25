@@ -83,6 +83,7 @@ This thesis focuses on the two recent developments enabled by hardware-assisted 
 Modern systems must leverage these new hardware features to enhance security and performance.
 Thus, the challenge for this dissertation is to explore principles for securely incorporating these security features.
 
+\clearpage
 
 \section{Approach}
 
@@ -125,6 +126,8 @@ Similarly, trying to retrofit legacy \glspl{os} into VM-level isolation (e.g., A
 This dissertation explores the principle of coherent protection with two complementary approaches:
 (1) retrofitting security guarantees provided by hardware to those provided by the SO, or (2) retrofitting the OS protection model to reflect the one established by hardware.
 
+\clearpage
+
 \section{Contributions}
 
 The work presented in this thesis, \capacity and \incognitos, examines two layers of the protection hierarchy to illustrate the broader principle of coherent protection.
@@ -146,6 +149,8 @@ The work presented in this thesis, \capacity and \incognitos, examines two layer
 	      Specifically, \incognitos redefines the role of the \gls{os} in modern \gls{cvm}- protected systems, treating it as an active component in mitigating \emph{side-channel attacks}, a critical attack vector for \gls{tee}.
 	      By retrofitting \gls{os} capabilities, scheduling, and memory management, it mitigates side-channel leakage while incurring reasonable overheads from protection.
 \end{itemize}
+
+\clearpage
 
 \section{Outline}
 

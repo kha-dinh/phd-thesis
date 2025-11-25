@@ -33,8 +33,9 @@ The remainder of this chapter is structured as follows.
 \cref{sec:intro:bg-ipi} and \cref{sec:intro:bg-cvm} examine two modern trends in hardware-defined protection -- the key drivers behind this thesis -- highlighting their motivations, enabling hardware features.
 
 
-\section{OS Protection}
-\label{sec:intro:bg-os}
+\clearpage
+
+\section{OS Protection}\label{sec:intro:bg-os}
 
 
 Ensuring software security became essential for \glspl{os} with the emergence of multiprogramming in the 1960s, when systems began supporting multiple concurrent users and programs.
@@ -102,6 +103,7 @@ When a process accesses a file, the \gls{os} enforces permissions by checking:
 	\item Else, apply the \texttt{other} permissions.
 \end{enumerate}
 
+
 \subsection{Legacy hardware protection}
 
 Most modern \glspl{os} assume certain hardware-enabled protection features to enforce security.
@@ -150,6 +152,8 @@ This position allows the hypervisor to mediate access to hardware resources and 
 Early x86 processors were not fully visualizable because some sensitive instructions failed to trap when executed outside ring 0.
 To address this, hypervisors such as VMware initially relied on dynamic binary translation to rewrite problematic instructions~\cite{devine2002virtualization}.
 Later, hardware extensions such as Intel VT-x~\cite{uhlig2005intel} and AMD-V introduced explicit support for virtualization, providing a new privilege mode for the hypervisor and mechanisms to securely switch between guest and host contexts.
+
+\clearpage
 
 \section{Hardware-assisted In-process Isolation}\label{sec:intro:bg-ipi}
 
@@ -243,6 +247,7 @@ MTE can enforce access control policies at the granularity of 16 bytes, and PKU-
 
 
 
+\clearpage
 
 \section{TEEs and Confidential Virtual Machines}
 \label{sec:intro:bg-cvm}
