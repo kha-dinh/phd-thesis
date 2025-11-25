@@ -46,6 +46,10 @@ citecolor=blue
 \usepackage{subcaption}
 % \expandafter\def\csname ver@subfig.sty\endcsname{}
 
+% Silent warnings
+\usepackage{silence}
+\WarningsOff
+
 % Highlight and stuffs
 \usepackage{soul}
 \makeatletter 
@@ -157,6 +161,7 @@ arrows,arrows.meta,calc,decorations.pathreplacing
 %\usepackage[final]{changes}
 %\usepackage[addedmarkup=uwave]{changes}
 %\setdeletedmarkup{\textcolor{red}{\sout{#1}}}
+%
 
 % \include{ldt_MBL_newcommand}
 
@@ -168,7 +173,9 @@ arrows,arrows.meta,calc,decorations.pathreplacing
 %
 %
 % HACK: for some reason diviopdfmx crashes with higher compression levels
-\special{dvipdfmx:config z 0}
+% \special{dvipdfmx:config z 9}
+
+
 \begin{document}
 % \catcode`\-=\active
 % \newcommand-{hallo}
@@ -263,7 +270,7 @@ To address these challenges, it presents two systems, \capacity and \incognitos,
 
 \capacity demonstrates how intra-process isolation domains established through ARM hardware primitives—such as Pointer Authentication and Memory Tagging—can be made coherent with legacy OS abstractions by transforming resource references into cryptographically authenticated capabilities.
 
-\incognitos addresses the challenge of aligning OS-level behavior with hardware-enforced VM isolation. 
+\incognitos addresses the challenge of aligning OS-level behavior with hardware-enforced VM isolation.
 It redesigns OS capabilities \dash\ scheduling, and memory management \dash\ to mitigate side-channel leakage in confidential VMs while preserving compatibility and performance.
 
 Together, these systems provide practical blueprints for reconciling modern hardware security primitives with long-standing OS protection models.

@@ -91,28 +91,28 @@
 }
 
 \newcommand{\makesubmissionform}{
-\thispagestyle{empty}
-{\centering \TitleFont \@title\vfill}
-{\centering \subTitleFont \@author\vfill}
-{\centering \setstretch{2} \subsubTitleFont
-A Ph.D. Dissertation Submitted to the Department of  \@department{} and the\\
-Graduate School of Sungkyunkwan University in partial fulfillment of
-the requirements for the\\
-degree of Ph.D. in Engineering\vfill}
-{\centering \subsubTitleFont \@month{} \@year\vfill}
-{\centering \setstretch{2} \subTitleFont Supervised by\\
-Professor \@advisor\\
-Major Advisor\\
-}
-\newpage
+	\thispagestyle{empty}
+	{\centering \TitleFont \@title\vfill}
+	{\centering \subTitleFont \@author\vfill}
+	{\centering \setstretch{2} \subsubTitleFont
+		A Ph.D. Dissertation Submitted to the Department of  \@department{} and the\\
+		Graduate School of Sungkyunkwan University in partial fulfillment of
+		the requirements for the\\
+		degree of Ph.D. in Engineering\vfill}
+	{\centering \subsubTitleFont \@month{} \@year\vfill}
+	{\centering \setstretch{2} \subTitleFont Supervised by\\
+		Professor \@advisor\\
+		Major Advisor\\
+	}
+	\newpage
 }
 \newcommand{\makecertification}{
 	\thispagestyle{empty}
 	{\centering \setstretch{2} \subTitleFont This certifies that the Ph.D. Dissertation of \\
 		\@author\ is approved.\vfill}
 	\begin{minipage}{0.45\linewidth}
-    ~
-  \end{minipage}%
+		~
+	\end{minipage}%
 	\begin{minipage}{0.55\linewidth}
 		% Somehow only hphantom works here
 		\setstretch{1.75}
@@ -197,8 +197,8 @@ Major Advisor\\
 % \iffontchar\font "2e3a \else {%
 % \newunicodechar{^^^^2e3a}{—\,—}%
 % } \fi
-\newfontfamily\fallbackfont{cmunrm.ttf}
-% \newfontfamily\fallbackfont{Noto Serif CJK KR}
+% \newfontfamily\fallbackfont{cmunrm.ttf}
+\newfontfamily\fallbackfont{Noto Serif CJK KR}
 % \DeclareTextFontCommand{\textfallback}{\fallbackfont}
 \newcommand{\fallbackchar}[2][\textfallback]{%
 	\newunicodechar{#2}{#1{#2}}%
@@ -221,7 +221,8 @@ Major Advisor\\
 \DeclareRobustCommand\dash{{\fallbackfont{^^^^2014}}}
 
 \setmainfont{HMJ}[
-	Mapping=tex-text,
+	% Mapping=tex-text,
+	Ligatures=TeX,
 	AutoFakeSlant=0.3,AutoFakeBold=4, % There are no no italic and bold faces so we fake them LOL
 	Path=./,
 	Extension=.ttf,
