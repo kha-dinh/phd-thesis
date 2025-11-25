@@ -7,9 +7,9 @@
 	This then is programming, both a tar pit in which many efforts have floundered and a creative activity with joys and woes all its own.
 }{\textit{Frederick P. Brooks, Jr}, The Mythical Man-month}
 
-\ 
+\
 
-\ 
+\
 
 
 Most \glspl{os} pursue three fundamental objectives.
@@ -105,7 +105,7 @@ When a process accesses a file, the \gls{os} enforces permissions by checking:
 \subsection{Legacy hardware protection}
 
 Most modern \glspl{os} assume certain hardware-enabled protection features to enforce security.
-These features have evolved alongside \gls{os} design for more than six decades and have converged into the architectural foundations that continue to underpin commodity systems: a dual-mode privilege hierarchy, kernel-mediated access control, and virtual memory–based isolation. 
+These features have evolved alongside \gls{os} design for more than six decades and have converged into the architectural foundations that continue to underpin commodity systems: a dual-mode privilege hierarchy, kernel-mediated access control, and virtual memory–based isolation.
 
 
 \hdr{Protection rings for privilege separation}
@@ -196,13 +196,13 @@ First, the instrumentation required for SFI imposes instruction-level overhead a
 Second, host applications often require modification~\cite{rlbox} to interface cleanly with WASM bytecode, and compatibility remains imperfect; WASI supports only a limited set of system interactions.
 
 \begin{table}[t]
-  \small
+	\small
 	\begin{center}
 		\begin{tabular}[c]{p{6cm}p{2cm}p{2cm}p{3cm}}
 			\toprule
 			                                                                & Context switching costs & Runtime overheads & Compatibility \textbackslash{}w existing applications \\
 			\midrule
-			Virtual machines                                                & Very high                     & Low               & Low                                                   \\
+			Virtual machines                                                & Very high               & Low               & Low                                                   \\
 			Process                                                         & High                    & None              & Low                                                   \\
 			SFI                                                             & Low                     & Medium            & Medium                                                \\
 			Hardware-assisted\
@@ -227,9 +227,9 @@ CHERI capabilities enforce fine-grained memory safety through 128-bit pointers t
 
 
 \begin{figure}
-  \centering
-\input{figures/bg-ipi-bg}
-\caption{In-process isolation divides a process into smaller, isolated compartments.}\label{ipi}
+	\centering
+	\input{figures/bg-ipi-bg}
+	\caption{In-process isolation divides a process into smaller, isolated compartments.}\label{ipi}
 \end{figure}
 
 A plethora of work leverages these new hardware isolation primitives to retrofit \emph{in-place} domain isolation into existing applications~\cite{erim,hodor}.
@@ -247,12 +247,12 @@ MTE can enforce access control policies at the granularity of 16 bytes, and PKU-
 \section{TEEs and Confidential Virtual Machines}
 \label{sec:intro:bg-cvm}
 
-This section provides background on \glspl{tee} and the industry's shift toward \glspl{cvm}, establishing the context for \incognitos, an \gls{os}- design for \gls{cvm} side-channel mitigation, as presented in \cref{chap: incognitos}.
+This section provides background on \glspl{tee} and the industry's shift toward \glspl{cvm}, establishing the context for \incognitos, an \gls{os}- design for \gls{cvm} side-channel mitigation, as presented in \cref{chap:incognitos}.
 
 \subsection{Motivation: re-establishing trust in the cloud}
 
 Cloud computing has transformed modern application deployment, enabling users to host services without maintaining their own infrastructure.
-Over time, critical services—including financial, healthcare, and AI workloads—have become increasingly dependent on cloud platforms. 
+Over time, critical services—including financial, healthcare, and AI workloads—have become increasingly dependent on cloud platforms.
 By 2025, cloud computing will have grown into an almost trillion-dollar market.\footnote{\url{https://www.cloudzero.com/blog/cloud-computing-statistics/}}
 
 Traditionally, cloud computing requires users to fully trust the \gls{csp} to preserve the confidentiality and integrity of their outsourced computation.
@@ -269,16 +269,16 @@ In contrast, \gls{tee} systems (right) reduce the \gls{tcb} to the TEE-capable h
 
 
 The key properties of \glspl{tee} are (1) \gls{tcb} minimization, (2) root-of-trust establishment, and (3) runtime isolation. \begin{itemize}
-  \item \textbf{\gls{tcb} minimization} reduces the amount of code that must be trusted for the security of a protected application. 
-    By excluding the \ glspl {os}, hypervisor, and most system software from the \ glspl {tcb}, \glspl{tee} limits the attack surface and makes formal or informal assurance more tractable. 
-Only a small hardware-defined computing base and the trusted portion of the application remain within the \gls{tcb}.
-\item \textbf{Root-of-trust establishment} provides a verifiable foundation upon which remote users can rely. 
-TEEs use hardware-backed cryptographic keys and measurement mechanisms (e.g., hashing of code and initial state) to create attestable evidence of the platform's integrity. 
-This evidence allows a relying party to confirm that the expected \gls{tee} implementation is running and that the deployed computation has not been tampered with before execution.
-This process of establishing trust is also called \emph{remote attestation}.
-\item \textbf{Runtime isolation} protects the confidentiality and integrity of an application's execution against other software on the same platform. 
-  Once an enclave is initialized, the \gls{tee} enforces strict memory and state isolation: the \gls{os}, hypervisor, or co-resident applications cannot observe or modify the protected execution context. 
-Isolation typically includes encrypted memory, restricted access to registers or microarchitectural state, and hardware-managed enforcement of access controls.
+	\item \textbf{\gls{tcb} minimization} reduces the amount of code that must be trusted for the security of a protected application.
+	      By excluding the \ glspl {os}, hypervisor, and most system software from the \ glspl {tcb}, \glspl{tee} limits the attack surface and makes formal or informal assurance more tractable.
+	      Only a small hardware-defined computing base and the trusted portion of the application remain within the \gls{tcb}.
+	\item \textbf{Root-of-trust establishment} provides a verifiable foundation upon which remote users can rely.
+	      TEEs use hardware-backed cryptographic keys and measurement mechanisms (e.g., hashing of code and initial state) to create attestable evidence of the platform's integrity.
+	      This evidence allows a relying party to confirm that the expected \gls{tee} implementation is running and that the deployed computation has not been tampered with before execution.
+	      This process of establishing trust is also called \emph{remote attestation}.
+	\item \textbf{Runtime isolation} protects the confidentiality and integrity of an application's execution against other software on the same platform.
+	      Once an enclave is initialized, the \gls{tee} enforces strict memory and state isolation: the \gls{os}, hypervisor, or co-resident applications cannot observe or modify the protected execution context.
+	      Isolation typically includes encrypted memory, restricted access to registers or microarchitectural state, and hardware-managed enforcement of access controls.
 \end{itemize}
 
 
@@ -304,15 +304,15 @@ During enclave creation, SGX measures the enclave's initial code and data and re
 
 \subsection{Modern hardware support for CVMs}
 
-Despite its strong isolation guarantees, SGX did not achieve widespread adoption. 
+Despite its strong isolation guarantees, SGX did not achieve widespread adoption.
 In practice, many applications could not be migrated to SGX without extensive redesign because enclaves execute in a highly restricted environment: they cannot perform system calls directly, cannot access files or network sockets, and rely on an untrusted \gls{os} for scheduling, paging, and I/O mediation.
 As a result, developers must partition their applications, implement enclave-specific interfaces, and adopt complex communication mechanisms.
 These constraints significantly increase the effort required to develop enclave applications.
 
 \begin{figure}[t]
 	\centering
-\input{figures/bg-cvm-tikz}
-\caption{CVMs encapsulate the entire VM, including the OS and application, inside a protection domain.}\label{cvm}
+	\input{figures/bg-cvm-tikz}
+	\caption{CVMs encapsulate the entire VM, including the OS and application, inside a protection domain.}\label{cvm}
 \end{figure}
 
 Recognizing the need for compatibility, vendors introduced a new class of \gls{tee} called \gls{cvm}.
