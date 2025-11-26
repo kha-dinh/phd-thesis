@@ -25,12 +25,12 @@ Historically, security enforcement has been primarily the responsibility of the 
 However, in recent years, we have seen a shift toward (1) finer-grained, application-defined isolation and (2) hardware-defined security boundaries enabled by modern architectural features.
 This dissertation argues that the legacy protection model established by the \gls{os} must be revisited for modern security needs.
 
-This chapter covers the fundamental background for the ideas developed in this dissertation.
-Background relevant to each major component appears in their perspective chapters, \cref{chap:capacity} and \cref{chap:incognitos}.
+This chapter covers the background for the ideas developed in this dissertation.
+Technical background relevant to each major component appears in their respective chapters, \cref{chap:capacity} and \cref{chap:incognitos}.
 
 The remainder of this chapter is structured as follows.
 \cref{sec:intro:bg-os} reviews the traditional OS protection model and its influences.
-\cref{sec:intro:bg-ipi} and \cref{sec:intro:bg-cvm} examine two modern trends in hardware-defined protection -- the key drivers behind this thesis -- highlighting their motivations, enabling hardware features.
+\cref{sec:intro:bg-ipi} and \cref{sec:intro:bg-cvm} examine two modern trends in hardware-defined protection \dash\ the key drivers behind this thesis \dash\ highlighting their motivations and enabling hardware features.
 
 
 \clearpage
@@ -114,7 +114,7 @@ These features have evolved alongside \gls{os} design for more than six decades 
 
 A fundamental security requirement of the \gls{os} is to protect itself from untrusted programs and prevent them from bypassing access control (e.g., by corrupting critical \gls{os} data structures).
 
-Modern \glspl{os} employ protection rings to achieve this, establishing two execution modes: kernel and user.
+Modern \glspl{os} employs protection rings to achieve this, establishing two execution modes: kernel and user.
 Kernel mode hosts the \gls{os}. It runs in the most privileged level, ring~0, which is permitted to execute sensitive instructions and interact directly with hardware devices.
 User-mode programs run in ring~3 and are restricted from issuing sensitive instructions or accessing protected resources.
 Requests for system resources must be mediated by the kernel through a restricted interface known as the system call.
@@ -166,7 +166,7 @@ These provide context for \capacity (\cref{chap:capacity}), a hardware-supported
 Modern software systems often consolidate large amounts of functionality into a single process.
 This monolithic design simplifies deployment and avoids the overhead of designing and maintaining multi-process applications.
 However, it enlarges the program's \gls{tcb}. When a process has access to system secrets (e.g., cryptographic keys) or privileged operations (e.g., executing arbitrary commands), a single vulnerability anywhere in the process can lead to secret leakage or privilege escalation.
-The Heartbleed vulnerability in OpenSSL, discovered in April 2014, is a well-known example where a single memory bug compromised the confidentiality of all its users.
+The Heartbleed vulnerability in OpenSSL~\cite{heartbleed}, discovered in April 2014, is a well-known example where a single memory bug compromised the confidentiality of all its users.
 The incident affected millions of systems and underscored the need for finer-grained isolation of untrusted code.
 
 Worse, modern applications increasingly rely on third-party components.
@@ -174,8 +174,10 @@ Language runtimes such as Node.js and Python depend on large public repositories
 Research has shown that compromised commonly used packages affect up to hundreds of thousands of users~\cite{vasilakis_supply-chain_2021}.
 
 Because software bugs are inevitable and preventing supply-chain attacks remains difficult, an effective way to limit their impact is \emph{privilege separation}.
-This approach divides software into isolated protection domains (\cref{chap:background}), each with access to only a minimal set of privileges.
-For instance, a URL parsing library should not be allowed access to program execution or networking, or only the cryptographic library should be able to read the system's private key.
+This approach divides software into isolated protection domains (\cref{sec:intro:bg-os}), each with access to only a minimal set of privileges.
+For instance, a URL parsing library should not be allowed access to networking system calls and data strucutres, or only the cryptographic library should be able to read the system's private key.
+This is the act of decomposing software into least-priviledge components is also called \emph{compartmentalization}~\cite{hugo2025sok}.
+
 The need for privilege separation in complex software has long been recognized by both research and industry.
 In 2003, Provos et al.~\cite{provos2003preventing} discussed over-privilege in core OS services and proposed a privilege-separation architecture later applied to the OpenSSH server.
 Influenced by this work, similar designs were deployed in the Chromium browser~\cite{barth2008security} starting in 2008, separating the browser into two processes: a browser kernel and sandboxed rendering engines.
@@ -195,7 +197,8 @@ While this offers strong isolation, it suffers from prohibitive context-switchin
 The most widely used implementations include Google's Native Client, later superseded by WebAssembly (WASM).
 Due to WASM's broad adoption and standardization, recent efforts have explored its use for sandboxing native code.
 Specifications like \gls{wasi}~\cite{wasi} define interfaces for WASM modules to interact with \gls{os} services.
-Unfortunately, \gls{sfi} introduces several drawbacks.
+
+Unfortunately, \gls{sfi} introduces several drawbacks that prevent practical adoption for compartmentalization.
 First, the instrumentation required for SFI imposes instruction-level overhead and requires compiler support, necessitating recompilation of libraries.
 Second, host applications often require modification~\cite{rlbox} to interface cleanly with WASM bytecode, and compatibility remains imperfect; WASI supports only a limited set of system interactions.
 
@@ -225,7 +228,7 @@ Second, host applications often require modification~\cite{rlbox} to interface c
 \autoref{tab:isolation} provides a comparison between the previously described isolation primitives and modern hardware-assisted isolation.
 Hardware-assisted isolation introduced by emerging architectural features addresses several of the limitations discussed above.
 Recent processors offer primitives that directly support efficient in-process memory isolation.
-Intel Memory Protection Keys (PKU) allow user-space code to assign access rights to groups of pages and to modify those rights without changing page tables.
+Intel \gls{pku} allow user-space code to assign access rights to groups of pages and to modify those rights without changing page tables.
 ARM Memory Tagging Extension (MTE) associates pointers and memory with tags, enabling fine-grained, hardware-checked bounds on memory accesses.
 CHERI capabilities enforce fine-grained memory safety through 128-bit pointers that encapsulate their bounds and permissions.
 
@@ -236,11 +239,11 @@ CHERI capabilities enforce fine-grained memory safety through 128-bit pointers t
 	\caption{In-process isolation divides a process into smaller, isolated compartments.}\label{ipi}
 \end{figure}
 
-A plethora of work leverages these new hardware isolation primitives to retrofit \emph{in-place} domain isolation into existing applications~\cite{erim,hodor}.
+A plethora of work leverages these new hardware isolation primitives to retrofit \emph{in-place} domain isolation or compartmentalization into existing applications~\cite{erim,hodor,cerberus,jenny,ghosn2021enclosure,cryptompk,chen2016shreds}.
 This retrofitting process often involves inserting domain boundaries between logical components of a process.
 Each \emph{in-process domain} is given access to a subset of program memory.
 Communication between domains is restricted, and their entries and exits are strictly controlled through domain \emph{entry/exit gates}.
-\autoref{ipi} demonstrates one of such configurations, where libraries are placed into compartments with separate memory spaces.
+\autoref{ipi} demonstrates one of such in-process compartmentalization, where libraries are placed into compartments with separate memory spaces.
 
 Modern hardware features enable fine-grained memory-protection enforcement and efficient domain entry gating.
 MTE can enforce access control policies at the granularity of 16 bytes, and PKU-based isolation systems can switch between up to 15 memory domains at runtime with overheads of only about 260 cycles~\cite{erim}.
@@ -249,15 +252,14 @@ MTE can enforce access control policies at the granularity of 16 bytes, and PKU-
 
 \clearpage
 
-\section{TEEs and Confidential Virtual Machines}
-\label{sec:intro:bg-cvm}
+\section{TEEs and Confidential Virtual Machines}\label{sec:intro:bg-cvm}
 
 This section provides background on \glspl{tee} and the industry's shift toward \glspl{cvm}, establishing the context for \incognitos, an \gls{os}- design for \gls{cvm} side-channel mitigation, as presented in \cref{chap:incognitos}.
 
 \subsection{Motivation: re-establishing trust in the cloud}
 
 Cloud computing has transformed modern application deployment, enabling users to host services without maintaining their own infrastructure.
-Over time, critical services—including financial, healthcare, and AI workloads—have become increasingly dependent on cloud platforms.
+Over time, critical services, including financial, healthcare, and AI workloads, have become increasingly dependent on cloud platforms. 
 By 2025, cloud computing will have grown into an almost trillion-dollar market.\footnote{\url{https://www.cloudzero.com/blog/cloud-computing-statistics/}}
 
 Traditionally, cloud computing requires users to fully trust the \gls{csp} to preserve the confidentiality and integrity of their outsourced computation.
@@ -265,12 +267,16 @@ However, this trust is often unwarranted: cloud platforms face persistent cybera
 In 2024, cyber incidents exposed over 280 million records in the U.S. health sector alone.\footnote{\url{https://www.verizon.com/business/resources/reports/2024-dbir-data-breach-investigations-report.pdf}}
 Data breaches are also financially damaging, costing organizations up to \$4.4 billion on average in remediation efforts as of 2025.\footnote{\url{https://www.ibm.com/downloads/documents/us-en/131cf87b20b31c91}}
 
+\begin{figure}[t]
+    \centering
 \input{figures/bg-tee-trust-model-tikz}
+\caption{Trust model of Traditional computing vs. Intel SGX.}\label{trad-vs-tee}
+\end{figure}
 
 \Glspl{tee} aims to re-establish trust in cloud environments by enabling remote users to securely deploy computation and isolating that computation from the rest of the platform, including cloud administrators.
-\autoref{fig:bg:trust-model-tee} illustrates the trust models of traditional systems and that of \glspl{tee}, such as Intel SGX~\cite{costan_intel_2016}.
+\autoref{trad-vs-tee} illustrates the trust models of traditional systems and that of \glspl{tee}, such as Intel \gls{sgx}~\cite{costan_intel_2016}.
 In traditional systems (left), the application owner must trust the entire software stack—including the \gls{os}, hypervisor, and hardware.
-In contrast, \gls{tee} systems (right) reduce the \gls{tcb} to the TEE-capable hardware and the trusted portion of the application, referred to as the \emph{enclave} in SGX.
+In contrast, \gls{tee} systems (right) reduce the \gls{tcb} to the TEE-capable hardware and the trusted portion of the application, referred to as the \emph{enclave} in \gls{sgx}.
 
 
 The key properties of \glspl{tee} are (1) \gls{tcb} minimization, (2) root-of-trust establishment, and (3) runtime isolation. \begin{itemize}
@@ -289,10 +295,10 @@ The key properties of \glspl{tee} are (1) \gls{tcb} minimization, (2) root-of-tr
 
 
 Earlier systems such as Terra~\cite{terra}, Overshadow~\cite{chen_overshadow_2008}, and InkTag~\cite{hofmann_inktag_nodate} relied on a small trusted hypervisor as a root of trust to enforce these properties.
-The hypervisor would intercept potentially dangerous operations of the untrusted \gls{os}.
-For instance, the hypervisor would keep enclave memory pages encrypted during untrusted \gls{os} execution and decrypt them only during enclave execution.
+The hypervisor would intercept potentially dangerous operations of the untrusted \gls{os} to enforce isolation.
+For instance, it must keep enclave memory pages encrypted during untrusted \gls{os} execution and decrypt them only during enclave execution.
 
-Intel \gls{sgx}, released in 2015, was one of the first industry attempts at establishing \glspl{tee} on a commodity x86 CPU.
+Intel \gls{sgx}~\cite{sgx-explained}, released in 2015, was one of the first industry attempts at establishing \glspl{tee} on an x86 CPU.
 \gls{sgx} places the root of trust almost entirely within hardware while aggressively minimizing the application \gls{tcb}.
 SGX reserves a region of DRAM during startup, called the \gls{epc}, which is isolated from all non-enclave software.
 Once a memory page is allocated to an enclave, it can be accessed only by code executing inside that enclave; any access attempt from the \gls{os}, hypervisor, or another enclave is blocked by the memory controllers.

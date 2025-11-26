@@ -38,9 +38,8 @@ Despite the promise of fine-grained security and low performance overheads, mode
 
 \hdr{Kernel as a confused deputy}
 
-The seminal paper by Connor et al.~\cite{connor2020pku} demonstrates this problem for PKU-based systems, highlighting the risk of \emph{confused-deputy attacks}~\cite{hardy_confused_1988} targeting the kernel~\cite{pku-pitfall}.
-Such attack vector is shown in \autoref{ipi-misalignment}.
-The \gls{os} is unaware of a process's userspace protection domains and therefore continues to enforce access control only at \emph{process} granularity, inadvertently compromising the in-process isolation scheme.
+The seminal paper by Connor et al.~\cite{connor2020pku} highlights the risk of \emph{confused-deputy attacks}~\cite{hardy_confused_1988} targeting the kernel~\cite{pku-pitfall} for \gls{pku}-based systems.
+Such an attack vector is shown in \autoref{ipi-misalignment}, where the \gls{os}, unaware of a process's userspace protection domains, continues to enforce access control only at \emph{process} granularity, and inadvertently compromises the in-process isolation scheme.
 For instance, a domain may use the \texttt{mmap} system call to \emph{remove} \gls{pku} protection on a target page.
 Even worse, system calls such as \texttt{process\_vm\_readv} and \texttt{send}, and kernel mechanisms like signals, read from userspace memory without regard for in-process domains, enabling a domain to bypass memory isolation~\cite{pku-pitfall,yang2025endokernel}.
 
