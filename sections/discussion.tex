@@ -4,9 +4,9 @@
 
 \epigraph{It's not the destination, it's the journey.}{\emph{Ralph Waldo Emerson}}
 
-\ 
+\
 
-\ 
+\
 
 
 % \clearpage
@@ -28,6 +28,16 @@ Endokernel~\cite{yang2025endokernel} introduces an in-process reference monitor 
 Pegasus~\cite{dinglan2025pegasus} similarly merges frequently communicating processes into a single process using an in-process abstraction, amortizing the cost of inter-process communication.
 These efforts effectively treat sub-process components as miniature processes, enforcing access control decisions in a manner analogous to how an \gls{os} manages process-level protection.
 I expect that this principle will continue to hold for future hardware-assisted security retrofitting efforts.
+
+
+\hdr{Abstraction can keep secrets}
+
+Contrary to the common belief that abstraction should not be relied upon for protecting secrets, particularly against side-channel attacks~\cite{lampson2021hintsprinciplescomputerdesign}, certain \gls{os} abstractions can, in fact, be retrofitted to provide such protection efficiently.
+\incognitos (\cref{chap:incognitos}) demonstrates this by retrofitting the \gls{os} memory-management and scheduling abstractions to enforce a whole-system side-channel mitigation scheme that remains transparent to the target application.
+
+Future systems should identify abstractions that can be strengthened or extended to provide similar guarantees.
+One prominent candidate is the system-call interface, which has been shown to be a weak point for in-process isolation~\cite{pku-pitfall} and can also be exploited for side-channel leakage~\cite{minkyung2025pave,werner_severest_2019}.
+Future work includes integrating side-channel protection semantics into system calls, thereby preventing leakage both across in-process isolation domains and toward an untrusted \gls{os} or hypervisor.
 
 \hdr{Security requires careful consideration across the stack}
 
