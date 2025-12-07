@@ -183,51 +183,76 @@ In 2003, Provos et al.~\cite{provos2003preventing} discussed over-privilege in c
 Influenced by this work, similar designs were deployed in the Chromium browser~\cite{barth2008security} starting in 2008, separating the browser into two processes: a browser kernel and sandboxed rendering engines.
 
 
-\hdr{Limitations of existing isolation primitives}
+\subsection{Limitations of existing isolation primitives}
 
-Several approaches aim to provide isolation.
+Several approaches aim to provide isolation, which has been explored for finer-grained application isolation in modern systems.
+A comparison between these approaches is shown in \autoref{tab:isolation}.
+
+\hdr{VM isolation}
 For the strongest guarantees, untrusted code can be placed inside dedicated virtual machines.
 However, this approach is generally impractical for applications that require tight integration, as it incurs substantial overhead from context switches between the \gls{vm} and hypervisor.
 
+\hdr{Process-based isolation}
 Another approach repurposes OS processes to decompose existing applications into multiple least-privilege processes~\cite{privtrans}.
-While this offers strong isolation, it suffers from prohibitive context-switching costs (e.g., RPC overhead). It requires substantial architectural changes, which impose significant engineering effort.
+Applications would be rewritten to split it execution logic  between different processes, each would communicate with each otehr through \glspl{rpc}.
+This is the approach taken by the OpenSSH~\cite{provos2003preventing} and modern web browsers~\cite{chrome-security,barth2008security}.
 
+While this offers strong isolation, it suffers from prohibitive context-switching costs from \glspl{rpc}.
+It also requires substantial software architectural changes, imposing significant engineering effort.
+
+\hdr{Software-fault isolation}
 \gls{sfi}, first proposed by Wahbe et al.\ in 1993~\cite{wahbe_efficient_1993}, instruments untrusted code to ensure that memory writes and indirect jumps remain confined to predefined regions.
 \gls{sfi} gained mainstream adoption in web browsers and has also been applied to isolating system programs and kernel drivers~\cite{mao2011software,castro_fast_2009}.
-The most widely used implementations include Google's Native Client, later superseded by WebAssembly (WASM).
+
+The most widely adopted implementations of \gls{sfi} include Google's Native Client~\cite{nacl}, later superseded by \emph{WebAssembly (WASM)}~\cite{webassembly}.
 Due to WASM's broad adoption and standardization, recent efforts have explored its use for sandboxing native code.
 Specifications like \gls{wasi}~\cite{wasi} define interfaces for WASM modules to interact with \gls{os} services.
 
 Unfortunately, \gls{sfi} introduces several drawbacks that prevent practical adoption for compartmentalization.
 First, the instrumentation required for SFI imposes instruction-level overhead and requires compiler support, necessitating recompilation of libraries.
-Second, host applications often require modification~\cite{rlbox} to interface cleanly with WASM bytecode, and compatibility remains imperfect; WASI supports only a limited set of system interactions.
+Second, host applications often require moderate modifications~\cite{rlbox} to interface cleanly with WASM bytecode, and compatibility remains imperfect; WASI supports only a limited set of system interactions.
 
 \begin{table}[t]
 	\small
 	\begin{center}
-		\begin{tabular}[c]{p{6cm}p{2cm}p{2cm}p{3cm}}
+		\begin{tabular}[c]{p{6.5cm}p{2cm}p{2cm}p{2.5cm}}
 			\toprule
-			                                                                & Context switching costs & Runtime overheads & Compatibility \textbackslash{}w existing applications \\
+			                                                                           & Context switching costs & Runtime overheads & Compatibility \textbackslash{}w existing applications \\
 			\midrule
-			Virtual machines                                                & Very high               & Low               & Low                                                   \\
-			Process                                                         & High                    & None              & Low                                                   \\
-			SFI                                                             & Low                     & Medium            & Medium                                                \\
+			Virtual machines                                                           & Very high               & Low               & Low                                                   \\
+			Process~\cite{provos2003preventing,barth2008security}                      & High                    & None              & Low                                                   \\
+			Software Fault Isolation~\cite{nacl,webassembly}                           & Low                     & Medium            & Medium                                                \\
+			Light-weight context switching~\cite{lwc,chen2016shreds,jing2022operating} & Medium                  & None              & Medium                                                \\
+			\midrule
 			Hardware-assisted\
-			(PKU~\cite{park2019libmpk}, CHERI~\cite{cheri}, MTE~\cite{mte}) & Low                     & None              & High                                                  \\
+			(PKU~\cite{park2019libmpk}, CHERI~\cite{cheri}, MTE~\cite{mte})            & Low                     & None              & High                                                  \\
 			\bottomrule
 		\end{tabular}
 		\caption{Comparison of isolation primitives}\label{tab:isolation}
 	\end{center}
 \end{table}
 
+\hdr{Lightweight context switching}
+Another approach to isolation is to retrofit lighter-weight context-switching mechanisms into existing processes.
+This direction is explored by \emph{Lightweight Contexts (LwC)}~\cite{lwc}, Shreds~\cite{chen2016shreds}, and, more recently, Orbit~\cite{jing2022operating}.
+For example, LwC introduces sub-process protection units with distinct memory views, file descriptors, and credentials, offering lower context-switching costs than switching kernel threads.
+Shreds leverages ARM memory domains to achieve in-process isolation for secret protection.
+Unfortunately, the switching overhead for these mechanisms remains relatively high, as they require a system call to the kernel to transition between protection domains.
+Further, most mechanisms require rewriting portions of the application to conform to their execution models~\cite{lwc,jing2022operating}.
+
+
 
 \subsection{Modern hardware support for isolation}
 
 
-
+Recognizing the limitations of other isolation primitives, hardware vendors are increasingly developing hardware features that enable light-weight and flexible isolation.
 \autoref{tab:isolation} provides a comparison between the previously described isolation primitives and modern hardware-assisted isolation.
 Hardware-assisted isolation introduced by emerging architectural features addresses several of the limitations discussed above.
 Recent processors offer primitives that directly support efficient in-process memory isolation.
+
+
+
+
 Intel \gls{pku} allow user-space code to assign access rights to groups of pages and to modify those rights without changing page tables.
 ARM Memory Tagging Extension (MTE) associates pointers and memory with tags, enabling fine-grained, hardware-checked bounds on memory accesses.
 CHERI capabilities enforce fine-grained memory safety through 128-bit pointers that encapsulate their bounds and permissions.
@@ -259,7 +284,7 @@ This section provides background on \glspl{tee} and the industry's shift toward 
 \subsection{Motivation: re-establishing trust in the cloud}
 
 Cloud computing has transformed modern application deployment, enabling users to host services without maintaining their own infrastructure.
-Over time, critical services, including financial, healthcare, and AI workloads, have become increasingly dependent on cloud platforms. 
+Over time, critical services, including financial, healthcare, and AI workloads, have become increasingly dependent on cloud platforms.
 By 2025, cloud computing will have grown into an almost trillion-dollar market.\footnote{\url{https://www.cloudzero.com/blog/cloud-computing-statistics/}}
 
 Traditionally, cloud computing requires users to fully trust the \gls{csp} to preserve the confidentiality and integrity of their outsourced computation.
@@ -268,10 +293,12 @@ In 2024, cyber incidents exposed over 280 million records in the U.S. health sec
 Data breaches are also financially damaging, costing organizations up to \$4.4 billion on average in remediation efforts as of 2025.\footnote{\url{https://www.ibm.com/downloads/documents/us-en/131cf87b20b31c91}}
 
 \begin{figure}[t]
-    \centering
-\input{figures/bg-tee-trust-model-tikz}
-\caption{Trust model of Traditional computing vs. Intel SGX.}\label{trad-vs-tee}
+	\centering
+	\input{figures/bg-tee-trust-model-tikz}
+	\caption{Trust model of Traditional computing vs. Intel SGX.}\label{trad-vs-tee}
 \end{figure}
+
+\subsection{Trusted Execution Environments}
 
 \Glspl{tee} aims to re-establish trust in cloud environments by enabling remote users to securely deploy computation and isolating that computation from the rest of the platform, including cloud administrators.
 \autoref{trad-vs-tee} illustrates the trust models of traditional systems and that of \glspl{tee}, such as Intel \gls{sgx}~\cite{costan_intel_2016}.
@@ -338,3 +365,20 @@ Intel's TDX~\cite{tdx} and ARM's \gls{cca}~\cite{cca} introduce similar protecti
 
 By leveraging \gls{vm}-level deployment in the cloud, the \gls{cvm} deployment model offers unprecedented compatibility with cloud workloads.
 This enables the deployment of existing (e.g., databases and web servers) and cutting-edge (e.g., AI inference and large language models~\cite{yifan2025pipellm}) workloads with minimal migration costs.
+
+
+\section{Side-channel attacks}
+In 1973, Butler Lampson~\cite{lampson1973confinement} described in his seminar work on the \emph{confinement problem}, the difficulties of preventing an untrusted program from leaking secrets through \emph{covert channels} or \emph{side channels}.
+These channels, such as the time an operation takes, while not designed for information transfer, allow a program to communicate with other programs.
+
+Side-channel attacks remain a significant challenge in modern computing systems.
+Especially on cloud platforms where computation across thousands of users is shared on the same system, the \emph{shared} state between the victim and attacker processes becomes a major side-channel threat.
+Between different processes, the cloud \gls{os}/hypervisor multiplexes memory (through the page table), storage, and CPU execution time, while the hardware multiplexes microarchitectural states such as the cache and branch predictor.
+These shared states are never designed to hold secrets; previous research has demonstrated the feasibility of microarchitectural attacks, such as cache attacks~\cite{yarom_flushreload_nodate,liu_last-level_2015}, to extract sensitive information, such as secret keys.
+
+% \subsection{Microarchitectural side-channel attacks}
+
+% \subsection{Side-channel attacks on TEEs}
+\glspl{tee} excabates the side-channel problem with a much stronger threat model compared to traditional protections (\cref{sec:intro:bg-os}).
+The attackers in this threat model are the management software, i.e., the \gls{os} and the hypervisor.
+Thus, attackers are now given access to powerful capabilities like page access interception~\cite{xu2015controlledchannel} and interrupt timers ~\cite{sgx-step,bulck2018nemesis,cachezoom}, which they can leverage to leak information~\cite{controlled-channel} or amplify existing side channels~\cite{cachezoom,hahnel_high-resolution_2017}.

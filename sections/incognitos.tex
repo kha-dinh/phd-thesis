@@ -37,33 +37,19 @@ Then, it covers the design and evaluation of \incognitos, showing the evolution 
 
 
 % The \gls{cvm} deployment model offers unprecedented protection for cloud workloads, enabling the deployment of existing (e.g., databases and web servers) and cutting-edge (e.g., AI inference and large language models~\cite{yifan2025pipellm}) workloads with minimal migration costs.
+\subsection{Challenges of CVM Deployment Model}
 Despite their strong compatibility with existing workloads, \glspl{cvm} inherit the side-channel attack challenges from the previous Intel SGX model while introducing unique challenges due to the expanded \gls{tcb}.
 
 \hdr{Side-channel attacks}
-In 1973, Butler Lampson~\cite{lampson1973confinement} described in his seminar work on the \emph{confinement problem}, the difficulties of preventing an untrusted program from leaking secrets through \emph{covert channels} or \emph{side channels}.
-These channels, such as the time an operation takes, while not designed for information transfer, allow a program to communicate with other programs.
-
-
-
-Side-channel attacks remain a significant challenge in modern computing systems.
-Especially on cloud platforms where computation across thousands of users is shared on the same system, the \emph{shared} state between the victim and attacker processes becomes a major side-channel threat. 
-Between different processes, the cloud \gls{os}/hypervisor multiplexes memory (through the page table), storage, and CPU execution time, while the hardware multiplexes microarchitectural states such as the cache and branch predictor.
-These shared states are never designed to hold secrets; previous research has demonstrated the feasibility of microarchitectural attacks, such as cache attacks~\cite{yarom_flushreload_nodate,liu_last-level_2015}, to extract sensitive information, such as secret keys.
-
-\glspl{tee} excabates the side-channel problem with a much stronger threat model compared to traditional protections (\cref{sec:intro:bg-os}).
-The attackers in this threat model are the management software, i.e., the \gls{os} and the hypervisor. 
-Thus, attackers are now given access to powerful capabilities like page access interception~\cite{xu2015controlledchannel} and interrupt timers ~\cite{sgx-step,bulck2018nemesis,cachezoom}, which they can leverage to leak information~\cite{controlled-channel} or amplify existing side channels~\cite{cachezoom,hahnel_high-resolution_2017}.
-
-
 
 \begin{figure}[t]
 	\centering
-  \input{figures/bg-side-channel-cvm}
-  \caption{While an untrusted cloud platform cannot directly access a CVM's sensitive memory, they can leak information through side channel attacks on shared hardware architectural/microarchitectural states. Further, they can exploit their management of the page table to perform a controlled-channel attack.}\label{cvm-side-channel}
+	\input{figures/bg-side-channel-cvm}
+	\caption{While an untrusted cloud platform cannot directly access a CVM's sensitive memory, they can leak information through side channel attacks on shared hardware architectural/microarchitectural states. Further, they can exploit their management of the page table to perform a controlled-channel attack.}\label{cvm-side-channel}
 \end{figure}
 
 Side channels were a significant threat in Intel SGX and continue to persist in emerging \gls{cvm} models such as AMD SEV and Intel TDX, which remain vulnerable to a broad class of side-channel attacks.
-(\autoref{cvm-side-channel} illustrates the side-channel attacks in \gls{cvm}.
+\autoref{cvm-side-channel} illustrates the side-channel attacks in \gls{cvm}.
 Since the \gls{cvm} shares architectural and microarchitectural hardware states with the untrusted hypervisor, it suffers from similar side-channel attack vectors, such as page-table-based attacks (also called the \emph{controlled-channel} attack) and cache attacks~\cite{sevstep}.
 Worse, newer \gls{cvm}-specific side-channels, such as the ciphertext side channel~\cite{li_cipherleaks_nodate,ciphersteal}, continued to be discovered.
 Thus, research into side-channel mitigation for \gls{cvm} is a pressing need.
@@ -81,7 +67,7 @@ Second, the large \gls{tcb} complicates efforts to defend against side-channel a
 
 
 
-\hdr{\incognitos: coherent OS-assisted CVM protection}
+\subsection{\incognitos: coherent OS-assisted CVM protection}
 
 To support more robust \gls{cvm} deployments, \incognitos is designed to address the challenges outlined above.
 It explores the principle of coherent protection (\cref{chap:intro}) by rethinking the traditional protection model of \gls{os} (\cref{chap:background}, \cref{sec:intro:bg-os}), to align with the protection established by \gls{cvm} hardware like AMD SEV and Intel TDX.

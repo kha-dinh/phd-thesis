@@ -1,6 +1,6 @@
 % !TeX root = ../main.tex
 %
-\chapter{Lessons learned and conclusion}\label{chap:discussion}
+\chapter{Lessons Learned and Conclusion}\label{chap:discussion}
 
 \epigraph{It's not the destination, it's the journey.}{\emph{Ralph Waldo Emerson}}
 
@@ -42,13 +42,13 @@ Future work includes integrating side-channel protection semantics into system c
 \hdr{Security requires careful consideration across the stack}
 
 Confused-deputy attacks on in-process isolation systems (\cref{chap:capacity}) and side-channel attacks on \glspl{cvm} highlight the need for a holistic threat model that spans the entire software stack.
-\incognitos takes this approach to its logical extreme: it not only incorporates side-channel protection into the OS but also extends this protection across the whole system, covering both user and kernel code.
+\incognitos takes this approach to its logical extreme: it not only incorporates side-channel protection into the \gls{os} but also extends this protection across the whole system, covering both user and kernel code.
 
 To avoid pitfalls and gaps in protection, future systems should continue to adopt such cross-layer reasoning, ensuring that policy definition and enforcement remain consistent across hardware, kernel, and user space.
 
 \hdr{Security and compatibility can coexist through retrofitting}
 
-Important ideas in security, although often phased out of mainstream systems in favor of compatibility, remain relevant.
+Important ideas in security, although phased out of mainstream systems in favor of compatibility, remain relevant, especially to the modern security requirements.
 
 Capability-based security, in particular, aligns surprisingly well with the programming model of many existing software interfaces, enabling fine-grained access control through retrofitting.
 Inspired by approaches such as DroidCap~\cite{droidcap} and Capsicum~\cite{capsicum}, \capacity's cryptographic capability mechanism integrates cleanly with UNIX file descriptors, which already behave as capability-like interfaces~\cite{miller2003capability}.
