@@ -1,5 +1,5 @@
 \let\TeXyear\year
-\documentclass[a4paper,11pt]{SKKU-PhD-Thesis}
+\documentclass[a4paper,11pt]{SKKU-PhD-Thesis-compact}
 \let\setyear\year
 \let\year\TeXyear
 % \usepackage[recompile]{memoize}
@@ -71,7 +71,6 @@ citecolor=blue
 % style=ieee
 % ]{biblatex}
 \usepackage[nocompress]{cite}
-\usepackage{bibentry}
 %%-----------------------------------------
 %% required packages for writing
 \usepackage{listings}
@@ -203,7 +202,7 @@ arrows,arrows.meta,calc,decorations.pathreplacing
 \author{Kha Dinh Duy}
 \department{Computer Science and Engineering}
 % \title{Retrofitting Modern Operating System Security with Hardware Supports}
-\title{Retrofitting Operating System Security for Modern Hardware Protections}
+\title{Retrofitting Operating System Security for Modern Hardware Protections (Compacted Version)}
 
 \setyear{2025}
 \month{November}
@@ -217,11 +216,11 @@ arrows,arrows.meta,calc,decorations.pathreplacing
 %%---------------------------------
 \makecover
 %%---------------------------------
-\makeinsidecover
+% \makeinsidecover
 %%---------------------------------
-\makesubmissionform
+% \makesubmissionform
 %%---------------------------------
-\makecertification
+% \makecertification
 
 
 
@@ -240,20 +239,20 @@ arrows,arrows.meta,calc,decorations.pathreplacing
 % \renewcommand{\contentsname}{}
 \setcounter{tocdepth}{2}
 \pagenumbering{roman}% start numbering from Content
-\tableofcontents
+% \tableofcontents
 
 
 \newpage
 \phantomsection \label{listoftab}
 % \addcontentsline{toc}{chapter}{List of Tables}
-\listoftables
+% \listoftables
 
 \newpage
 \phantomsection \label{listoffig}
 % \addcontentsline{toc}{chapter}{List of Figures}
-\listoffigures
+% \listoffigures
 
-\newpage
+% \newpage
 
 %\phantomsection \label{chap:Publications}
 %\addcontentsline{toc}{chapter}{Publications}
@@ -301,29 +300,29 @@ The ideas from this dissertation contribute to the vision of secure computing in
 % \include{sections/sepim}
 
 \include{sections/capacity}
-\include{sections/capacity/introduction}
-\include{sections/capacity/background}
-\include{sections/capacity/overview}
-\include{sections/capacity/dom-auth}
-\include{sections/capacity/ref-mon}
-\include{sections/capacity/instrumentation}
-\include{sections/capacity/evaluation}
-\include{sections/capacity/discussion}
-\include{sections/capacity/related-work}
-\include{sections/capacity/conclusion}
+% \include{sections/capacity/introduction}
+% \include{sections/capacity/background}
+% \include{sections/capacity/overview}
+% \include{sections/capacity/dom-auth}
+% \include{sections/capacity/ref-mon}
+% \include{sections/capacity/instrumentation}
+% \include{sections/capacity/evaluation}
+% \include{sections/capacity/discussion}
+% \include{sections/capacity/related-work}
+% \include{sections/capacity/conclusion}
 
 
 \include{sections/incognitos}
-\include{sections/incognitos/intro}
-\include{sections/incognitos/background}
-\include{sections/incognitos/threat-model}
-\include{sections/incognitos/overview}
-\include{sections/incognitos/scheduling}
-\include{sections/incognitos/paging}
-\include{sections/incognitos/evaluation}
-\include{sections/incognitos/security-analysis}
-\include{sections/incognitos/related-work}
-\include{sections/incognitos/conclusion}
+% \include{sections/incognitos/intro}
+% \include{sections/incognitos/background}
+% \include{sections/incognitos/threat-model}
+% \include{sections/incognitos/overview}
+% \include{sections/incognitos/scheduling}
+% \include{sections/incognitos/paging}
+% \include{sections/incognitos/evaluation}
+% \include{sections/incognitos/security-analysis}
+% \include{sections/incognitos/related-work}
+% \include{sections/incognitos/conclusion}
 
 \include{sections/discussion}
 % \include{sections/conclusion}
@@ -333,14 +332,14 @@ The ideas from this dissertation contribute to the vision of secure computing in
 
 %%--------------------------------------
 % Chapters.....
-% \phantomsection %\label{chap:Intro}
+\phantomsection %\label{chap:Intro}
 %\addcontentsline{toc}{chapter}{Introduction}
 %\include{ldt-MBL-Pre-1-intro}
 %================================================
 
 
 %================================================
-% \phantomsection
+\phantomsection
 %\addcontentsline{toc}{chapter}{Literature Review}
 %\include{ldt-MBL-Pre-2-background}
 
@@ -362,35 +361,17 @@ The ideas from this dissertation contribute to the vision of secure computing in
 }
 
 \newpage
-
-\appendix
 \phantomsection \label{chap:Appendix}
-\addcontentsline{toc}{chapter}{Appendix: Accelerating Protections with Processing-in-Memory}
-\chapter*{Appendix: Accelerating Protections with Processing-In-Memory}\label{chap:pim}
-
-\emph{
-	* The content of this chapter was published in IEEE Transactions on Cloud Computing and 2025 Annual Computer Security Applications Conference (ACSAC '25), Honolulu, Hawaii, USA
-}
-\\
-
-% \section{SE-PIM}\label{sepim}
+% \addcontentsline{toc}{chapter}{Appendix}
 % \include{ldt-MBL-0-appendix}
-\includepdf[pages=1-,scale=.8]{sections/sepim.pdf}
-
-% \section{PIM-ORAM}\label{pimoram}
-\includepdf[pages=1-,scale=.9]{sections/pimoram.pdf}
 
 \newpage
 % \phantomsection \label{chap:KrAbstract}
-\phantomsection \label{chap:KrAbstract}
-
-% \addcontentsline{toc}{chapter}{초록}%Korean Abstract
-% \addcontentsline{toc}{chapter}{초록}%Korean Abstract
 % \addcontentsline{toc}{chapter}{초록}%Korean Abstract
 % \include{ldt-MBL-0-abstract-ko}
 \newpage
 
-\makesidecover
+% \makesidecover
 
 
 

@@ -118,19 +118,20 @@ This thesis proposes the following principle when integrating hardware-assisted 
 	This means (1) any new hardware-defined protection must carefully consider the one established by software, and (2) the software-enforced protection must align with the threat model of new hardware protection.
 \end{displayquote}
 
+
 Previous research has demonstrated that incoherencies in the protection model lead to insecurity \- systems that leverage modern hardware features in an ad hoc manner often reveal gaps in protections that undermine the benefits provided.
 For instance, for hardware-assisted in-process isolation systems, prior work has demonstrated \emph{confused deputy} attacks, arising from the \gls{os} 's lack of awareness of hardware-enforced protection domains~\cite{pku-pitfalls,jenny}.
 Similarly, trying to retrofit legacy \glspl{os} into VM-level isolation (e.g., AMD-SEV) can exacerbate side-channel and interface vulnerabilities, as demonstrated by recent attacks against confidential virtual machines~\cite{wesee,heckler,ciphersteal,li2021cipherleaks}.
 \cref{chap:capacity} and \cref{chap:incognitos} will go into more detail about the problems caused by inconsistencies in the protection.
 
 This dissertation explores the principle of coherent protection with two complementary approaches:
-(1) retrofitting security guarantees provided by hardware to those provided by the SO, or (2) retrofitting the OS protection model to reflect the one established by hardware.
+(1) retrofitting security guarantees provided by hardware to those provided by the \gls{os}, and (2) retrofitting the \gls{os} protection model to reflect the one established by hardware.
 
 \clearpage
 
 \section{Contributions}
 
-The work presented in this thesis, \capacity and \incognitos, examines two layers of the protection hierarchy to illustrate the broader principle of coherent protection.
+The work presented in this thesis, \capacity~\cite{capacity}  and \incognitos~\cite{incognitos}, examines two layers of the protection hierarchy to illustrate the broader principle of coherent protection.
 
 % \begin{figure}[t]
 % 	\centering
@@ -138,17 +139,30 @@ The work presented in this thesis, \capacity and \incognitos, examines two layer
 % 	\caption{Comparison between legacy OS protection and modern hardware-assisted protection.}\label{fig:protection-models-conceptual}
 % \end{figure}
 
-\begin{itemize}
-	\item[-] \textbf{Retrofitting hardware to incorporate OS protection.}
-	      At the intra-process level, \capacity demonstrates how intra-process domains established through modern ARM hardware acceleration can be coherently
-	      retrofitted into legacy abstractions, with a novel cryptographic capabilities mechanism.
-	      \capacity retrofits capability-based protection into legacy process abstractions, leveraging ARM Pointer Authentication (\gls{pa}) and Memory Tagging (\gls{mte}) to transform resource references into cryptographically verifiable capabilities.
-	      This design enforces consistent security semantics across file and memory accesses, bridging the gap between software abstractions and hardware enforcement while leveraging modern hardware acceleration.
-	\item[-] \textbf{Retrofitting OSes for protection of hardware domains}
-	      At the system level, \incognitos explores how \glspl{os} can collaborate with hardware-enforced VM-level isolation to enforce coherent threat models.
-	      Specifically, \incognitos redefines the role of the \gls{os} in modern \gls{cvm}- protected systems, treating it as an active component in mitigating \emph{side-channel attacks}, a critical attack vector for \gls{tee}.
-	      By retrofitting \gls{os} capabilities, scheduling, and memory management, it mitigates side-channel leakage while incurring reasonable overheads from protection.
-\end{itemize}
+
+\hdr{Retrofitting hardware to incorporate OS protection}
+At the intra-process level, \capacity~\cite{capacity} demonstrates how intra-process domains established through modern ARM hardware acceleration can be coherently
+retrofitted into legacy abstractions, with a novel cryptographic capabilities mechanism.
+\capacity retrofits capability-based protection into legacy process abstractions, leveraging ARM Pointer Authentication (\gls{pa}) and Memory Tagging (\gls{mte}) to transform resource references into cryptographically verifiable capabilities.
+This design enforces consistent security semantics across file and memory accesses, bridging the gap between software abstractions and hardware enforcement while leveraging modern hardware acceleration.
+
+
+\hdr{Retrofitting OSes for protection of hardware domains}
+At the system level, \incognitos~\cite{incognitos} explores how \glspl{os} can collaborate with hardware-enforced VM-level isolation to enforce coherent threat models.
+Specifically, \incognitos redefines the role of the \gls{os} in modern \gls{cvm}- protected systems, treating it as an active component in mitigating \emph{side-channel attacks}, a critical attack vector for \gls{tee}.
+By retrofitting \gls{os} capabilities, scheduling, and memory management, it mitigates side-channel leakage while incurring reasonable overheads from protection.
+
+
+\subsection{Orthogonal Contributions}
+Within the timeframe of this thesis, I also lead and participated research into how \gls{pim} could be leveraged to address some of the system security challenges.
+
+
+\hdr{Accelerating Hardware Security with Processing-in-memory}
+As modern computing workloads are increasingly data-intensive, \gls{pim} is an emerging processing paradigm that promises to overcome the \emph{memory wall problem}~\cite{prime,pim-architecture,samsung-pim}.
+SE-PIM~\cite{sepim} is a hardware-software co-design that for accelerating confidential data-intensive workloads in the cloud.
+It studies attack vectors that are exposed when PIM is leveraged to accelerating confidential computing, and explore the necessary hardware extensions to existing PIM models to enable secure and practical acceleration.
+Building on the foundations of \cite{sepim}, PIM-ORAM explore how a secure PIM module could alleviate the overheads of ORAM, security algorithms that mitigate side-channels with notoriously high memory overheads.
+
 
 \clearpage
 
@@ -161,5 +175,22 @@ The remainder of this thesis will be as follows.
 \cref{chap:discussion} concludes the thesis by
 reflecting on the broader implications of the proposed systems.
 It discusses lessons learned from retrofitting operating-system security with modern hardware support.
+
+
+\section{Selected Publications}
+
+The following contains the full list of publications selected for this thesis.
+\cite{capacity} and \cite{incognitos} constitude \cref{chap:capacity} and \cref{chap:incognitos} of this thesis.
+The other two publications, \cite{sepim, pimoram}, which explore related problems in hardware-assisted security, are placed in \cref{chap:pim}.
+This is because these work does not fit harmoniously with the theme of coherent protection presented in this thesis.
+
+\begin{itemize}
+	\item [\cite{capacity}] K. Dinh Duy, K. Cho, T. Noh, and H. Lee, “Capacity: Cryptographically-enforced in-process capabilities for modern arm architectures,” in \emph{Proceedings of the 2023 ACM SIGSAC Conference on Computer and Communications Security}, ser. CCS ’23. New York, NY, USA: Association for Computing Machinery, 2023, p. 874–888.
+	\item [\cite{incognitos}] K. Dinh Duy, J. Kim, H. Lim, and H. Lee, “INCOGNITOS: A Practical Unikernel Design for Full-System Obfuscation in Confidential Virtual Machines ,” in \emph{2025 IEEE Symposium on Security and Privacy (SP)}. Los Alamitos, CA, USA: IEEE Computer Society, May 2025, pp. 4192--4209
+	\item [\cite{sepim}] SE-PIM In-memory Acceleration of Data-intensive Confidential Computing,” \emph{IEEE Transactions on Cloud Computing}, vol. 11, no. 3, pp. 2473--2490, 2023
+	\item [\cite{pimoram}] B. Woo, K. Dinh Duy, Y. Han, B. B. Kang, and H. Lee, “PIM-ORAM: Towards Oblivious RAM Primitives in Commodity Processing -In-Memory,” in \emph{Annual Computer Security Applications Conference (ACSAC)}. Honolulu, Hawaii, USA, ACM, Dec. 2025
+\end{itemize}
+
+
 
 

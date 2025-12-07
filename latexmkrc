@@ -1,8 +1,8 @@
-@default_files = ('main.tex');
+@default_files = ('main.tex', 'main-compact.tex');
 
 # set the TeX command options for latex/pdflatex/xelatex/lualatex
-set_tex_cmds('-shell-escape -interaction=nonstopmode %O %S');
-
+set_tex_cmds('-shell-escape  -interaction=nonstopmode %O %S');
+$aux_dir = build;
 $synctex    = 1;
 $force_mode = 1;
 $max_repeat = 20;
