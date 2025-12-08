@@ -93,7 +93,7 @@ We do not support the nesting of domains in the current prototype.
 	\caption{\thename's reference encapsulation of pointers and file descriptors with cryptographic authentication code (AC).}\label{fig:ref-encapsulation}
 \end{figure}
 
-\paragraph{Object encapsulation}
+\paragraph{Object encapsulation.}
 % \autoref{fig:ref-encapsulation} summarizes how \thename constructs resource references with \gls{pa} and \gls{mte} hardware acceleration.
 As summarized by \autoref{fig:ref-encapsulation}, \thename facilities employ \gls{pa} to \emph{sign} private resource references with the domain key and the per-instance modifier (e.g., a unique session ID), engraving the reference ownership into its embedded \gls{ac}.
 Before a reference is used to access some resource, \thename \emph{authenticates} its \gls{ac} with the currently activating domain key and modifier before granting the access.
