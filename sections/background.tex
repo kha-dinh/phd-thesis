@@ -404,7 +404,7 @@ By selectively unmapping pages and observing resulting \emph{page faults}, the a
 A similar attack technique is also observed on \glspl{cvm} such as AMD SEV and Intel TDX~\cite{heckler,wesee}, leveraging the \emph{nested page table} used for virtualization of memory.
 
 Interrupt-based attacks further escalate the threat by enabling fine-grained control over enclave execution.
-By triggering interrupts after every few instructions, the attacker can \emph{single-step} or \emph{multi-step} the TEE~\cite{sevstep}, observing state at extremely fine granularity—such as the cache lines accessed by individual instructions.
+By triggering interrupts after every few instructions, the attacker can \emph{single-step} or \emph{multi-step} the TEE~\cite{sevstep}, observing state at extremely fine granularity, such as the cache lines accessed by individual instructions.
 
 % \subsection{Side-channel Attacks Steps}
 %

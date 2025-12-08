@@ -28,7 +28,7 @@ The remainder of the chapter then details the design, implementation, and evalua
 
 \begin{figure}[t]
 	\centering
-\input{figures/bg-ipi}
+	\input{figures/bg-ipi}
 	\caption{The system call interface allows a compromised compartment to access other domains' system resources.}\label{ipi-misalignment}
 \end{figure}
 
@@ -38,7 +38,7 @@ Despite the promise of fine-grained security and low performance overheads, mode
 
 \subsection{Kernel as a confused deputy}
 
-The seminal paper by Connor et al.~\cite{connor2020pku} highlights the risk of \emph{confused-deputy attacks}~\cite{hardy_confused_1988} targeting the kernel~\cite{pku-pitfall} for \gls{pku}-based systems.
+The seminal paper by Connor et al.~\cite{connor2020pku} highlights the risk of \emph{confused-deputy attacks}~\cite{hardy_confused_1988} targeting the kernel for \gls{pku}-based systems.
 Such an attack vector is shown in \autoref{ipi-misalignment}, where the \gls{os}, unaware of a process's userspace protection domains, continues to enforce access control only at \emph{process} granularity, and inadvertently compromises the in-process isolation scheme.
 For instance, a domain may use the \texttt{mmap} system call to \emph{remove} \gls{pku} protection on a target page.
 Even worse, system calls such as \texttt{process\_vm\_readv} and \texttt{send}, and kernel mechanisms like signals, read from userspace memory without regard for in-process domains, enabling a domain to bypass memory isolation~\cite{pku-pitfall,yang2025endokernel}.
@@ -50,14 +50,15 @@ Due to the semantic gap between \gls{os}-level protection and in-process enforce
 A principled approach to retrofitting security remains an open challenge.
 
 I posit that the root cause of the confused-deputy problem is the \emph{incoherency of protection} introduced when attempting to retrofit hardware-assisted isolation into the existing process-level model enforced by the \gls{os}.
-Most in-process mechanisms focus primarily on memory isolation. 
+Most in-process mechanisms focus primarily on memory isolation.
 In contrast, the \gls{os} enforces access control across all resource types (e.g., memory \emph{and} files).
 This incoherence introduces gaps in protection that attackers can exploit.
 
-\subsection{Capacity: coherent in-process isolation}
 
-\capacity adopts the principle of coherent protection (\cref{chap:intro}) by ensuring that hardware-assisted in-process isolation remains coherent—covering \emph{all} resource types.
-Observing that PA and MTE on modern ARM processors exhibit characteristics of a capability-based protection model, \capacity proposes a capability-based scheme that coherently protects both userspace references (i.e., pointers) and references to system objects.
+\subsection{\capacity: coherent in-process isolation}
+
+\capacity adopts the principle of coherent protection (\cref{chap:intro}) by introducing a new cryptographic capability abstraction that coherently applies to \emph{all} resource types.
+Observing that PA and MTE on modern ARM processors exhibit characteristics of a capability-based protection model, \capacity proposes a capability-based scheme that protects both userspace references (i.e., pointers) and references to system objects.
 This approach enables the protection of sensitive resources throughout their life cycles.
 
 This coherence also enables efficiency.
