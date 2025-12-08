@@ -48,7 +48,7 @@ Despite their strong compatibility with existing workloads, \glspl{cvm} inherit 
 	\caption{While an untrusted cloud platform cannot directly access a CVM's sensitive memory, they can leak information through side channel attacks on shared hardware architectural/microarchitectural states. Further, they can exploit their management of the page table to perform a controlled-channel attack.}\label{cvm-side-channel}
 \end{figure}
 
-Side channels were a significant threat in Intel SGX and continue to persist in emerging \gls{cvm} models such as AMD SEV and Intel TDX, which remain vulnerable to a broad class of side-channel attacks.
+Side channels (\cref{chap:background}, \cref{sec:sidechannels}) were a significant threat in Intel SGX and continue to persist in emerging \gls{cvm} models such as AMD SEV and Intel TDX, which remain vulnerable to a broad class of side-channel attacks.
 \autoref{cvm-side-channel} illustrates the side-channel attacks in \gls{cvm}.
 Since the \gls{cvm} shares architectural and microarchitectural hardware states with the untrusted hypervisor, it suffers from similar side-channel attack vectors, such as page-table-based attacks (also called the \emph{controlled-channel} attack) and cache attacks~\cite{sevstep}.
 Worse, newer \gls{cvm}-specific side-channels, such as the ciphertext side channel~\cite{li_cipherleaks_nodate,ciphersteal}, continued to be discovered.

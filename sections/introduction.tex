@@ -108,12 +108,13 @@ Especially, SELinux is now a core component of Android, running on millions of d
 Similarly, large applications such as Chrome and Firefox are retrofitting sub-process isolation to contain vulnerabilities from compromised third-party libraries~\cite{rlbox}.
 
 
-\subsection{Coherent software/hardware protection}
+\subsection{Coherent software/hardware protection}\label{subsec:coherent}
 
 While modern processors provide powerful protection primitives, their full security potential can only be realized when \glspl{os} integrates them carefully.
 This thesis proposes the following principle when integrating hardware-assisted security features:
 
 \begin{displayquote}
+	\itshape
 	\textbf{Principle of coherent protection.} Protection enforced by the software (\gls{os}) must be coherent with the protection established with hardware support, toward a unified protection model
 	This means (1) any new hardware-defined protection must carefully consider the one established by software, and (2) the software-enforced protection must align with the threat model of new hardware protection.
 \end{displayquote}
@@ -124,25 +125,22 @@ For instance, for hardware-assisted in-process isolation systems, prior work has
 Similarly, trying to retrofit legacy \glspl{os} into VM-level isolation (e.g., AMD-SEV) can exacerbate side-channel and interface vulnerabilities, as demonstrated by recent attacks against confidential virtual machines~\cite{wesee,heckler,ciphersteal,li2021cipherleaks}.
 \cref{chap:capacity} and \cref{chap:incognitos} will go into more detail about the problems caused by inconsistencies in the protection.
 
-This dissertation explores the principle of coherent protection with two complementary approaches:
-(1) retrofitting security guarantees provided by hardware to those provided by the \gls{os}, and (2) retrofitting the \gls{os} protection model to reflect the one established by hardware.
+The work presented in this thesis, \capacity~\cite{capacity}  and \incognitos~\cite{incognitos}, examines different layers of the protection hierarchy, visiting different modern challenges in system security, to illustrate the broader principle of coherent protection.
+These systems demonstrate that, safety and efficiency could be achieved through coherent designs.
+
 
 \clearpage
 
-\section{Contributions}
+\section{Contributions \& Publications}
 
-The work presented in this thesis, \capacity~\cite{capacity}  and \incognitos~\cite{incognitos}, examines two layers of the protection hierarchy to illustrate the broader principle of coherent protection.
+\subsection{Main Contributions}
 
-% \begin{figure}[t]
-% 	\centering
-% 	\input{figures/intro-protections-conceptual}
-% 	\caption{Comparison between legacy OS protection and modern hardware-assisted protection.}\label{fig:protection-models-conceptual}
-% \end{figure}
+This dissertation explores the principle of coherent protection with two complementary approaches:
+(1) retrofitting security guarantees provided by hardware to those provided by the \gls{os}, and (2) retrofitting the \gls{os} protection model to reflect the one established by hardware.
 
 
 \hdr{Retrofitting hardware to incorporate OS protection}
-At the intra-process level, \capacity~\cite{capacity} demonstrates how intra-process domains established through modern ARM hardware acceleration can be coherently
-retrofitted into legacy abstractions, with a novel cryptographic capabilities mechanism.
+At the intra-process level, \capacity~\cite{capacity} demonstrates how intra-process domains established through modern ARM hardware acceleration can be coherently retrofitted into legacy abstractions, with a novel cryptographic capabilities abstraction.
 \capacity retrofits capability-based protection into legacy process abstractions, leveraging ARM Pointer Authentication (\gls{pa}) and Memory Tagging (\gls{mte}) to transform resource references into cryptographically verifiable capabilities.
 This design enforces consistent security semantics across file and memory accesses, bridging the gap between software abstractions and hardware enforcement while leveraging modern hardware acceleration.
 
@@ -154,14 +152,30 @@ By retrofitting \gls{os} capabilities, scheduling, and memory management, it mit
 
 
 \subsection{Orthogonal Contributions}
-Within the timeframe of this thesis, I also lead and participated research into how \gls{pim} could be leveraged to address some of the system security challenges.
-
+Beyond CPU features, which are the primary focus of this thesis, hardware vendors also continue to introduce new acceleration hardware.
+A key challenge for modern systems security is how to safely leverage such accelerators amid evolving protection models.
+During the timeframe of this thesis, I also led and participated in research addressing this challenge, specifically exploring how \gls{pim} can accelerate emerging confidential computing workloads.
 
 \hdr{Accelerating Hardware Security with Processing-in-memory}
-As modern computing workloads are increasingly data-intensive, \gls{pim} is an emerging processing paradigm that promises to overcome the \emph{memory wall problem}~\cite{prime,pim-architecture,samsung-pim}.
-SE-PIM~\cite{sepim} is a hardware-software co-design that for accelerating confidential data-intensive workloads in the cloud.
-It studies attack vectors that are exposed when PIM is leveraged to accelerating confidential computing, and explore the necessary hardware extensions to existing PIM models to enable secure and practical acceleration.
-Building on the foundations of \cite{sepim}, PIM-ORAM explore how a secure PIM module could alleviate the overheads of ORAM, security algorithms that mitigate side-channels with notoriously high memory overheads.
+
+As computing workloads become increasingly data-intensive, \gls{pim} is emerging as a promising paradigm to alleviate the \emph{memory wall problem}~\cite{prime,pim-architecture,samsung-pim}.
+SE-PIM~\cite{sepim}, a project I led, is a hardware–software co-design for accelerating confidential data-intensive workloads in the cloud. It examines the attack vectors exposed when PIM is employed for confidential computing and investigates the hardware extensions required to enable secure and practical acceleration.
+Building on the foundations of \cite{sepim}, PIM-ORAM, a project in which I contributed as second author, explores how a PIM module with confidential computation capabilities can reduce the overheads of ORAM, a class of security algorithms known for high memory and performance costs when mitigating side channels.
+
+\subsection{Selected Publications}
+
+The following is the set of publications selected for inclusion in this thesis.
+\cite{capacity} and \cite{incognitos} constitute \cref{chap:capacity} and \cref{chap:incognitos}, respectively.
+The other two publications, \cite{sepim, pimoram}, which examine related problems in hardware-assisted security, are included in \cref{chap:pim}.
+They are separated from the main narrative because these works do not align as directly with the theme of coherent protection developed in this thesis.
+
+\begin{itemize}
+	\item [\cite{capacity}] K. Dinh Duy, K. Cho, T. Noh, and H. Lee, “Capacity: Cryptographically-enforced in-process capabilities for modern arm architectures,” in \emph{Proceedings of the 2023 ACM SIGSAC Conference on Computer and Communications Security}, ser. CCS ’23. New York, NY, USA: Association for Computing Machinery, 2023, p. 874–888.
+	\item [\cite{incognitos}] K. Dinh Duy, J. Kim, H. Lim, and H. Lee, “INCOGNITOS: A Practical Unikernel Design for Full-System Obfuscation in Confidential Virtual Machines ,” in \emph{2025 IEEE Symposium on Security and Privacy (SP)}. Los Alamitos, CA, USA: IEEE Computer Society, May 2025, pp. 4192--4209
+	\item [\cite{sepim}] K. Dinh Duy and H. Lee, "SE-PIM: In-memory Acceleration of Data-intensive Confidential Computing,” \emph{IEEE Transactions on Cloud Computing}, vol. 11, no. 3, pp. 2473\dash2490, 2023
+	\item [\cite{pimoram}] B. Woo, K. Dinh Duy, Y. Han, B. B. Kang, and H. Lee, “PIM-ORAM: Towards Oblivious RAM Primitives in Commodity Processing -In-Memory,” in \emph{Annual Computer Security Applications Conference (ACSAC)}. Honolulu, Hawaii, USA, ACM, Dec. 2025
+\end{itemize}
+
 
 
 \clearpage
@@ -176,20 +190,6 @@ The remainder of this thesis will be as follows.
 reflecting on the broader implications of the proposed systems.
 It discusses lessons learned from retrofitting operating-system security with modern hardware support.
 
-
-\section{Selected Publications}
-
-The following contains the full list of publications selected for this thesis.
-\cite{capacity} and \cite{incognitos} constitude \cref{chap:capacity} and \cref{chap:incognitos} of this thesis.
-The other two publications, \cite{sepim, pimoram}, which explore related problems in hardware-assisted security, are placed in \cref{chap:pim}.
-This is because these work does not fit harmoniously with the theme of coherent protection presented in this thesis.
-
-\begin{itemize}
-	\item [\cite{capacity}] K. Dinh Duy, K. Cho, T. Noh, and H. Lee, “Capacity: Cryptographically-enforced in-process capabilities for modern arm architectures,” in \emph{Proceedings of the 2023 ACM SIGSAC Conference on Computer and Communications Security}, ser. CCS ’23. New York, NY, USA: Association for Computing Machinery, 2023, p. 874–888.
-	\item [\cite{incognitos}] K. Dinh Duy, J. Kim, H. Lim, and H. Lee, “INCOGNITOS: A Practical Unikernel Design for Full-System Obfuscation in Confidential Virtual Machines ,” in \emph{2025 IEEE Symposium on Security and Privacy (SP)}. Los Alamitos, CA, USA: IEEE Computer Society, May 2025, pp. 4192--4209
-	\item [\cite{sepim}] SE-PIM In-memory Acceleration of Data-intensive Confidential Computing,” \emph{IEEE Transactions on Cloud Computing}, vol. 11, no. 3, pp. 2473--2490, 2023
-	\item [\cite{pimoram}] B. Woo, K. Dinh Duy, Y. Han, B. B. Kang, and H. Lee, “PIM-ORAM: Towards Oblivious RAM Primitives in Commodity Processing -In-Memory,” in \emph{Annual Computer Security Applications Conference (ACSAC)}. Honolulu, Hawaii, USA, ACM, Dec. 2025
-\end{itemize}
 
 
 

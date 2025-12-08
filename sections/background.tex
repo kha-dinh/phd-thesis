@@ -31,6 +31,7 @@ Technical background relevant to each major component appears in their respectiv
 The remainder of this chapter is structured as follows.
 \cref{sec:intro:bg-os} reviews the traditional OS protection model and its influences.
 \cref{sec:intro:bg-ipi} and \cref{sec:intro:bg-cvm} examine two modern trends in hardware-defined protection \dash\ the key drivers behind this thesis \dash\ highlighting their motivations and enabling hardware features.
+Finally, \cref{sec:sidechannels} covers the background for side-channel attacks, a challenge that is address by \incognitos.
 
 
 \clearpage
@@ -353,7 +354,7 @@ These constraints significantly increase the effort required to develop enclave 
 	\caption{CVMs encapsulate the entire VM, including the OS and application, inside a protection domain.}\label{cvm}
 \end{figure}
 
-Recognizing the need for compatibility, vendors introduced a new class of \gls{tee} called \gls{cvm}.
+Recognizing the need for compatibility, vendors introduced a new class of \gls{tee} called \emph{\glsfmtfull{cvm}}.
 \glspl{cvm}, as illustrated in \autoref{cvm}, extends the protection to entire \glspl{vm}.
 Instead of isolating only a small portion of an application, \glspl{cvm} allows an unmodified guest \gls{os} and its applications to run inside a protected execution environment.
 This design preserves strong hardware isolation while retaining the familiar virtualization interface that cloud systems already rely on.
@@ -367,18 +368,65 @@ By leveraging \gls{vm}-level deployment in the cloud, the \gls{cvm} deployment m
 This enables the deployment of existing (e.g., databases and web servers) and cutting-edge (e.g., AI inference and large language models~\cite{yifan2025pipellm}) workloads with minimal migration costs.
 
 
-\section{Side-channel attacks}
-In 1973, Butler Lampson~\cite{lampson1973confinement} described in his seminar work on the \emph{confinement problem}, the difficulties of preventing an untrusted program from leaking secrets through \emph{covert channels} or \emph{side channels}.
-These channels, such as the time an operation takes, while not designed for information transfer, allow a program to communicate with other programs.
+\section{Side-channel Attacks}\label{sec:sidechannels}
+
+\incognitos, presented in \cref{chap:incognitos}, is a side-channel mitigation approach for \glspl{cvm}.
+Thus, this section provides some ground on side-channel attacks and their implications on \glspl{tee} and \glspl{cvm}.
+
+In 1973, Butler Lampson~\cite{lampson1973confinement} described, in his seminal work on the \emph{confinement problem}, the difficulty of preventing an untrusted program from leaking secrets through \emph{covert channels} or \emph{side channels}.
+Covert channels refer to \emph{intentional} information leakage enabled by a colluding application and an external observer, whereas side channels refer to \emph{unintentional} information leakage exploited by an attacker.
+These channels rely on observable properties such as execution time, that, while not designed for communication, allow a program to convey/leak information to other programs.
 
 Side-channel attacks remain a significant challenge in modern computing systems.
-Especially on cloud platforms where computation across thousands of users is shared on the same system, the \emph{shared} state between the victim and attacker processes becomes a major side-channel threat.
-Between different processes, the cloud \gls{os}/hypervisor multiplexes memory (through the page table), storage, and CPU execution time, while the hardware multiplexes microarchitectural states such as the cache and branch predictor.
-These shared states are never designed to hold secrets; previous research has demonstrated the feasibility of microarchitectural attacks, such as cache attacks~\cite{yarom_flushreload_nodate,liu_last-level_2015}, to extract sensitive information, such as secret keys.
+While the broader topic is extensive, this thesis (and \incognitos) focuses on memory-based side channels that enable an attacker to infer a victim’s memory access patterns, as these are among the most prevalent.
+On cloud platforms, where computation from thousands of users shares a common physical substrate, \emph{shared} microarchitectural and system states between victim and attacker processes become major side-channel vectors.
+Across processes, the cloud \gls{os}/hypervisor multiplexes physical memory via page tables, while hardware multiplexes resources such as caches and branch predictors—creating exploitable shared states.
 
-% \subsection{Microarchitectural side-channel attacks}
+\hdr{Microarchitectural side-channels}
 
-% \subsection{Side-channel attacks on TEEs}
-\glspl{tee} excabates the side-channel problem with a much stronger threat model compared to traditional protections (\cref{sec:intro:bg-os}).
-The attackers in this threat model are the management software, i.e., the \gls{os} and the hypervisor.
-Thus, attackers are now given access to powerful capabilities like page access interception~\cite{xu2015controlledchannel} and interrupt timers ~\cite{sgx-step,bulck2018nemesis,cachezoom}, which they can leverage to leak information~\cite{controlled-channel} or amplify existing side channels~\cite{cachezoom,hahnel_high-resolution_2017}.
+Modern CPUs employ microarchitectural optimizations that exploit locality by caching the results of slower operations (e.g., memory accesses or branch target resolution) in faster structures such as caches and branch predictors.
+These structures are frequently shared among software executing on the same machine.
+Prior work has demonstrated the feasibility of timing-based microarchitectural attacks, particularly cache attacks~\cite{gullasch_cache_2011,yarom_flushreload_nodate,liu_last-level_2015}, to extract sensitive information such as cryptographic keys.
+These attacks exploit timing differences when accessing shared resources to infer a victim's memory access patterns.
+
+For example, the Flush+Reload attack~\cite{yarom_flushreload_nodate} uses the \texttt{clflush} instruction to evict a cache line belonging to a shared memory page.
+When the victim later accesses the evicted line, it is fetched back into the cache, causing a measurable delay.
+By repeatedly flushing and timing reloads, the attacker infers whether and when the victim accessed specific memory locations.
+
+\hdr{Side-channel attacks on TEEs}
+
+\glspl{tee} exacerbate the side-channel problem by introducing a much stronger threat model than traditional systems (\cref{sec:intro:bg-os}).
+Here, the attacker is the privileged management software, such as the \gls{os} or hypervisor, which possesses powerful capabilities such as page access interception~\cite{xu2015controlledchannel} and fine-grained interrupt control~\cite{sgx-step,bulck2018nemesis,cachezoom}.
+These mechanisms can be used to leak information~\cite{controlled-channel} or amplify existing microarchitectural side channels~\cite{cachezoom,hahnel_high-resolution_2017}.
+
+Page access interception attacks, often referred to as \emph{controlled-channel attacks}~\cite{xu2015controlledchannel}, exploit the fact that privileged software controls memory management via page tables.
+By selectively unmapping pages and observing resulting \emph{page faults}, the attacker learns coarse-grained access patterns of the victim.
+A similar attack technique is also observed on \glspl{cvm} such as AMD SEV and Intel TDX~\cite{heckler,wesee}, leveraging the \emph{nested page table} used for virtualization of memory.
+
+Interrupt-based attacks further escalate the threat by enabling fine-grained control over enclave execution.
+By triggering interrupts after every few instructions, the attacker can \emph{single-step} or \emph{multi-step} the TEE~\cite{sevstep}, observing state at extremely fine granularity—such as the cache lines accessed by individual instructions.
+
+% \subsection{Side-channel Attacks Steps}
+%
+% Side-channel attacks often require the attacker to have prior knowledge of the correlation between the attacker's observered access patterns and the victim's accesses to secret that generate them.
+% For instance, the cache timing attacker must be able to identify the exact cache lines that were accessed when processing an input, and then measure the timing on these cache lines.
+% While many works assume this prior knowledge, obtaining the information is proven difficult in practice, due to variability memory layout, e.g., due to \gls{aslr}, and a profiling phase may be required~\cite{wesee,heckler}.
+%
+% With the memory layout known to the attacker, the side-channel attack is proceeded in two phases.
+% First, the attacker observe 
+
+
+% In the \emph{profiling phase}, the high-bandwidth \gls{npf} controlled-channel attack is used as a practical primitive to pinpoint the sensitive pages and functions by accumulating traces the page memory accesses in the \gls{cvm}~\cite{li2021cipherleaks,li2022systematic,li2019exploiting,cachewarp,sevstep,werner2019severest,morbitzer2018severed,heckler,wesee}.
+
+% Previous attacks on SEV CVMs~\cite{li2021cipherleaks,li2022systematic,li2019exploiting,cachewarp,sevstep,werner2019severest,morbitzer2018severed,heckler,wesee} show how the side-channel attack primitives are chained to form a practical attack:
+
+% a coarse-grained primitive is used for the \emph{profiling} phase while fine-grained ones are used for the \emph{extraction} phase.
+%
+%
+% The adversary aims to pinpoint the sensitive pages/function executions within the \gls{gpa} space of the \gls{cvm}.
+% The adversary resorts to the coarse-grained \gls{npf} controlled channel that provides more bandwidth in this phase since the profiling phase has to be performed on the entire memory space of the \gls{cvm}.
+
+% Then, the adversary proceeds to the \emph{extraction phase} in which finer-grained attack primitives, including the finer-grained side channel primitives, are used.
+% The extraction phase focuses on recovering secrets from the \gls{cvm} by utilizing the information obtained from secret-dependent memory accesses exposed through side channels.
+% This phase often depends on the exact locations of the target code or data collected in the profiling phase, for example, the exact pages that store AES T-table~\cite{sevstep}.
+% With the targeted page locations established, the attacker can utilize lower-bandwidth yet high-precision side channels, such as cache and ciphertext, to carry out the extraction~\cite{sevstep,li2021cipherleaks}.
