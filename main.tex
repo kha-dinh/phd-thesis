@@ -30,10 +30,11 @@ enable fallback to manual mode,
 \usepackage{rotating}
 
 \usepackage{xcolor}
-\usepackage[breaklinks=true,colorlinks,backref=page]{hyperref} % to use \phantomsection
+\usepackage[breaklinks=true,colorlinks=false,backref=page]{hyperref} % to use \phantomsection
 \hypersetup{
 linkcolor=black,
-citecolor=black
+citecolor=black,
+urlcolor=black
 }
 
 \renewcommand*{\backref}[1]{}
@@ -195,6 +196,12 @@ arrows,arrows.meta,calc,decorations.pathreplacing
 \usepackage{tocloft}
 \renewcommand{\cftchappresnum}{Chapter }
 \AtBeginDocument{\addtolength\cftchapnumwidth{\widthof{\bfseries Chapter }}}
+\setlength{\cftbeforetoctitleskip}{0pt}
+\setlength{\cftaftertoctitleskip}{0pt}
+\setlength{\cftbeforelottitleskip}{0pt}
+\setlength{\cftafterlottitleskip}{0pt}
+\setlength{\cftbeforeloftitleskip}{0pt}
+\setlength{\cftafterloftitleskip}{0pt}
 \begin{document}
 % \catcode`\-=\active
 % \newcommand-{hallo}
@@ -326,13 +333,12 @@ To address these challenges, it presents two systems, \capacity and \incognitos,
 \capacity demonstrates how intra-process isolation domains can be made coherent with legacy OS isolation.
 Toward this end, it introduces a cryptographically-authenticated capabilities abstraction, inspired by modern ARM hardware primitives such as Pointer Authentication and Memory Tagging.
 
+\incognitos addresses the challenge of aligning OS-level security models with hardware-enforced Confidential Virtual Machines (CVMs).
+it redesigns os capabilities \dash\ scheduling and memory management \dash\ to mitigate side-channel leakage in cvms while preserving compatibility and performance.
 
-\incognitos addresses the challenge of aligning OS-level behavior with hardware-enforced Confidential Virtual Machines (CVMs) for security.
-It redesigns OS capabilities \dash\ scheduling and memory management \dash\ to mitigate side-channel leakage in CVMs while preserving compatibility and performance.
-
-Together, these systems provide practical blueprints for reconciling modern hardware security primitives with long-standing OS protection models.
-They demonstrate that, through principled retrofitting, contemporary systems can leverage new hardware capabilities without sacrificing performance, compatibility, or security.
-The ideas presented in this dissertation contribute to the vision of secure computing infrastructures, where hardware and software collaborate seamlessly to defend against current and emerging threats.
+together, these systems provide blueprints for reconciling modern hardware security primitives with long-standing os protection models.
+they demonstrate that, through principled retrofitting, contemporary systems can leverage new hardware capabilities without sacrificing performance, compatibility, or security.
+% The ideas presented in this dissertation contribute to the vision of secure computing infrastructures, where hardware and software collaborate seamlessly to defend against current and emerging threats.
 
 
 \textbf{Keywords:} Security, Operating System, Protection, Side channels
@@ -399,10 +405,14 @@ The ideas presented in this dissertation contribute to the vision of secure comp
 
 % Dirty hack lol
 \renewcommand{\bibname}{\hfil \hfil References}
+
+\
+
+\
 {
-	\small
-	% \printbibliography
-	\bibliography{all}
+\small
+% \printbibliography
+\bibliography{all}
 }
 
 \newpage
@@ -459,24 +469,23 @@ The ideas presented in this dissertation contribute to the vision of secure comp
 \
 
 
-현대 하드웨어는 기존 소프트웨어에 대해 향상된 보안을 약속하는 강력한 보안 메커니즘을 점점 더 많이 제공하고 있다.
-동시에, 거친 단위의 프로세스 격리를 중심으로 구축된 오랜 OS 보호 모델은 현대 소프트웨어의 보안 및 성능 요구를 충족하는 데 어려움을 겪고 있다.
-이에 따라 최근 연구들은 기존의 OS 강제 보호에 하드웨어 지원 보안을 덧붙이려는 시도를 하고 있다.
-그러나 이러한 임시방편적인 보안 개조는 하드웨어와 소프트웨어에 의해 각각 강제되는 보호 모델 간의 불일치를 초래하며, 공격자가 악용할 수 있는 간극을 남긴다.
+현대 하드웨어는 점점 더 강력한 보안 메커니즘을 제공하며 기존 소프트웨어의 보안 강화를 약속하고 있다.
+동시에, 거친 단위의 프로세스 격리에 기반한 기존의 OS 보호 모델은 현대 소프트웨어의 보안 및 성능 요구를 충족하는 데 한계를 보이고 있다.
+이에 따라 최근 연구들은 기존 OS가 강제하는 보호 체계에 하드웨어 지원 보안을 덧붙이려는 시도를 하고 있다.
+그러나 이러한 임기응변식 보안 개조는 일관성 없는 보호 모델을 낳아, 공격자가 악용할 수 있는 빈틈을 남긴다.
 
-본 학위논문은 효과적인 시스템 보안을 위해서는 일관된 보호(coherent protection)가 필요하다고 주장한다. 즉, 하드웨어 지원 보호 모델은 OS가 구현하는 보호 모델과 체계적으로 정렬되어야 하며, 그 역도 마찬가지이다.
-일관된 보호라는 관점에서, 본 논문은 두 가지 새로운 도전 과제를 살펴본다: (1) 하드웨어 지원 프로세스 내부 격리, 그리고 (2) VM 수준의 신뢰 실행 환경에서의 사이드 채널 완화.
-이러한 과제를 해결하기 위해, 본 논문은 호환성을 희생하지 않으면서 최신 하드웨어 기능에 맞게 OS 보안 메커니즘을 개조한 두 가지 시스템, \capacity 와 \incognitos 를 제시한다.
+본 학위논문은 효과적인 시스템 보안을 위해서는 일관된 보호(coherent protection)가 필요하다고 주장한다: 하드웨어 지원 보호 모델은 OS가 구현하는 보호 모델과 체계적으로 정렬되어야 하며, 그 역도 마찬가지다.
+일관된 보호라는 관점을 통해, 본 논문은 두 가지 새로운 과제를 고찰한다: (1) 하드웨어 지원 프로세스 내부 격리, 그리고 (2) VM 수준 신뢰 실행 환경에서의 사이드 채널 완화.
+이러한 과제를 해결하기 위해, 호환성을 희생하지 않으면서 현대 하드웨어 기능에 맞게 OS 보안 메커니즘을 개조한 두 시스템, \capacity 와 \incognitos 를 제시한다.
 
 \capacity 는 프로세스 내부 격리 도메인을 기존 OS 격리와 일관되게 만드는 방법을 보여준다.
-이를 위해, 포인터 인증(Pointer Authentication)과 메모리 태깅(Memory Tagging)과 같은 최신 ARM 하드웨어 프리미티브에서 영감을 받은 암호학적으로 인증된 기능(capabilities) 추상화를 도입한다.
+이를 위해, 포인터 인증(Pointer Authentication)과 메모리 태깅(Memory Tagging)과 같은 현대 ARM 하드웨어 프리미티브에서 영감을 받은, 암호학적으로 인증된(capabilities) 추상화를 도입한다.
 
-\incognitos 는 보안을 위해 하드웨어에 의해 강제되는 기밀 가상 머신(Confidential Virtual Machines, CVMs)과 OS 수준 동작을 정렬하는 문제를 다룬다.
-이는 호환성과 성능을 유지하면서 CVM에서의 사이드 채널 누출을 완화하기 위해 OS의 기능 \dash\ 스케줄링 및 메모리 관리 \dash\ 를 재설계한다.
+\incognitos 는 하드웨어로 강제되는 기밀 가상 머신(Confidential Virtual Machines, CVMs)과 OS 수준 보안 모델을 정렬하는 과제를 다룬다.
+이는 cvms 에서의 사이드 채널 누출을 완화하기 위해, 호환성과 성능을 유지하면서 os capability \dash\ 스케줄링과 메모리 관리 \dash\ 를 재설계한다.
 
-이들 시스템은 함께 현대 하드웨어 보안 프리미티브와 오랜 OS 보호 모델을 조화시키기 위한 실질적인 청사진을 제공한다.
-이들은 원칙에 기반한 개조를 통해, 현대 시스템이 성능, 호환성, 또는 보안을 희생하지 않고도 새로운 하드웨어 기능을 활용할 수 있음을 보여준다.
-본 학위논문에서 제시된 아이디어들은 하드웨어와 소프트웨어가 긴밀하게 협력하여 현재 및 미래의 위협으로부터 방어하는 안전한 컴퓨팅 인프라라는 비전에 기여한다.
+이 두 시스템은 함께, 현대 하드웨어 보안 프리미티브와 오랜 OS 보호 모델을 조화시키기 위한 청사진을 제공한다.
+이들은 원칙에 기반한 개조를 통해, 현대 시스템이 성능, 호환성, 보안을 희생하지 않고도 새로운 하드웨어 기능을 활용할 수 있음을 보여준다.
 
 \textbf{Keywords:} 보안, 운영체제, 보호, 사이드 채널
 

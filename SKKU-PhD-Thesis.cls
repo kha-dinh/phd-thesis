@@ -181,7 +181,8 @@
 	\phantomsection %\label{chap:Abstract}
 	\addcontentsline{toc}{chapter}{Abstract}
 	\chapter*{Abstract}\label{chap:Abstract}
-	{\centering \subTitleFont \bfseries \@title\\~\\}
+	{\ \newline}
+	{\centering \subTitleFont \bfseries   \@title\\~\\}
 }
 
 % Set paper size and margins
