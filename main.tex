@@ -32,8 +32,8 @@ enable fallback to manual mode,
 \usepackage{xcolor}
 \usepackage[breaklinks=true,colorlinks,backref=page]{hyperref} % to use \phantomsection
 \hypersetup{
-linkcolor=blue,
-citecolor=blue
+linkcolor=black,
+citecolor=black
 }
 
 \renewcommand*{\backref}[1]{}
@@ -49,7 +49,7 @@ citecolor=blue
 \usepackage{multirow}
 \usepackage{makecell} % makecell, thead
 \usepackage{nicematrix}
-% \usepackage[english]{babel}
+\usepackage[english]{babel}
 \usepackage{booktabs}
 \usepackage{threeparttable}
 \usepackage{subcaption}
@@ -185,7 +185,16 @@ arrows,arrows.meta,calc,decorations.pathreplacing
 % HACK: for some reason diviopdfmx crashes with higher compression levels
 % \special{dvipdfmx:config z 9}
 
-
+% \usepackage{titletoc}% http://ctan.org/pkg/titletoc
+% \titlecontents*{chapter}% <section-type>
+%   [0pt]% <left>
+%   {\addvspace{1em}}% <above-code>
+%   {\bfseries\chaptername\ \thecontentslabel\quad}% <numbered-entry-format>
+%   {}% <numberless-entry-format>
+%   {\bfseries\hfill\contentspage}% <filler-page-format>
+\usepackage{tocloft}
+\renewcommand{\cftchappresnum}{Chapter }
+\AtBeginDocument{\addtolength\cftchapnumwidth{\widthof{\bfseries Chapter }}}
 \begin{document}
 % \catcode`\-=\active
 % \newcommand-{hallo}
@@ -201,7 +210,7 @@ arrows,arrows.meta,calc,decorations.pathreplacing
 
 
 \author{Kha Dinh Duy}
-\department{Computer Science and Engineering}
+\department{Computer Scietnce and Engineering}
 % \title{Retrofitting Modern Operating System Security with Hardware Supports}
 \title{Retrofitting Operating System Security for Modern Hardware Protections}
 
@@ -238,7 +247,7 @@ arrows,arrows.meta,calc,decorations.pathreplacing
 %\includepdf[pages=1]{131226-ThesisAproval.pdf}
 
 %%---------------------------------
-\phantomsection \label{chap:Acknowledgement}
+\phantomsection \label{chap:sAcknowledgement}
 % \addcontentsline{toc}{chapter}{Acknowledgements}
 % \include{sections/acknowledgement}
 
@@ -249,18 +258,40 @@ arrows,arrows.meta,calc,decorations.pathreplacing
 % \renewcommand{\contentsname}{}
 \setcounter{tocdepth}{2}
 \pagenumbering{roman}% start numbering from Content
+
+\renewcommand{\contentsname}{\centerline{\subsubTitleFont Table of Contents}}
+\renewcommand{\listtablename}{\centerline{\subsubTitleFont List of Tables}}
+\renewcommand{\listfigurename}{\centerline{\subsubTitleFont List of Figures}}
+
+
 \tableofcontents
+
+% {%
+% 	\let\oldnumberline\numberline%
+% 	\renewcommand{\numberline}{\chaptername~\oldnumberline}%
+% 	\tableofcontents%
+% }
 
 
 \newpage
 \phantomsection \label{listoftab}
 % \addcontentsline{toc}{chapter}{List of Tables}
-\listoftables
+% \listoftables
+{%
+	\let\oldnumberline\numberline%
+	\renewcommand{\numberline}{\tablename~\oldnumberline}%
+	\listoftables%
+}
 
 \newpage
 \phantomsection \label{listoffig}
 % \addcontentsline{toc}{chapter}{List of Figures}
-\listoffigures
+% \listoffigures
+{%
+	\let\oldnumberline\numberline%
+	\renewcommand{\numberline}{\figurename~\oldnumberline}%
+	\listoffigures%
+}
 
 \newpage
 
@@ -407,12 +438,22 @@ The ideas presented in this dissertation contribute to the vision of secure comp
 \phantomsection %\label{chap:Abstract}
 \addcontentsline{toc}{chapter}{논문요약}
 \chapter*{논문요약}\label{chap:KrAbstract}
+\
+
 {\centering \fontsize{18}{18} \selectfont \bfseries 현대 하드웨어 보호를 위한운영체제 보안의 개조\\~\\}
 
 % \addcontentsline{toc}{chapter}{초록}%Korean Abstract
 % \addcontentsline{toc}{chapter}{초록}%Korean Abstract
 % \addcontentsline{toc}{chapter}{초록}%Korean Abstract
 % \include{ldt-MBL-0-abstract-ko}
+%
+\hfill Dinh Duy Kha
+
+\hfill 소프트웨어학과
+
+\hfill 성균관대학교
+
+
 \
 
 \
