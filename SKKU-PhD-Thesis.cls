@@ -57,7 +57,9 @@
 \def\department#1{\def\@department{#1}}
 \def\year#1{\def\@year{#1}}
 \def\month#1{\def\@month{#1}}
+\def\approvemonth#1{\def\@approvemonth{#1}}
 \def\advisor#1{\def\@advisor{#1}}
+\def\committeeadvisor#1{\def\@committeeadvisor{#1}}
 \def\committeechair#1{\def\@committeechair{#1}}
 \def\firstmember#1{\def\@firstmember{#1}}
 \def\secondmember#1{\def\@secondmember{#1}}
@@ -101,7 +103,7 @@
 		degree of Ph.D. in Engineering\vfill}
 	{\centering \subsubTitleFont \@month{} \@year\vfill}
 	{\centering \setstretch{2} \subTitleFont Supervised by\\
-		Professor \@advisor\\
+		\@advisor\\
 		Major Advisor\\
 	}
 	\newpage
@@ -130,18 +132,19 @@
 		{\raggedright \SubSectionFont Committee Member : \@thirdmember \\~\\\vspace{-.5em}}
 		{\SectionFont \hphantom{CCCCCCC}\textcolor{gray}{[signature]}\vspace{-.8em}}
 		\par\rule{\textwidth}{1pt} \\
-		{\raggedright \SubSectionFont Major Advisor: \@advisor \\~\\}
+		{\raggedright \SubSectionFont Major Advisor: \@committeeadvisor \\~\\}
 	\end{minipage}
 	\vfill
 	{\centering \setstretch{2} \subTitleFont The Graduate School\\
 		Sungkyunkwan University\\
-		\@month{} \@year\\}
+		\@approvemonth{} \@year\\}
 }
 
 \newcommand{\makesidecover}{
-	\newgeometry{top=10mm,bottom=10mm}
+	% \newgeometry{top=1in,bottom=10mm}
 	\thispagestyle{empty}
 
+	\vfill
 	\begin{minipage}{\linewidth}
 		\centering
 		\rotatebox{-90}{Ph.D. Dissertation}
@@ -149,20 +152,29 @@
 	\vfill
 	\begin{minipage}{\linewidth}
 		\centering
-		\rotatebox{-90}{\@title}
+		\rotatebox[origin=c]{-90}{\parbox{9cm}{
+				\begin{spacing}{1}
+					\vspace{-.3cm}
+					\centering \@title
+				\end{spacing}
+			}}
+
 	\end{minipage}
 	\vfill
 	\begin{minipage}{\linewidth}
 		\centering
-		\rotatebox{-90}{\@year}
+		% \rotatebox{-90}{\@year}
+		\begin{spacing}{1} 2 \\ 0 \\ 2 \\ 6 \end{spacing}
+		% \parbox{1mm}{\begin{spacing}{1} 2 0 2 5 \end{spacing}}%
 	\end{minipage}
 	\vfill
 	\begin{minipage}{\linewidth}
 		\centering
 		\rotatebox{-90}{\@author}
 	\end{minipage}
-	\vfill
-	\restoregeometry
+	% \vfill
+	\clearpage
+	% \restoregeometry
 }
 
 \newcommand{\makeabstracttitle}{

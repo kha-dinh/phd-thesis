@@ -1,12 +1,12 @@
 \section{Security analysis \& discussion}
 \label{sec:discussion}
-In this section, we use the security requirements outlined in \cref{sec:overview:secreq} to analyze the security of \thename. 
+In this section, we use the security requirements outlined in \cref{sec:overview:secreq} to analyze the security of \thename.
 We show that these security requirements are achieved throughout the life cycles of program resources.
-We also discuss the possible mitigation for brute-forcing attacks at the end of the section.
+We also discuss the possible mitigation for brute-forcing attacks, and optimizations, at the end of the section.
 
 % \subsection{Domain impersonation \& complete mediation}
 \textbf{Non-impersonable domains (\srimper).}
-The domain entry explained in \cref{sec:design:libcapac} renders invoking domain switches into arbitrary domains in unintended locations impossible. 
+The domain entry explained in \cref{sec:design:libcapac} renders invoking domain switches into arbitrary domains in unintended locations impossible.
 Also, our trusted domain ID fetching and in-register tag protection prevent the attacker from impersonating a domain by corrupting the currently activating domain ID spilled onto the stack or accessible globally.
 
 \textbf{Complete mediation (\srcompmed).}
@@ -25,7 +25,7 @@ A domain-private \fd leaked to another domain remains unusable thanks to our \fd
 The reference monitor also prevents the OS from reusing \fd numbers after one is deallocated.
 In addition, a domain compromised by the adversary cannot reuse in-memory pointers pointing to other domains' private memory.
 Due to domain key mismatch, the authentication would fail at \texttt{pacdb} sites.
-A pointer signed with \key{DB} would also fail to authenticate at pointer 
+A pointer signed with \key{DB} would also fail to authenticate at pointer
 load sites where \key{DA} is used.
 
 
@@ -42,7 +42,7 @@ With two methods, the adversary may forge a tagged and signed pointer to access 
 First, the adversary may overwrite an existing in-memory pointer through memory corruption.
 Such attacks are thwarted by the \gls{pa}-based pointer authentication, whose primary purpose is to detect corruptions of in-memory pointers.
 Second, through code reuse attacks, the adversary may sign arbitrarily manipulated data (e.g., 64-bit data with the victim’s domain tag and target sensitive memory address) using the available \texttt{pacda} and \texttt{pacdb} gadgets.
-For \texttt{pacdb} gadgets, \thename PA contexts created by key switching force the attacker to use them within the target domain. 
+For \texttt{pacdb} gadgets, \thename PA contexts created by key switching force the attacker to use them within the target domain.
 We consider the isolated domains small enough so that it can be verified that the domain code is free of signing gadgets.
 However, this is a substantial and realistic threat when completely safe TCB is not guaranteed \cite{civ, kernel-pac}, and a scanner to remove such gadgets could be utilized~\cite{kernel-pac}.
 % \thename is a framework that introduces primitive for compartmentalization at multiple boundaries.
@@ -72,6 +72,19 @@ This is an inherent weakness with \gls{pa}-based security.
 Such attacks can be overcome by placing thresholds on the number of crashed threads due to \gls{pa} traps and systems call authentication failures~\cite{kernel-pac}.
 %Such countermeasures need to be in place since the entropy of \gls{pa} in \thename is only 7 bits due to the combined use of \gls{pa} and \gls{mte}.
 
+\textbf{Possible optimizations.}
+Our evaluation (\cref{sec:evaluation}) indicates that most of \thename's overhead arises from the per-load and per-store pointer authentication mechanism, which requires executing \gls{pa} on every memory load and store.
+A promising strategy to reduce this overhead and enable practical adoption is to minimize register spilling of pointers, thereby reducing the number of pointer authentication operations.
+To achieve this optimization, the compiler's register allocation and spilling logic must distinguish between pointer types and non-pointer (e.g., integer) values when deciding which registers to spill to memory.
+Implementing this strategy requires pointer-awareness across multiple compiler backend passes.
+While challenging, this approach is already being pursued by compiler developers.
+For example, LLVM 22.0~\footnote{\url{https://llvm.org/docs/PointerAuth.html}} provides not only built-in intrinsics for pointer authentication, but also \emph{function attributes} to annotate pointer authentication operations on functions and \emph{operand bundles} to prevent spilling of selected registers across function calls.
+We expect that these efforts will also aid in reducing the overhead of \thename.
+
+
+
+
+
 % \hdr{Completeness of reference monitor policy} 
 % We do not seek completeness with the \gls{syscall} filtering policy in our reference monitor.
 % The syscall APIs were never developed with intra-process isolation in mind. 
@@ -82,8 +95,8 @@ Such attacks can be overcome by placing thresholds on the number of crashed thre
 % Heuristics can be applied (e.g., threshold on crashed threads).
 
 %  Entropy, it can be 7bits, --> thresholding must be in place.
- 
- % (Maybe mask? and r1 0x00fffff) (sign_ambient intrinsic )
+
+% (Maybe mask? and r1 0x00fffff) (sign_ambient intrinsic )
 
 
 % Pointer forging through code reuse attacks, which requires the adversary to prepare a fake pointer and a signing gadget (e.g., \texttt{pacda}), is extremely challenging under \gls{cfi}'s protection.
@@ -99,11 +112,11 @@ Such attacks can be overcome by placing thresholds on the number of crashed thre
 % As such, the adversary may launch an extremely advanced attack to reuse the \gls{pa} instructions to forge pointers. We regard polishing \gls{cfi} as an orthogonal direction to our contribution.
 % However, our use of \gls{pa} and \gls{mte} does not interfere with and thus can coexist with the proposals for \gls{pa}-based CFI~\cite{pac-it-up,kernel-pac,pactight,pacstack}.
 
- % Capacity's PA context created by key switching forces the attacker to use the gadgets in the target domain.
- % When completely safe TCB (i.e., capacity domain code) is not guaranteed. This is a substantial and realistic threat, however, already discussed in a previous work that also introduced a scanner to remove such gadgets
- % Given that no such convenient gadgets exist in Cap domains, the adversary may still launch an extremely sophisticated attack by finding the necessary gadgets.
- % In such case, the attack will be as the following: 1. leak memory address 2. add tag (randomized?) 3. PACDA to just create ambient pointer that points to domain-private area.
- % (Maybe mask? and r1 0x00fffff) (sign_ambient intrinsic )
+% Capacity's PA context created by key switching forces the attacker to use the gadgets in the target domain.
+% When completely safe TCB (i.e., capacity domain code) is not guaranteed. This is a substantial and realistic threat, however, already discussed in a previous work that also introduced a scanner to remove such gadgets
+% Given that no such convenient gadgets exist in Cap domains, the adversary may still launch an extremely sophisticated attack by finding the necessary gadgets.
+% In such case, the attack will be as the following: 1. leak memory address 2. add tag (randomized?) 3. PACDA to just create ambient pointer that points to domain-private area.
+% (Maybe mask? and r1 0x00fffff) (sign_ambient intrinsic )
 
 %~\cite{pactight}
 

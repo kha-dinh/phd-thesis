@@ -155,7 +155,7 @@ By retrofitting \gls{os} capabilities \dash scheduling, and memory management \d
 \subsection{Orthogonal Contributions}
 Beyond CPU features, which are the primary focus of this thesis, hardware vendors also continue to introduce new acceleration hardware.
 A key challenge for modern systems security is how to safely leverage such accelerators amid evolving protection models.
-During the timeframe of this thesis, I also led and participated in research addressing this challenge, specifically exploring how \gls{pim} can accelerate emerging confidential computing workloads (\cref{chap:pim}).
+During the timeframe of this thesis, I also led and participated in research addressing this challenge, specifically exploring how \gls{pim} can accelerate emerging confidential computing workloads.
 
 \hdr{Accelerating Hardware Security with Processing-in-memory}
 
@@ -163,18 +163,20 @@ As computing workloads become increasingly data-intensive, \gls{pim} is emerging
 SE-PIM~\cite{sepim}, a project I led, is a hardware–software co-design for accelerating confidential data-intensive workloads in the cloud. It examines the attack vectors exposed when PIM is employed for confidential computing and investigates the hardware extensions required to enable secure and practical acceleration.
 Building on the foundations of \cite{sepim}, PIM-ORAM, a project in which I contributed as second author, explores how a PIM module with confidential computation capabilities can reduce the overheads of ORAM, a class of security algorithms known for high memory and performance costs when mitigating side channels.
 
-\subsection{Selected Publications}
+\subsection{Publications}
 
-The following is the set of publications selected for inclusion in this thesis.
+The following is the list of publications that are made during the period of writing this thesis.
 \cite{capacity} and \cite{incognitos} constitute \cref{chap:capacity} and \cref{chap:incognitos}, respectively.
-The other two publications, \cite{sepim, pimoram}, which examine related problems in hardware-assisted security, are included in \cref{chap:pim}.
-They are separated from the main narrative because these works do not align as directly with the theme of coherent protection developed in this thesis.
+
+The other publications, \cite{sepim, pimoram, rustsan}, examine related problems in hardware-assisted security and software security.
+They are separated omited from this thesis because these works do not align as directly with the theme of coherent protection developed in this thesis.
 
 \begin{itemize}
 	\item [\cite{capacity}] K. Dinh Duy, K. Cho, T. Noh, and H. Lee, “Capacity: Cryptographically-enforced in-process capabilities for modern arm architectures,” in \emph{Proceedings of the 2023 ACM SIGSAC Conference on Computer and Communications Security}, ser. CCS ’23. New York, NY, USA: Association for Computing Machinery, 2023, p. 874–888.
 	\item [\cite{incognitos}] K. Dinh Duy, J. Kim, H. Lim, and H. Lee, “INCOGNITOS: A Practical Unikernel Design for Full-System Obfuscation in Confidential Virtual Machines ,” in \emph{2025 IEEE Symposium on Security and Privacy (SP)}. Los Alamitos, CA, USA: IEEE Computer Society, May 2025, pp. 4192--4209
 	\item [\cite{sepim}] K. Dinh Duy and H. Lee, "SE-PIM: In-memory Acceleration of Data-intensive Confidential Computing,” \emph{IEEE Transactions on Cloud Computing}, vol. 11, no. 3, pp. 2473\dash2490, 2023
 	\item [\cite{pimoram}] B. Woo, K. Dinh Duy, Y. Han, B. B. Kang, and H. Lee, “PIM-ORAM: Towards Oblivious RAM Primitives in Commodity Processing -In-Memory,” in \emph{Annual Computer Security Applications Conference (ACSAC)}. Honolulu, Hawaii, USA, ACM, Dec. 2025
+	\item [\cite{rustsan}] K. Cho, J. Kim, K. D. Duy, H. Lim, and H. Lee, “RustSan: Retrofitting AddressSanitizer for Efficient Sanitization of Rust,” in 33rd USENIX Security Symposium (USENIX Security 24). Philadelphia, PA: USENIX Association, Aug. 2024
 \end{itemize}
 
 

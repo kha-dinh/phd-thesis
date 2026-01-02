@@ -78,22 +78,45 @@ Second, functions can be called from multiple domains; the \texttt{AUT} authenti
 
 % , as discussed in \cref{sec:overview}.
 % \gls{ipi}-aware process reference monitor has only been actively discussed in recent works~\cite{donky,pku-pitfall,jenny,cerberus}. The adversaries in the untrusted domain may launch various forms of confused deputy attacks on the trusted domain through \glspl{syscall}~\cite{pku-pitfall,jenny}. For this reason, 
-Recently, there have been proposals for reference monitors better suited for in-process isolation~\cite{donky,jenny,cerberus,muswitch}.
-Jenny~\cite{jenny} proposed a secure and efficient syscall reference monitor that delegates access control to userspace.
-$\mu$Switch~\cite{muswitch} leverages implicit context switches to delay the kernel resource context switching until a syscall is performed to achieve better performance.
-While previous works on reference monitors require developers to write filtering rules to be applied to the monitor, \thename's cryptographically-secured \fd references are coherently built into the program's semantic, and their \gls{pa}-assisted authentication is both transparent and efficient.
 
 
 %\hj{mention interface fuzzing here}
 
-\hdr{Isolation boundaries}
+\hdr{Defining isolation boundaries}
 \thename currently only provides intra-procedural sensitivity annotation propagation.
 Automated whole-program and inter-procedural tracking of secret propagation is a field of its own, and previous works have proposed methods towards the objective~\cite{cryptompk,ptrsplit,dynpta,aces}.
+Another approach to specify the isolation boundary between domains is to leverage a separate specification, much like how SELinux~\cite{selinux} and AppArmor~\cite{apparmor-paper} manage security profiles per applications.
 We expect that \thename can incorporate such methods in the future, although it is currently out of the scope of this paper, which focuses on introducing a new isolation mechanism.
+
 On another note, a recent work~\cite{civ} discussed the perils of artificially drawn in-process boundaries and their interfaces.
-Such attack surface must be eliminated or minimized through validation and interface narrowing when porting existing programs to use \thename.
-If a program is redesigned or written from scratch with \thename, then a conscious effort can be made to have a secure interface by design.
+Such an attack surface must be eliminated or minimized through validation and interface narrowing when porting existing programs to use \thename.
+An approach to detect these interface vulnerabilities is to employ software testing techniques like fuzzing~\cite{civ} or symbolic execution~\cite{mansour2025rakis} to detect potential security violations in the boundaries.
+If a program is redesigned or written from scratch with \thename, then a conscious effort can be made to have a secure interface, e.g., by applying secure interface design guidelines~\cite{civ}.
 The evaluated prototypes focus on showing the feasibility of \thename as an isolation mechanism, and we regard the validation process to be an orthogonal issue.
+
+
+
+
+
+\hdr{System call filtering}
+\thename enforces a coherent in-process isolation scheme by authenticating system resource handles, such as file paths and file descriptors.
+Prior work has long recognized the system call interface as a critical security boundary, as it provides a powerful avenue for privilege escalation (e.g., by executing arbitrary binaries).
+Consequently, a common defense is to restrict the set of system calls and system resources that a process is permitted to access.
+
+Previous work has sought to restrict system calls at the process-level.
+Linux Seccomp is one of the most widely deployed mechanisms for this and is a security staple in execution environments ranging from Android applications and \texttt{systemd} services to Docker containers~\cite{confine}, Amazon Firecracker~\cite{firecracker}, and Kubernetes~\cite{kubernetes-seccomp}.
+SELinux~\cite{selinux}, based on Linux Security Module (LSM) further constrains the system call interface through a Mandatory Access Control (MAC) framework, assigning fine-grained security labels to system resources and enforcing strict information-flow policies.
+Another line of work is system call specialization, which tries to automatically construct policies that minimize the set of \gls{syscall} an application is allowed to call using configuration file-aware~\cite{c2c}  or application phases-aware~\cite{ghavamnia2020temporal} analyses.
+Despite their effectiveness, these mechanisms and policies primarily operate at process granularity; finer-grained access control within a process remains largely unsupported.
+% However, emerging software architectures increasingly require isolation between mutually distrusting in-process domains.
+
+
+Recent research has explored system call filtering mechanisms better suited for in-process isolation~\cite{donky,jenny,cerberus,muswitch}.
+Jenny~\cite{jenny} proposes a secure and efficient system call reference monitor that delegates access control decisions to userspace.
+$\mu$Switch~\cite{muswitch} leverages implicit context switches to defer kernel resource context switching until a system call is issued, improving performance.
+While these approaches rely on reference monitors and require developers to explicitly specify filtering rules, \thename integrates cryptographically secured \fd references directly into the program semantics.
+Building on this foundation, \thename relies on \gls{pa}-assisted authentication of system resources, enabling efficient and coherent protection across resource life cycles without external policy specifications.
+
 
 % \thename and HAKC have the following differences.
 % First, \thename's \gls{pa} key-identified domains fundamentally differ from HAKC's use of modifiers and provide the advantage we discussed above.

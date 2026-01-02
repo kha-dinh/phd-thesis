@@ -25,6 +25,8 @@ Moreover, \gls{acl}-based access control requires keeping track of the isolated 
 In contrast, the \fds in \thename are cryptographically secured; the proof of ownership and object attributes are attached to the reference itself, regardless of the number of subjects sharing a resource.
 
 We implement the reference monitor in about $1000$ LoC. It provides domain key switching and \gls{syscall} interception through \gls{syscall} table hooking using a similar approach to a previous efficient reference monitor~\cite{jenny}.
+That is, we employ a kernel module that hooks the \gls{syscall} table with custom authentication/signing routines that are invoked before and after a \gls{syscall}'s execution.
+% as a kernel module that hooks the \gls{syscall} table and prepend domain authentication routines using the \gls{pa} instructions. This method allows our reference monitor with minimal overheads. Note that the method is similar t
 To avoid the system monitor affecting all processes within the system, we set an unused flag in \texttt{struct thread\_info->flags} to mark \thename-enabled processes during initialization and check for the flag before performing syscall authentication.
 
 
@@ -182,7 +184,7 @@ Finally, the returned \fd for the requested file is signed with \key{DA} for amb
 }
 Hence, all \fds issued to the process carry \glspl{ac} that are authenticated on use.
 Additionally, we use a \emph{secret modifier} only known to the kernel as the \gls{pa} signing modifier, to prevent forging by signing a plain integer with \texttt{pac} instructions in the userspace (\srforge).
-\thename's security model also requires that the integer for \fds are not reused (\srreuse), even after they are closed. 
+\thename's security model also requires that the integer for \fds are not reused (\srreuse), even after they are closed.
 We achieve this by changing the hook for the \texttt{close} to reserve the closed \fd in the thread's \fd table, preventing the OS from reusing it.
 
 \hdr{In-process FD capabilities}

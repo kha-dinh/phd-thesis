@@ -50,12 +50,12 @@ Despite their strong compatibility with existing workloads, \glspl{cvm} inherit 
 
 Side channels (\cref{chap:background}, \cref{sec:sidechannels}) were a significant threat in Intel SGX and continue to persist in emerging \gls{cvm} models such as AMD SEV and Intel TDX, which remain vulnerable to a broad class of side-channel attacks.
 \autoref{cvm-side-channel} illustrates the side-channel attacks in \gls{cvm}.
-Since the \gls{cvm} shares architectural and microarchitectural hardware states with the untrusted hypervisor, it suffers from similar side-channel attack vectors, such as page-table-based attacks (also called the \emph{controlled-channel} attack) and cache attacks~\cite{sevstep}.
+Since the \gls{cvm} shares architectural and microarchitectural hardware states with the untrusted hypervisor, it suffers from similar side-channel attack vectors, such as page-table-based attacks~\cite{heckler,wesee,sevstep} (also called the \emph{controlled-channel} attack) and cache attacks~\cite{sevstep}.
 Worse, newer \gls{cvm}-specific side-channels, such as the ciphertext side channel~\cite{li_cipherleaks_nodate,ciphersteal}, continued to be discovered.
 Thus, research into side-channel mitigation for \gls{cvm} is a pressing need.
 
 \hdr{Bloated TCB}
-Another with the \gls{cvm} deployment model is the significantly bloated \gls{tcb}.
+Another challenge with the \gls{cvm} deployment model is the significantly bloated \gls{tcb}.
 The \gls{tcb} of a \gls{tee} comprises components trusted to handle the user's secret.
 The \gls{cvm} model now places the confidential application, along with all of its supporting software, within the trust boundary, placing a significant amount of code inside the TEE.
 Specifically, the \gls{os} must now be a part of the \gls{tee}, which contains tens of millions of lines of code and thousands of known vulnerabilities.
@@ -71,7 +71,6 @@ Second, the large \gls{tcb} complicates efforts to defend against side-channel a
 
 To support more robust \gls{cvm} deployments, \incognitos is designed to address the challenges outlined above.
 It explores the principle of coherent protection (\cref{chap:intro}) by rethinking the traditional protection model of \gls{os} (\cref{chap:background}, \cref{sec:intro:bg-os}), to align with the protection established by \gls{cvm} hardware like AMD SEV and Intel TDX.
-
 This shift in perspective has two implications.
 First, this means that the \gls{os} must now incorporate side-channel attacks from untrusted hypervisors into its threat model.
 \thename shows that this both presents challenges and opportunities \dash\ with the \gls{os}'s access to low-level capabilities like memory management and scheduling, \thename can \emph{efficiently} and \emph{transparently} protect the memory accesses from side-channel attack.
