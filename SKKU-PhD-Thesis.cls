@@ -334,9 +334,9 @@
 {10pt}
 {\vspace{1em}}
 
-\renewcommand\thesection{\arabic{section}.}
-\renewcommand\thesubsection{\Alph{subsection}.}
-\renewcommand\thesubsubsection{\Alph{subsection}.\arabic{subsubsection}.}
+% \renewcommand\thesection{\arabic{section}.}
+% \renewcommand\thesubsection{\Alph{subsection}.}
+% \renewcommand\thesubsubsection{\Alph{subsection}.\arabic{subsubsection}.}
 
 \def\@makechapterhead#1{%
 	\vspace*{0\p@}%
