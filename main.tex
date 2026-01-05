@@ -101,6 +101,8 @@ urlcolor=black
 \usepackage{color}
 \usepackage{multirow}
 \usepackage{etoolbox}
+
+
 \usepackage{mathtools}
 \usepackage{textcomp}
 \usepackage{lipsum,graphicx,multicol}
@@ -396,7 +398,6 @@ they demonstrate that, through principled retrofitting, contemporary systems can
 
 %================================================
 % References 
-\newpage
 %\include{ldt-MBL-Pre-reference}
 % \titleformat*{\section}{\center\large\bfseries}
 \phantomsection \label{chap:Reference}
@@ -404,12 +405,14 @@ they demonstrate that, through principled retrofitting, contemporary systems can
 \bibliographystyle{IEEEtran}
 
 % Dirty hack lol
-\renewcommand{\bibname}{\hfil \hfil References}
+\renewcommand{\bibname}{\centerline{References}}
 
 \
 
 \
 {
+% No new page before bibliography (Why do I need to specify this???)
+\renewcommand{\clearpage}{}
 \small
 % \printbibliography
 \bibliography{all}
@@ -442,7 +445,7 @@ they demonstrate that, through principled retrofitting, contemporary systems can
 % % \section{PIM-ORAM}\label{pimoram}
 % \includepdf[pages=1-,scale=.9,pagecommand={\thispagestyle{plain}}]{sections/pimoram.pdf}
 %
-\newpage
+% \newpage
 % \phantomsection \label{chap:KrAbstract}
 %
 \phantomsection %\label{chap:Abstract}
