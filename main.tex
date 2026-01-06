@@ -119,6 +119,10 @@ urlcolor=black
 
 \usepackage{pifont}
 
+\usepackage{needspace}
+% \pretocmd{\section}{\needspace{5\baselineskip}}{}{}
+\pretocmd{\subsection}{\needspace{\baselineskip}}{}{}
+
 % Hack symbol
 \renewcommand{\labelitemi}{\ding{228}}
 
