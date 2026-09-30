@@ -1,7 +1,11 @@
-\let\TeXyear\year
-\documentclass[a4paper,11pt]{SKKU-PhD-Thesis}
-\let\setyear\year
-\let\year\TeXyear
+\documentclass[a4paper,11pt]{report}
+\usepackage{fontspec}
+\usepackage[table]{xcolor}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{indentfirst}
+\usepackage{xspace}
+\DeclareRobustCommand\dash{---}
+\renewcommand{\bibname}{References}
 % \usepackage[recompile]{memoize}
 % \mmzset{
 % % deactivate={\tikz, tikzpicture}, % deactivate automemoization of all TikZ pictures
@@ -26,7 +30,6 @@ enable fallback to manual mode,
 \usepackage{epigraph}
 \setlength{\epigraphwidth}{0.5\textwidth}
 
-\usepackage[a4paper]{geometry}
 \usepackage{rotating}
 
 \usepackage{xcolor}
@@ -191,27 +194,9 @@ arrows,arrows.meta,calc,decorations.pathreplacing
 
 
 \author{Kha Dinh Duy}
-\department{Computer Science and Engineering}
-% \title{Retrofitting Modern Operating System Security with Hardware Supports}
 \title{Retrofitting Operating System Security for Modern Hardware Protections}
-
-\setyear{2025}
-\month{November}
-\advisor{Hojoon Lee}
-\committeechair{Hyungjoon Koo}
-\firstmember{Hyungshick Kim}
-\secondmember{Sungjae Hwang}
-\thirdmember{Sooyong Cha}
-
-\newpage
-%%---------------------------------
-\makecover
-%%---------------------------------
-\makeinsidecover
-%%---------------------------------
-\makesubmissionform
-%%---------------------------------
-\makecertification
+\date{November 2025}
+\maketitle
 
 
 
@@ -258,7 +243,7 @@ arrows,arrows.meta,calc,decorations.pathreplacing
 %%--------------------------------------
 % Abstract
 %\include{ldt-MBL-Pre-0-abstract}
-\makeabstracttitle
+\chapter*{Abstract}
 
 Modern hardware increasingly provides powerful security mechanisms that operate partially outside the operating system’s traditional authority.
 At the same time, the long-standing OS protection model, built around coarse-grained process isolation, struggles to address the security and performance demands of modern software.
@@ -344,7 +329,7 @@ The ideas from this dissertation contribute to the vision of secure computing in
 \bibliographystyle{IEEEtran}
 
 % Dirty hack lol
-\renewcommand{\bibname}{\hfil \hfil References}
+
 {
 	\small
 	% \printbibliography
@@ -362,7 +347,6 @@ The ideas from this dissertation contribute to the vision of secure computing in
 % \include{ldt-MBL-0-abstract-ko}
 \newpage
 
-\makesidecover
 
 
 
