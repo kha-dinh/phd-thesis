@@ -40,7 +40,7 @@ Then, it covers the design and evaluation of \incognitos, showing the evolution 
 Despite their strong compatibility with existing workloads, \glspl{cvm} inherit the side-channel attack challenges from the previous Intel SGX model while introducing unique challenges due to the expanded \gls{tcb}.
 
 \hdr{Side-channel attacks}
-In 1973, Butler Lampson~\cite{lampson1973confinement} described in his seminar work on the \emph{confinement problem}, the difficulties of preventing an untrusted program from leaking secrets through \emph{covert channels} or \emph{side channels}.
+In 1973, Butler Lampson~\cite{lampson1973confinement} described in his seminal work on the \emph{confinement problem}, the difficulties of preventing an untrusted program from leaking secrets through \emph{covert channels} or \emph{side channels}.
 These channels, such as the time an operation takes, while not designed for information transfer, allow a program to communicate with other programs.
 
 
@@ -50,31 +50,31 @@ Especially on cloud platforms where computation across thousands of users is sha
 Between different processes, the cloud \gls{os}/hypervisor multiplexes memory (through the page table), storage, and CPU execution time, while the hardware multiplexes microarchitectural states such as the cache and branch predictor.
 These shared states are never designed to hold secrets; previous research has demonstrated the feasibility of microarchitectural attacks, such as cache attacks~\cite{yarom_flushreload_nodate,liu_last-level_2015}, to extract sensitive information, such as secret keys.
 
-\glspl{tee} excabates the side-channel problem with a much stronger threat model compared to traditional protections (\cref{sec:intro:bg-os}).
+\glspl{tee} exacerbate the side-channel problem with a much stronger threat model compared to traditional protections (\cref{sec:intro:bg-os}).
 The attackers in this threat model are the management software, i.e., the \gls{os} and the hypervisor. 
-Thus, attackers are now given access to powerful capabilities like page access interception~\cite{xu2015controlledchannel} and interrupt timers ~\cite{sgx-step,bulck2018nemesis,cachezoom}, which they can leverage to leak information~\cite{xu2015controlledchannel} or amplify existing side channels~\cite{cachezoom,hahnel_high-resolution_2017}.
+Thus, attackers are now given access to powerful capabilities like page access interception~\cite{xu2015controlledchannel} and interrupt timers~\cite{sgx-step,bulck2018nemesis,cachezoom}, which they can leverage to leak information~\cite{xu2015controlledchannel} or amplify existing side channels~\cite{cachezoom,hahnel_high-resolution_2017}.
 
 
 
 \begin{figure}[t]
 	\centering
   \input{figures/bg-side-channel-cvm}
-  \caption{While an untrusted cloud platform cannot directly access a CVM's sensitive memory, they can leak information through side channel attacks on shared hardware architectural/microarchitectural states. Further, they can exploit their management of the page table to perform a controlled-channel attack.}\label{cvm-side-channel}
+  \caption{While an untrusted cloud platform cannot directly access a CVM's sensitive memory, they can leak information through side-channel attacks on shared hardware architectural/microarchitectural states. Further, they can exploit their management of the page table to perform a controlled-channel attack.}\label{cvm-side-channel}
 \end{figure}
 
 Side channels were a significant threat in Intel SGX and continue to persist in emerging \gls{cvm} models such as AMD SEV and Intel TDX, which remain vulnerable to a broad class of side-channel attacks.
-(\autoref{cvm-side-channel} illustrates the side-channel attacks in \gls{cvm}.
+(\autoref{cvm-side-channel} illustrates the side-channel attacks in \gls{cvm}.)
 Since the \gls{cvm} shares architectural and microarchitectural hardware states with the untrusted hypervisor, it suffers from similar side-channel attack vectors, such as page-table-based attacks (also called the \emph{controlled-channel} attack) and cache attacks~\cite{sevstep}.
-Worse, newer \gls{cvm}-specific side-channels, such as the ciphertext side channel~\cite{li2021cipherleaks,ciphersteal}, continued to be discovered.
+Worse, newer \gls{cvm}-specific side channels, such as the ciphertext side channel~\cite{li2021cipherleaks,ciphersteal}, continued to be discovered.
 Thus, research into side-channel mitigation for \gls{cvm} is a pressing need.
 
 \hdr{Bloated TCB}
-Another with the \gls{cvm} deployment model is the significantly bloated \gls{tcb}.
+Another challenge with the \gls{cvm} deployment model is the significantly bloated \gls{tcb}.
 The \gls{tcb} of a \gls{tee} comprises components trusted to handle the user's secret.
 The \gls{cvm} model now places the confidential application, along with all of its supporting software, within the trust boundary, placing a significant amount of code inside the TEE.
 Specifically, the \gls{os} must now be a part of the \gls{tee}, which contains tens of millions of lines of code and thousands of known vulnerabilities.
 This bloated \gls{tcb} significantly increases the attack surface.
-First, since \gls{os} must interact with low-level hardware that was previously assumed to be trusted before the \gls{cvm} model, the shift in the trust model introduces easy attack vectors.
+First, since the \gls{os} must interact with low-level hardware that was previously assumed to be trusted before the \gls{cvm} model, the shift in the trust model introduces easy attack vectors.
 Research has demonstrated that the legacy \gls{os}, when deployed in a \gls{cvm}, exposes new attack surfaces, such as interrupt handling~\cite{wesee,heckler}.
 Second, the large \gls{tcb} complicates efforts to defend against side-channel attacks; the \gls{os} itself, through complex interactions with user applications, may \emph{amplify} existing side channels or even \emph{introduce} new ones.
 
@@ -88,9 +88,9 @@ It explores the principle of coherent protection (\cref{chap:intro}) by rethinki
 
 This shift in perspective has two implications.
 First, this means that the \gls{os} must now incorporate side-channel attacks from untrusted hypervisors into its threat model.
-\thename shows that this both presents challenges and opportunities \dash\ with the \gls{os}'s access to low-level capabilities like memory management and scheduling, \thename can \emph{efficiently} and \emph{transparently} protect the memory accesses from side-channel attack.
+\incognitos shows that this both presents challenges and opportunities \dash\ with the \gls{os}'s access to low-level capabilities like memory management and scheduling, \incognitos can \emph{efficiently} and \emph{transparently} protect the memory accesses from side-channel attack.
 Second,  it motivates the exploration of alternative OS designs to achieve the security goals.
-With a unikernel design, \incognitos make whole-system protection feasible while keeping the TCB minimal.
+With a unikernel design, \incognitos makes whole-system protection feasible while keeping the TCB minimal.
 
 \clearpage
 

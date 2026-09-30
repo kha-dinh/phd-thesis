@@ -16,7 +16,7 @@
 \clearpage
 
 Modern hardware increasingly embeds security primitives that, if properly integrated, can enforce fine-grained protection within software.
-Yet mainstream \glspl{os} continue to rely on process-based protection, introducing \emph{protection incoherencies}: while hardware features such as Intel PKU, ARM PA, and MTE provide security guarantees in userspace, the \ glspl {os} continues to mediate access at the coarse, process level.
+Yet mainstream \glspl{os} continue to rely on process-based protection, introducing \emph{protection incoherencies}: while hardware features such as Intel PKU, ARM PA, and MTE provide security guarantees in userspace, the \glspl{os} continue to mediate access at the coarse, process level.
 
 This chapter presents \capacity, a hardware-assisted intra-process protection framework that reconciles these incoherencies by retrofitting a capability-based protection model into existing \gls{os} abstractions.
 By transforming memory and file references into cryptographically verifiable capabilities, \capacity extends trust enforcement beyond the kernel boundary and establishes hardware-backed integrity across in-process domains.
@@ -44,7 +44,7 @@ For instance, a domain may use the \texttt{mmap} system call to \emph{remove} \g
 Even worse, system calls such as \texttt{process\_vm\_readv} and \texttt{send}, and kernel mechanisms like signals, read from userspace memory without regard for in-process domains, enabling a domain to bypass memory isolation~\cite{pku-pitfalls,yang2025endokernel}.
 
 Recent work proposes addressing the confused deputy problem by introducing an in-process \emph{reference monitor}.
-The reference monitor interceps all system calls made by the protected application, then enforce access control on domains' accesses to resources.
+The reference monitor interceps all system calls made by the protected application, then enforces access control on domains' accesses to resources.
 However, defining correct and comprehensive policies for in-process isolation is difficult.
 Due to the semantic gap between \gls{os}-level protection and in-process enforcement, policies defined by such monitors are often incomplete, missing information flows on many system calls~\cite{yang2025endokernel,schrammel2022jenny}.
 A principled approach to retrofitting security remains an open challenge.
@@ -87,5 +87,5 @@ This paper presents \thename, a novel hardware-assisted intra-process access con
 \thename coherently incorporates the new hardware security features on ARM, based on the insight that these features already exhibit inherent capabilities.
 It supports the life-cycle protection of the domain's sensitive objects \dash\ starting from their import from the file system to their place in memory.
 With intra-process domains authenticated with unique PA keys, \thename transforms file descriptors and memory pointers into cryptographically-authenticated references and completely mediates reference usage with its program instrumentation framework and an efficient system call monitor.
-We evaluate our \thename-enabled NGINX web server prototype and other common applications in which sensitive resources are isolated into different domains. Our evaluation shows that \thename incurs a low-performance overhead of approximately $17\%$ for the single-threaded and $13.54\%$ for the multi-threaded webserver.
+We evaluate our \thename-enabled NGINX web server prototype and other common applications in which sensitive resources are isolated into different domains. Our evaluation shows that \thename incurs a low performance overhead of approximately $17\%$ for the single-threaded and $13.54\%$ for the multi-threaded webserver.
 
