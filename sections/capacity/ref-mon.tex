@@ -12,13 +12,13 @@
 % Also, importing and using file resources must be mediated to prevent leaking % sensitive assets of a protected domain~\cite{jenny}. \thename's reference monitor enables the complete mediation of file path and file descriptor usages by authenticating the \gls{syscall} arguments. 
 % (e.g., \cpath into \fd)
 
-% Previous works on \gls{ipi} implemented reference monitors that mediate syscalls, along with their memory isolation scheme~\cite{erim,hodor,jenny,cerberus,pku-pitfall}. The necessity of such monitors arises because the kernel is unaware of the in-process domains, and adversaries in the untrusted domain may launch various forms of confused deputy attacks on the trusted domain. 
+% Previous works on \gls{ipi} implemented reference monitors that mediate syscalls, along with their memory isolation scheme~\cite{erim,hodor,jenny,cerberus,pku-pitfalls}. The necessity of such monitors arises because the kernel is unaware of the in-process domains, and adversaries in the untrusted domain may launch various forms of confused deputy attacks on the trusted domain. 
 
 % \thename references also serve as a non-forgeable token in a capability-based access control scheme.
 
 \keypoint{
 	\thename includes a reference monitor that verifies the \emph{arguments} of syscalls to enforce the complete mediation (\srcompmed) of system resource accesses.
-	This capability-inspired authentication mechanism drastically differs from previous works implementing \gls{acl}-based reference monitors for in-process syscall filtering and file access control~\cite{erim,hodor,jenny,cerberus,pku-pitfall}.
+	This capability-inspired authentication mechanism drastically differs from previous works implementing \gls{acl}-based reference monitors for in-process syscall filtering and file access control~\cite{erim,hodor,jenny,cerberus,pku-pitfalls}.
 }
 In those systems, enforcing access control on domain-private sensitive file objects requires a separate logic for the monitor detached from the program semantics.
 Moreover, \gls{acl}-based access control requires keeping track of the isolated objects and the domains that can access them at runtime~\cite{jenny}.
@@ -30,7 +30,7 @@ To avoid the system monitor affecting all processes within the system, we set an
 
 % Note that we do not seek completeness with the syscall filtering policy in our reference monitor.
 % The syscall APIs were never developed with intra-process isolation in mind. This large attack surface entails various domain-to-domain \emph{confused deputy} problems that undermine the security of protected domains.
-% Many such attacks have been discussed in the previous works~\cite{pku-pitfall,jenny,cerberus}.
+% Many such attacks have been discussed in the previous works~\cite{pku-pitfalls,jenny,cerberus}.
 % However, we regard the issue as an open challenge and  leave the completeness of the syscall filtering out of scope.
 
 % \keypoint{
@@ -73,7 +73,7 @@ To avoid the system monitor affecting all processes within the system, we set an
 % \added{
 % In \thename, file object isolation is provided by the complete mediation (\srcompmed) of resource usage provided by the reference monitor.
 % Isolation of \cpath references is provided by resolving the path to get its underlying file object (\ie, \texttt{struct inode}), then authenticate its attached the \gls{acl}-like data structure, as explained in (\cref{sec:design:path}).
-% File descriptors isolation is provided with Capsicum-inspired capability-enhanced file descriptors~\cite{capsicum} that are efficiently constructed and verified with \gls{pa} hardware acceleration (\cref{sec:design:fd}).
+% File descriptors isolation is provided with Capsicum-inspired capability-enhanced file descriptors~\cite{watson2010capsicum} that are efficiently constructed and verified with \gls{pa} hardware acceleration (\cref{sec:design:fd}).
 % The reference monitor also propagates ownership of references when they change forms, which enables the life-cycle isolation of program resources.
 % }
 
@@ -187,7 +187,7 @@ We achieve this by changing the hook for the \texttt{close} to reserve the close
 
 \hdr{In-process FD capabilities}
 \keypoint{
-	\thename's \fd access control scheme resembles that of Capsicum's capability-enabled \fds~\cite{capsicum} but is much more lightweight and is enforced at the in-process granularity.
+	\thename's \fd access control scheme resembles that of Capsicum's capability-enabled \fds~\cite{watson2010capsicum} but is much more lightweight and is enforced at the in-process granularity.
 }
 \thename's \fd capabilities scheme requires no additional kernel metadata for the permissions of \fds since the information necessary to authorize an \fd use is engraved in the \fd itself.
 Moreover, thanks to integrity protection provided by cryptographic authentication, we can securely embed fine-grained access control attributes into the file descriptors themself (\texttt{FD->Attr.} in \autoref{fig:ref-encapsulation}) without extensive bookkeeping.

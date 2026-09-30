@@ -5,9 +5,9 @@ We explain the previous works that are closely related to our work in terms of s
 
 \hdr{Capability-based resource access control}
 \label{sec:related-work:capability}
-Capability-based access control has long been sought after due to its advantages in achieving the principle of least privilege~\cite{obj-cap,cap-addressing,eros,capsicum,cheri,cheri-risc,cheri-jni,jkernel,caja,framer,sel4}.
+Capability-based access control has long been sought after due to its advantages in achieving the principle of least privilege~\cite{obj-cap,cap-addressing,eros,watson2010capsicum,cheri,cheri-risc,cheri-jni,jkernel,caja,framer,sel4}.
 Previous works explored capabilities in OS access control and memory safety.
-In the OS sphere, Capsicum~\cite{capsicum} introduced \emph{process-level} \fd capabilities to UNIX and has been adapted by FreeBSD~\cite{freebsd-capsicum}.
+In the OS sphere, Capsicum~\cite{watson2010capsicum} introduced \emph{process-level} \fd capabilities to UNIX and has been adapted by FreeBSD~\cite{freebsd-capsicum}.
 The SeL4 microkernel provides secure and fine-grained access to system resources through capability tokens~\cite{sel4}.
 % There are also works on capability programming languages~\cite{jkernel,caja}.
 % However, they require a complete program rewrite, while \thename is compatible with existing C/C++ applications.
@@ -59,7 +59,7 @@ However, \thename's use of \key{DB} for the domain key allows it to incorporate 
 Several works have leveraged x86 architecture's \gls{pku} to protect program domains and showed that \gls{pku}-based isolation significantly lower overhead compared to process-based and \gls{sfi}-based isolation~\cite{erim,hodor,cerberus,jenny,pkrusafe}.
 Notably, ERIM~\cite{erim} and Hodor~\cite{hodor} laid the groundwork for utilizing \gls{pku} for intra-process isolation through a meticulously designed call gate between domains.
 \thename is motivated by the underexplored design space for ARM-based in-process compartmentalization and access control.
-Shred~\cite{shreds} proposed isolating the memory of in-process execution units with AArch32's Domain memory protection, but the feature has been removed in AArch64.
+Shred~\cite{chen2016shreds} proposed isolating the memory of in-process execution units with AArch32's Domain memory protection, but the feature has been removed in AArch64.
 % While some works have tried to introduce rudimentary memory isolation on bare-metal ARM systems~\cite{minion,epoxy,dbox}, they are not designed for commodity OSes.
 
 HAKC~\cite{hakc} is a framework for Linux device driver compartmentalization, also leveraging \gls{pa} and \gls{mte}.
@@ -77,7 +77,7 @@ Second, functions can be called from multiple domains; the \texttt{AUT} authenti
 % To further compare Capacity and HAKC specifically regarding their PA/MTE use, HAKC's pointer-use sites are tied to pre-defined ACL regardless of the context (hence, static). On the other hand, Capacity's pointer authentication checks if the reference is issued for the currently active domain, depending on the current context \key{DB} ​	 of the currently executing domain). This key difference brings implications that are pivotal in Capacity's design. First, it allows the PA context to span across the user and kernel, enabling Capacity's FD authentication scheme without a complex user-kernel modifier sharing scheme. Second, functions can be called from multiple domains; the AUT authentication checks in the exact code location and uses different keys and therefore authenticates differently for each domain context.
 
 % , as discussed in \cref{sec:overview}.
-% \gls{ipi}-aware process reference monitor has only been actively discussed in recent works~\cite{donky,pku-pitfall,jenny,cerberus}. The adversaries in the untrusted domain may launch various forms of confused deputy attacks on the trusted domain through \glspl{syscall}~\cite{pku-pitfall,jenny}. For this reason, 
+% \gls{ipi}-aware process reference monitor has only been actively discussed in recent works~\cite{donky,pku-pitfalls,jenny,cerberus}. The adversaries in the untrusted domain may launch various forms of confused deputy attacks on the trusted domain through \glspl{syscall}~\cite{pku-pitfalls,jenny}. For this reason, 
 Recently, there have been proposals for reference monitors better suited for in-process isolation~\cite{donky,jenny,cerberus,muswitch}.
 Jenny~\cite{jenny} proposed a secure and efficient syscall reference monitor that delegates access control to userspace.
 $\mu$Switch~\cite{muswitch} leverages implicit context switches to delay the kernel resource context switching until a syscall is performed to achieve better performance.

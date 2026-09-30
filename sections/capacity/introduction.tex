@@ -26,9 +26,9 @@ The process-level compartments of the program must now communicate via \gls{ipc}
 
 
 % In-process memory isolation
-Many works have proposed in-process and in-place compartmentalization methodologies~\cite{lotrx86,shreds,seimi,erim,hodor,jenny,cerberus,donky} that either re-purposes existing hardware features~\cite{lotrx86,shreds,seimi} or adapts of newly introduced hardware features, most notably using Intel's \gls{pku}~\cite{intel-manual}.
+Many works have proposed in-process and in-place compartmentalization methodologies~\cite{lotrx86,chen2016shreds,seimi,erim,hodor,jenny,cerberus,donky} that either re-purposes existing hardware features~\cite{lotrx86,chen2016shreds,seimi} or adapts of newly introduced hardware features, most notably using Intel's \gls{pku}~\cite{intel-manual}.
 Recent \gls{pku}-based proposals~\cite{pkrusafe,hodor,erim,jenny,cerberus} have demonstrated in-place isolation with limited performance overhead.
-Hardware-assisted isolation on ARM was previously explored \cite{shreds} using \emph{domains} memory protection feature that had an uncanny resemblance to \gls{pku}.
+Hardware-assisted isolation on ARM was previously explored \cite{chen2016shreds} using \emph{domains} memory protection feature that had an uncanny resemblance to \gls{pku}.
 However, the domains feature has now been deprecated in AArch64.
 
 We argue that the in-process compartmentalization designs on the modern ARM architectures are currently underexplored.
@@ -42,7 +42,7 @@ However, the principles and mechanisms of the ARM's direction in hardware-assist
 
 
 In this paper, we propose \thename, a novel OS access control model that revolves around capability security principles~\cite{obj-cap,eros}.
-A plethora of existing research has discussed capability as the ideal scheme for achieving the \emph{least privilege} compartments and eliminating \emph{ambient authority} in OSes~\cite{cheri,capsicum,eros,cheri,cheri-risc,cheriabi}.
+A plethora of existing research has discussed capability as the ideal scheme for achieving the \emph{least privilege} compartments and eliminating \emph{ambient authority} in OSes~\cite{cheri,watson2010capsicum,eros,cheri-risc,cheriabi}.
 % explores a hardware-accelerated compartmentalization model that 
 We observe that the new ARM hardware extensions, \gls{pa} and \gls{mte}, carry inherent characteristics of \emph{capabilities}.
 \thename's design choices fully leverage these features.
@@ -56,13 +56,13 @@ Our work retrofits the OS-based access control with its consistent capability sc
 \thename brings a coherent in-process capability for compartments within the process (subjects) and abstract process resources (objects) whose state may alternate between a file or memory content throughout its life cycle.
 Capability-based \emph{memory} access control has been explored by many previous works~\cite{cheri,cheri-risc,cheriabi,lowfat-pointer,new-lowfat-pointer}.
 Notably, the CHERI architecture~\cite{cheri,cheri-risc,cheriabi} applies memory capabilities to pointers, although the requirement of customized processor architecture limits its applicability.
-Process-level capabilities have also been studied from OS design perspectives~\cite{obj-cap,eros,freebsd-capsicum,cap-addressing,capsicum}.
+Process-level capabilities have also been studied from OS design perspectives~\cite{obj-cap,eros,freebsd-capsicum,cap-addressing,watson2010capsicum}.
 These works focus on access control of OS resources bestowed on the process often represented in the form of \emph{files}.
 However, securing today's large monolithic user programs calls for finer-granular access control on files, not to mention the necessity of consolidating a memory access control for in-process compartments.
 
 % Novelty2: efficient and simple reference monitor
 \textbf{Simple and efficient reference monitoring.} \thename's coherent capability scheme also seamlessly incorporates a simple and efficient reference monitor design for in-process access control.
-The necessity and design space of efficient \gls{syscall} reference monitors for in-process domains have been discussed in many previous works~\cite{pku-pitfall,jenny,cerberus,monguard}.
+The necessity and design space of efficient \gls{syscall} reference monitors for in-process domains have been discussed in many previous works~\cite{pku-pitfalls,jenny,cerberus,monguard}.
 Since the OS kernel is unaware of the in-process compartments, a reference monitor must mediate accesses to process resources among the potentially mutually distrusting compartments in addition to \glspl{syscall} filtering that may undermine the security of the compartments.
 % \thename also implements a reference monitor to interpose \glspl{syscall}. 
 We take a different route from previous works to achieve both goals coherently.

@@ -52,7 +52,7 @@ These shared states are never designed to hold secrets; previous research has de
 
 \glspl{tee} excabates the side-channel problem with a much stronger threat model compared to traditional protections (\cref{sec:intro:bg-os}).
 The attackers in this threat model are the management software, i.e., the \gls{os} and the hypervisor. 
-Thus, attackers are now given access to powerful capabilities like page access interception~\cite{xu2015controlledchannel} and interrupt timers ~\cite{sgx-step,bulck2018nemesis,cachezoom}, which they can leverage to leak information~\cite{controlled-channel} or amplify existing side channels~\cite{cachezoom,hahnel_high-resolution_2017}.
+Thus, attackers are now given access to powerful capabilities like page access interception~\cite{xu2015controlledchannel} and interrupt timers ~\cite{sgx-step,bulck2018nemesis,cachezoom}, which they can leverage to leak information~\cite{xu2015controlledchannel} or amplify existing side channels~\cite{cachezoom,hahnel_high-resolution_2017}.
 
 
 
@@ -65,7 +65,7 @@ Thus, attackers are now given access to powerful capabilities like page access i
 Side channels were a significant threat in Intel SGX and continue to persist in emerging \gls{cvm} models such as AMD SEV and Intel TDX, which remain vulnerable to a broad class of side-channel attacks.
 (\autoref{cvm-side-channel} illustrates the side-channel attacks in \gls{cvm}.
 Since the \gls{cvm} shares architectural and microarchitectural hardware states with the untrusted hypervisor, it suffers from similar side-channel attack vectors, such as page-table-based attacks (also called the \emph{controlled-channel} attack) and cache attacks~\cite{sevstep}.
-Worse, newer \gls{cvm}-specific side-channels, such as the ciphertext side channel~\cite{li_cipherleaks_nodate,ciphersteal}, continued to be discovered.
+Worse, newer \gls{cvm}-specific side-channels, such as the ciphertext side channel~\cite{li2021cipherleaks,ciphersteal}, continued to be discovered.
 Thus, research into side-channel mitigation for \gls{cvm} is a pressing need.
 
 \hdr{Bloated TCB}

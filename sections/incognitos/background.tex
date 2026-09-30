@@ -32,7 +32,7 @@ Side-channel attacks that undermine the confidentiality of trusted executions ha
 Adversaries who control the untrusted hypervisor can leverage its control over the \gls{npt} to strategically trigger \gls{npf} on \gls{cvm} pages by marking a page \emph{non-present}.
 When the victim \gls{cvm} accesses such pages, the CPU generates a \texttt{\#NPF}, with the corresponding faulting address recorded in the \gls{vmcb}.
 In the current SEV-SNP~\cite{amd64}, the processor notifies the hypervisor of (1) the faulting \gls{gpfn} (e.g.,\texttt{ 0xff...ab\textbf{000}}) through {\tt VMCB.EXITINFO2} and (2) the cause of the fault, along with other information~\cite{amd64} through the {\tt VMCB.EXITCODE} upon the \gls{npf} occurrence.
-These so-called \gls{npf} controlled-channel attacks are adaptations of the page fault-based attacks against Intel SGX~\cite{xu2015controlledchannel,hahnel2017highresolution}.
+These so-called \gls{npf} controlled-channel attacks are adaptations of the page fault-based attacks against Intel SGX~\cite{xu2015controlledchannel,hahnel_high-resolution_2017}.
 Through the attack, the adversary can trace instruction fetches and data accesses at page granularity.
 In many previous SEV(-SNP) attacks, NPF attacks have been employed as a CVM memory profiling primitive for pinpointing attack targets (\cref{sec:relatedwork:profiling}).
 
@@ -42,8 +42,8 @@ In many previous SEV(-SNP) attacks, NPF attacks have been employed as a CVM memo
 \hdr{Fine-grained side-channels}
 \label{sec:background:fine-grained-sc}
 Fine-grained side-channel attacks represent attack vectors that leak memory access patterns at a resolution finer than the page size.
-These attacks typically exploit microarchitectural leakages (e.g., cache~\cite{sgx-cache-attack,cache-attack-sgx,hahnel2017highresolution} and TLB~\cite{wang2017leaky}) or architectural leakages such the encrypted memory access patterns~\cite{leeoffchip}, and ciphertext updates~\cite{li2021cipherleaks,li2022systematic}.
-Fine-grained side-channel attack vectors have been extensively studied in the context of Intel SGX~\cite{sgx-cache-attack,cache-attack-sgx,sgxstep,bulck2018nemesis,hahnel2017highresolution,cachezoom,sgxspectre,foreshadow}, and certain attacks remain feasible against SEV-SNP \glspl{cvm}.
+These attacks typically exploit microarchitectural leakages (e.g., cache~\cite{sgx-cache-attack,cache-attack-sgx,hahnel_high-resolution_2017} and TLB~\cite{wang2017leaky}) or architectural leakages such the encrypted memory access patterns~\cite{leeoffchip}, and ciphertext updates~\cite{li2021cipherleaks,li2022systematic}.
+Fine-grained side-channel attack vectors have been extensively studied in the context of Intel SGX~\cite{sgx-cache-attack,cache-attack-sgx,sgx-step,bulck2018nemesis,hahnel_high-resolution_2017,cachezoom,sgxspectre,foreshadow}, and certain attacks remain feasible against SEV-SNP \glspl{cvm}.
 For instance, recent research highlights the exploitation of L2 cache Prime+Probe and ciphertext side-channel attacks to extract sensitive information from SEV CVMs~\cite{li2021cipherleaks,li2022systematic,sevstep}.
 Ciphertext side-channel attacks~\cite{li2021cipherleaks,li2022systematic,ciphersteal} are specific to AMD SEV(-SNP).
 They exploit the weak AES-XEX cipher used for CVM memory encryption, which consistently produces the same ciphertext for identical plaintext written to the same physical address.
@@ -57,7 +57,7 @@ In combination with other primitives, a previous work~\cite{li2021cipherleaks} d
 A SEV-SNP CVM currently has no option but to rely solely on the untrusted hypervisor to deliver \emph{virtualized} interrupts, which may be delayed or completely skipped.
 Also, the hypervisor may leverage the precise hardware interrupt timer (e.g., APIC) to seize the victim's CVM execution for itself at any moment and at an arbitrary frequency.
 This untrustworthy interrupt delivery relation has been exploited as a primitive to boost the temporal resolution of the fine-grained side channels.
-Since the fine-grained side channels must target very specific addresses and are often noisy due to the ongoing CVM computations, \emph{single-stepping} technique~\cite{sevstep,sgxstep,cachewarp} was often used to acquire temporal resolution of a single instruction.
+Since the fine-grained side channels must target very specific addresses and are often noisy due to the ongoing CVM computations, \emph{single-stepping} technique~\cite{sevstep,sgx-step,cachewarp} was often used to acquire temporal resolution of a single instruction.
 
 % The attack exploits ciphertext being generated for writes to the same physical address, where the physical address serves as the encryption tweak.
 
@@ -124,7 +124,7 @@ With the targeted page locations established, the attacker can utilize lower-ban
 % % While many of these exploits are no longer possible in the latest version of \gls{sevsnp}.
 
 % \hdr{Amplifying resolution with single-stepping}
-% \emph{Single-stepping}~\cite{sevstep,sgxstep} plays a crucial technique in secret extraction; it maximizes the \emph{temporal} resolution of the fine-grained secret extraction primitives such as cache side-channel and ciphertext.
+% \emph{Single-stepping}~\cite{sevstep,sgx-step} plays a crucial technique in secret extraction; it maximizes the \emph{temporal} resolution of the fine-grained secret extraction primitives such as cache side-channel and ciphertext.
 % With single-stepping the adversary can collect memory content changes with the resolution of one instruction execution.
 % Single-stepping leverages a precise hardware interrupt timer (e.g., APIC or \todo{something}) to intercept the execution of the victim after exactly one instruction.
 

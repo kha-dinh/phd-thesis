@@ -1,15 +1,15 @@
 \section{Introduction}\label{sec:incognitos:intro}
-Ensuring the confidentiality of computation in untrusted environments such as the cloud remains a daunting challenge even with the mature hardware-assisted \emph{TEE (Trusted Execution Environment)} architectures~\cite{sgx,kaplanamd,tdx}.
+Ensuring the confidentiality of computation in untrusted environments such as the cloud remains a daunting challenge even with the mature hardware-assisted \emph{TEE (Trusted Execution Environment)} architectures~\cite{sgx,kaplan_amd_nodate,tdx}.
 % \hjcomm{Side-channel threat summary}{...}
-A plethora of attacks have demonstrated their effectiveness in undermining the confidentiality of the userspace enclaves (e.g., Intel SGX)~\cite{sgx-cache-attack,cache-attack-sgx,sgxstep,bulck2018nemesis,xu2015controlledchannel,hahnel2017highresolution,cachezoom,sgxspectre,foreshadow}.
+A plethora of attacks have demonstrated their effectiveness in undermining the confidentiality of the userspace enclaves (e.g., Intel SGX)~\cite{sgx-cache-attack,cache-attack-sgx,sgx-step,bulck2018nemesis,xu2015controlledchannel,hahnel_high-resolution_2017,cachezoom,sgxspectre,foreshadow}.
 
 % While the execution state of the TEEs remain encrypted outside the protected domain, a plethora of side-channel attacks have aptly extracted sensitive information from TEE domains.
-% In this new \gls{cvm} model, untrusted software components are prohibited from accessing the \gls{cvm} memory and register contents through memory encryption, MMU-based isolation, bus access control, protected CPU state switches, or the combination of these mechanisms~\cite{kaplanamd,tdx,cca}.
+% In this new \gls{cvm} model, untrusted software components are prohibited from accessing the \gls{cvm} memory and register contents through memory encryption, MMU-based isolation, bus access control, protected CPU state switches, or the combination of these mechanisms~\cite{kaplan_amd_nodate,tdx,cca}.
 % , opening up new research challenges and also opportunities for design space explorations~\cite{adil2024veil,schwarz2024seven,narayanan2024vtpm,cocotpm,anna2023trustworthy,li2023bifrost}.
 
 \hdr{Shift towards CVMs}
-Meanwhile, a shift from process-based enclaves~\cite{costan2016intel,costan2016sanctum,keystone} such as Intel SGX towards \glspl{cvm} is anticipated with the current and upcoming hardware extensions.
-Intel's \gls{tdx}~\cite{tdx}, AMD's \gls{sev}~\cite{amd64,kaplanamd}, and ARM's \gls{cca}~\cite{cca} all adopt the virtual machine construct as TEE boundary.
+Meanwhile, a shift from process-based enclaves~\cite{costan_intel_2016,costan2016sanctum,keystone} such as Intel SGX towards \glspl{cvm} is anticipated with the current and upcoming hardware extensions.
+Intel's \gls{tdx}~\cite{tdx}, AMD's \gls{sev}~\cite{amd64,kaplan_amd_nodate}, and ARM's \gls{cca}~\cite{cca} all adopt the virtual machine construct as TEE boundary.
 This means the OS kernel now resides within the trust boundary, unlike the previous userspace enclave design of Intel SGX~\cite{sgx}.
 
 

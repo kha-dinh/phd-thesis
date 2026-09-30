@@ -26,7 +26,7 @@ minimum height=0.5cm,font=\scriptsize]
 		] (p1) {};
 		\node[above of=p1, yshift=.5cm]{Compartmentalized process};
 
-		\tikzstyle{memblock}=[draw,minimum width=1.5cm, minimum height=0.5cm];
+		\tikzstyle{memblock}=[draw,minimum width=1.5cm, minimum height=0.5cm]
 		\matrix (memory) [draw,above of=p1,column sep=10pt,yshift=-0.7cm,minimum width=\boxwidth - 0.3cm] {
 			\node[memblock,fill=orange!20] (m1) {}; &
 			\node[memblock,fill=green!20] (m2) {};  &
@@ -68,7 +68,7 @@ minimum height=0.5cm,font=\scriptsize]
 		\node[thick,draw=blue,fit=(c4)(m4),inner sep=2pt] (b3) {};
 
 
-		\tikzstyle{resourcesmatrix}=[draw,column sep=5pt,yshift=.2cm];
+		\tikzstyle{resourcesmatrix}=[draw,column sep=5pt,yshift=.2cm]
 		\matrix(files) [below of=r2, resourcesmatrix] {
 			\node[draw,fill=blue!20](s1) {}; \\
 		};

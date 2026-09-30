@@ -86,10 +86,10 @@ On average, \thename's instrumentation incurs $11.37\%$ performance degradation 
 
 % \vspace{-1em}
 \subsection{Adapting \thename to real-world programs}
-We exemplify \thename's capability domains by adapting it to several open-source applications studied by previous isolation frameworks~\cite{erim,shreds,ptrsplit}.
+We exemplify \thename's capability domains by adapting it to several open-source applications studied by previous isolation frameworks~\cite{erim,chen2016shreds,ptrsplit}.
 These applications include OpenSSH's \texttt{ssh} utility~\cite{openssh}, \texttt{wget} file download utility~\cite{wget}, and NGINX webserver~\cite{nginx} compiled along the TLS library LibreSSL~\cite{libressl}.
 Representative code examples of our modifications can be found in the appendix of the extended version of this paper~\cite{capacity-extended}.
-% Different from other compartmentalization frameworks~\cite{erim,jenny,shreds,ptrsplit,hakc}, on top of memory isolation, \thename also enables the coherent in-process isolation of system resources, such as file descriptors of private files and sockets.
+% Different from other compartmentalization frameworks~\cite{erim,jenny,chen2016shreds,ptrsplit,hakc}, on top of memory isolation, \thename also enables the coherent in-process isolation of system resources, such as file descriptors of private files and sockets.
 The applications are also compiled with the \thename-instrumented \emph{musl} libc~\cite{musl} adapted to handle signed pointers in system call arguments.
 \autoref{tbl:porting-app} summarizes the \thename domains in protected applications and their protected assets.
 %Our instrumentation framework is proven mature enough to compile complex real-world programs such as the webserver and its components.
@@ -107,7 +107,7 @@ We demonstrate \thename's program secrets protection throughout their life-cycle
 We compile OpenSSH to use its built-in crypto library and use \thename to isolate the private key of \texttt{ssh}.
 We introduce a new domain, \textsc{Privkey}, with exclusive access to the private key file and its in-memory buffer.
 This domain spans from when the private key is loaded from the file system until after the login operation succeeds.
-% Unlike previous systems \cite{shreds,ptrsplit}, \thename also protects the path and file descriptor of the private key.
+% Unlike previous systems \cite{chen2016shreds,ptrsplit}, \thename also protects the path and file descriptor of the private key.
 % To achieve this, 
 We then assign the static private key to the domain, allocate the private key buffer (\texttt{struct sshkey}) in private memory, annotate its pointers with \texttt{DOM\_PRIV}, and finally wrap functions that access the private key within domain entry gates.
 These changes require about $50$ LoC changes over 13 functions across 5 files.

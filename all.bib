@@ -3216,13 +3216,13 @@ https://www.amd.com/en/technologies/hbm
   note = {Last accessed May 10 , 2021,},
   howpublished = {\url{https://ebpf.io}},
 }
-@book{intel-manual,
+@manual{intel-manual,
   title = {{Intel\textsuperscript{\textregistered} 64 and IA-32 Architectures
            Software Developer's Manual}},
-  author = {{Intel Corporation}},
+  organization = {{Intel Corporation}},
   year = 2021,
-  month = {June},
-  number = {325462-075US},
+  month = jun,
+  note = {Order No. 325462-075US},
 }
 @misc{mte,
   title = {{ARMv8.5-A Memory Tagging Extension}},
@@ -3612,15 +3612,13 @@ https://www.amd.com/en/technologies/hbm
 @inproceedings{new-lowfat-pointer,
   title = {Heap Bounds Protection with Low Fat Pointers},
   author = {Duck, Gregory J. and Yap, Roland H. C.},
+  booktitle = {Proceedings of the 25th International Conference on Compiler
+               Construction (CC)},
   year = 2016,
-  location = {Barcelona, Spain},
+  address = {Barcelona, Spain},
   publisher = {Association for Computing Machinery},
-  address = {New York, NY, USA},
-  series = {CC 2016},
-  pages = {132–142},
+  pages = {132--142},
   doi = {10.1145/2892208.2892212},
-  isbn = 9781450342414,
-  numpages = 11,
 }
 @misc{memory-tagging,
   title = {{Memory Tagging and how it improves C/C++ memory safety}},
@@ -4175,13 +4173,13 @@ https://www.amd.com/en/technologies/hbm
   location = {Rotterdam, Netherlands},
   series = {ASPLOS '25},
 }
-@article{caja,
-  title = {Caja: Safe active content in sanitized JavaScript},
+@techreport{caja,
+  title = {Caja: Safe Active Content in Sanitized {JavaScript}},
   author = {Miller, Mark S. and Samuel, Mike and Laurie, Ben and Awad, Ihab and
             Stay, Mike},
+  institution = {Google, Inc.},
   year = 2008,
-  month = {June 7},
-  type = {PDF},
+  month = jun,
 }
 @inproceedings{dbox,
   title = {D-{{Box}}: {{DMA-enabled Compartmentalization}} for {{Embedded
@@ -4961,11 +4959,12 @@ https://www.amd.com/en/technologies/hbm
   journal = {Technology Guide},
   language = {en},
 }
-@article{kaplan_amd_nodate,
-  title = {{AMD} {SEV}-{SNP}: {Strengthening} {VM} {Isolation} with {Integrity}
-           {Protection} and {More}},
+@misc{kaplan_amd_nodate,
+  title = {{AMD SEV-SNP}: Strengthening {VM} Isolation with Integrity
+           Protection and More},
   author = {Kaplan, David},
-  language = {en},
+  howpublished = {AMD White Paper},
+  year = 2020,
 }
 @inproceedings{wesley_filardo_cornucopia_2020,
   title = {Cornucopia: {Temporal} {Safety} for {CHERI} {Heaps}},
@@ -5010,7 +5009,7 @@ https://www.amd.com/en/technologies/hbm
             Thomas},
   language = {en},
 }
-@article{li_cipherleaks_nodate,
+@inproceedings{li_cipherleaks_nodate,
   title = {{CIPHERLEAKS}: {Breaking} {Constant}-time {Cryptography} on {AMD} {
            SEV} via the {Ciphertext} {Side} {Channel}},
   author = {Li, Mengyuan and Zhang, Yinqian and Li, Kang and Cheng, Yueqiang and
@@ -7525,10 +7524,10 @@ https://www.amd.com/en/technologies/hbm
   language = {en},
 }
 @techreport{advanced_micro_device_sev_2022,
-  title = {{SEV} {Secure} {Nested} {Paging} {Firmware} {ABI} {Specification}},
-  author = {Advanced Micro Device},
+  title = {{SEV} Secure Nested Paging Firmware {ABI} Specification},
+  author = {{Advanced Micro Devices}},
+  institution = {Advanced Micro Devices},
   year = 2022,
-  language = {en},
 }
 @article{yadalam_sgxl_2021,
   title = {{SGXL}: {Security} and {Performance} for {Enclaves} {Using} {Large} {
@@ -7593,14 +7592,14 @@ https://www.amd.com/en/technologies/hbm
   language = {en},
   annotation = {6 citations (Semantic Scholar/DOI) [2023-06-19]},
 }
-@article{hofmann_inktag_nodate,
-  title = {{InkTag}: {Secure} {Applications} on an {Untrusted} {Operating} {
-           System}},
+@inproceedings{hofmann_inktag_nodate,
+  title = {{InkTag}: Secure Applications on an Untrusted Operating System},
   author = {Hofmann, Owen S and Kim, Sangman and Dunn, Alan M and Lee, Michael Z
             and Witchel, Emmett},
-  language = {en},
-  keywords = {application protection, paraverification, virtualization-based
-              security},
+  booktitle = {Proceedings of the 18th International Conference on Architectural
+               Support for Programming Languages and Operating Systems (ASPLOS)},
+  year = 2013,
+  pages = {265--278},
 }
 @inproceedings{rodrigues_sparse_2016,
   title = {Sparse representation of implicit flows with applications to
@@ -9175,17 +9174,12 @@ https://www.amd.com/en/technologies/hbm
   annotation = {108 citations (Semantic Scholar/DOI) [2023-04-05]},
 }
 @inproceedings{hahnel_high-resolution_2017,
-  title = {\{{High}-{Resolution}\} {Side} {Channels} for {Untrusted} {Operating}
-           {Systems}},
+  title = {{High-Resolution} Side Channels for Untrusted Operating Systems},
   author = {Hähnel, Marcus and Cui, Weidong and Peinado, Marcus},
+  booktitle = {2017 {USENIX} Annual Technical Conference ({USENIX} {ATC} 17)},
   year = 2017,
   pages = {299--312},
-  isbn = {978-1-931971-38-6},
-  url = {
-         https://www.usenix.org/conference/atc17/technical-sessions/presentation/hahnel
-         },
-  urldate = {2023-04-05},
-  language = {en},
+  url = {https://www.usenix.org/conference/atc17/technical-sessions/presentation/hahnel},
 }
 @article{lou_survey_2021,
   title = {A {Survey} of {Microarchitectural} {Side}-{Channel} {Vulnerabilities}
@@ -14586,20 +14580,19 @@ https://www.intel.com/content/www/us/en/products/docs/accelerator-engines/softwa
   year = 2023,
 }
 
-@article{amd-perf,
-  url = {
-         https://www.amd.com/content/dam/amd/en/documents/epyc-technical-docs/programmer-references/58550-0.01.pdf
-         },
-  title = {Performance Monitor Counters for AMD Family 1Ah Model 00h- 0Fh
+@misc{amd-perf,
+  author = {{Advanced Micro Devices}},
+  title = {Performance Monitor Counters for AMD Family 1Ah Model 00h--0Fh
            Processors},
+  howpublished = {\url{https://www.amd.com/content/dam/amd/en/documents/epyc-technical-docs/programmer-references/58550-0.01.pdf}},
   year = 2024,
 }
-@article{amd64,
-  title = {{{AMD64 Architecture Programmer}}'s {{Manual}}, {{Volumes}} 1-5,
-           40332, 24592, 24593, 24594, 26568, 26569},
+@manual{amd64,
+  title = {{AMD64} Architecture Programmer's Manual, Volumes 1--5},
+  organization = {{Advanced Micro Devices}},
+  note = {Publication No. 40332},
   year = 2024,
 }
-
 @misc{2023miri,
   title = {Miri},
   year = 2023,
@@ -14649,11 +14642,11 @@ https://www.intel.com/content/www/us/en/products/docs/accelerator-engines/softwa
 }
 
 @techreport{advancedmicrodevice2022sev,
-  title = {{{SEV Secure Nested Paging Firmware ABI Specification}}},
-  author = {Advanced Micro Device},
+  title = {{SEV} Secure Nested Paging Firmware {ABI} Specification},
+  author = {{Advanced Micro Devices}},
+  institution = {Advanced Micro Devices},
   year = 2022,
 }
-
 @inproceedings{aga2017invisimem,
   title = {{{InvisiMem}}: {{Smart Memory Defenses}} for {{Memory Bus Side
            Channel}}},
@@ -18792,12 +18785,13 @@ https://www.intel.com/content/www/us/en/products/docs/accelerator-engines/softwa
   annotation = {8 citations (Semantic Scholar/arXiv) [2023-02-24]},
 }
 
-@article{kaplanamd,
-  title = {{{AMD SEV-SNP}}: {{Strengthening VM Isolation}} with {{Integrity
-           Protection}} and {{More}}},
+@misc{kaplanamd,
+  title = {{AMD SEV-SNP}: Strengthening {VM} Isolation with Integrity
+           Protection and More},
   author = {Kaplan, David},
+  howpublished = {AMD White Paper},
+  year = 2020,
 }
-
 @misc{kaplanprotecting,
   title = {{{PROTECTING VM REGISTER STATE WITH SEV-ES}}},
   author = {Kaplan, David},
@@ -21233,21 +21227,13 @@ https://www.intel.com/content/www/us/en/products/docs/accelerator-engines/softwa
   annotation = {0 citations (Semantic Scholar/DOI) [2023-03-13]},
 }
 
-@article{miller2003capability,
-  title = {Capability {{Myths Demolished}}},
+@techreport{miller2003capability,
+  title = {Capability Myths Demolished},
   author = {Miller, Mark S and Yee, Ka-Ping and Shapiro, Jonathan},
+  institution = {Systems Research Laboratory, Johns Hopkins University},
+  number = {SRL2003-02},
   year = 2003,
-  abstract = {We address three common misconceptions about capability-based
-              systems: the Equivalence Myth (access control list systems and
-              capability systems are formally equivalent), the Confinement Myth
-              (capability systems cannot enforce confinement), and the
-              Irrevocability Myth (capability-based access cannot be revoked).
-              The Equivalence Myth obscures the benefits of capabilities as
-              compared to access control lists, while the Confinement Myth and
-              the Irrevocability Myth lead people to see problems with
-              capabilities that do not actually exist.},
 }
-
 @inproceedings{miller2019practical,
   title = {Practical {{Safe Linux Kernel Extensibility}}},
   booktitle = {Proc. {{Workshop Hot Top}}. {{Oper}}. {{Syst}}.},
