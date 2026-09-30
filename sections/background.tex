@@ -5,7 +5,7 @@
 
 \epigraph{
 	This then is programming, both a tar pit in which many efforts have floundered and a creative activity with joys and woes all its own.
-}{\textit{Frederick P. Brooks, Jr}, The Mythical Man-month}
+}{\textit{Frederick P. Brooks, Jr.}, The Mythical Man-Month}
 
 \
 
@@ -114,7 +114,7 @@ These features have evolved alongside \gls{os} design for more than six decades 
 
 A fundamental security requirement of the \gls{os} is to protect itself from untrusted programs and prevent them from bypassing access control (e.g., by corrupting critical \gls{os} data structures).
 
-Modern \glspl{os} employs protection rings to achieve this, establishing two execution modes: kernel and user.
+Modern \glspl{os} employ protection rings to achieve this, establishing two execution modes: kernel and user.
 Kernel mode hosts the \gls{os}. It runs in the most privileged level, ring~0, which is permitted to execute sensitive instructions and interact directly with hardware devices.
 User-mode programs run in ring~3 and are restricted from issuing sensitive instructions or accessing protected resources.
 Requests for system resources must be mediated by the kernel through a restricted interface known as the system call.
@@ -149,7 +149,7 @@ Virtualization technologies further extended the protection ring model by insert
 A hypervisor, or \gls{vmm}, executes in a higher-privilege level, often referred to as ring –1 on x86 hardware.
 This position allows the hypervisor to mediate access to hardware resources and intercept sensitive operations issued by guest \glspl{os}, ensuring that each \gls{vm} remains isolated from the host and from other \glspl{vm}.
 
-Early x86 processors were not fully visualizable because some sensitive instructions failed to trap when executed outside ring 0.
+Early x86 processors were not fully virtualizable because some sensitive instructions failed to trap when executed outside ring 0.
 To address this, hypervisors such as VMware initially relied on dynamic binary translation to rewrite problematic instructions~\cite{devine2002virtualization}.
 Later, hardware extensions such as Intel VT-x~\cite{uhlig2005intel} and AMD-V introduced explicit support for virtualization, providing a new privilege mode for the hypervisor and mechanisms to securely switch between guest and host contexts.
 
@@ -175,8 +175,8 @@ Research has shown that compromised commonly used packages affect up to hundreds
 
 Because software bugs are inevitable and preventing supply-chain attacks remains difficult, an effective way to limit their impact is \emph{privilege separation}.
 This approach divides software into isolated protection domains (\cref{sec:intro:bg-os}), each with access to only a minimal set of privileges.
-For instance, a URL parsing library should not be allowed access to networking system calls and data strucutres, or only the cryptographic library should be able to read the system's private key.
-This is the act of decomposing software into least-priviledge components is also called \emph{compartmentalization}~\cite{hugo2025sok}.
+For instance, a URL parsing library should not be allowed access to networking system calls and data structures, or only the cryptographic library should be able to read the system's private key.
+This act of decomposing software into least-privilege components is also called \emph{compartmentalization}~\cite{hugo2025sok}.
 
 The need for privilege separation in complex software has long been recognized by both research and industry.
 In 2003, Provos et al.~\cite{provos2003preventing} discussed over-privilege in core OS services and proposed a privilege-separation architecture later applied to the OpenSSH server.
@@ -207,7 +207,7 @@ Second, host applications often require modification~\cite{rlbox} to interface c
 	\begin{center}
 		\begin{tabular}[c]{p{6cm}p{2cm}p{2cm}p{3cm}}
 			\toprule
-			                                                                & Context switching costs & Runtime overheads & Compatibility \textbackslash{}w existing applications \\
+			                                                                & Context switching costs & Runtime overheads & Compatibility w/ existing applications \\
 			\midrule
 			Virtual machines                                                & Very high               & Low               & Low                                                   \\
 			Process                                                         & High                    & None              & Low                                                   \\
@@ -228,7 +228,7 @@ Second, host applications often require modification~\cite{rlbox} to interface c
 \autoref{tab:isolation} provides a comparison between the previously described isolation primitives and modern hardware-assisted isolation.
 Hardware-assisted isolation introduced by emerging architectural features addresses several of the limitations discussed above.
 Recent processors offer primitives that directly support efficient in-process memory isolation.
-Intel \gls{pku} allow user-space code to assign access rights to groups of pages and to modify those rights without changing page tables.
+Intel \gls{pku} allows user-space code to assign access rights to groups of pages and to modify those rights without changing page tables.
 ARM Memory Tagging Extension (MTE) associates pointers and memory with tags, enabling fine-grained, hardware-checked bounds on memory accesses.
 CHERI capabilities enforce fine-grained memory safety through 128-bit pointers that encapsulate their bounds and permissions.
 
@@ -243,7 +243,7 @@ A plethora of work leverages these new hardware isolation primitives to retrofit
 This retrofitting process often involves inserting domain boundaries between logical components of a process.
 Each \emph{in-process domain} is given access to a subset of program memory.
 Communication between domains is restricted, and their entries and exits are strictly controlled through domain \emph{entry/exit gates}.
-\autoref{ipi} demonstrates one of such in-process compartmentalization, where libraries are placed into compartments with separate memory spaces.
+\autoref{ipi} demonstrates one such in-process compartmentalization, where libraries are placed into compartments with separate memory spaces.
 
 Modern hardware features enable fine-grained memory-protection enforcement and efficient domain entry gating.
 MTE can enforce access control policies at the granularity of 16 bytes, and PKU-based isolation systems can switch between up to 15 memory domains at runtime with overheads of only about 260 cycles~\cite{erim}.
@@ -254,7 +254,7 @@ MTE can enforce access control policies at the granularity of 16 bytes, and PKU-
 
 \section{TEEs and Confidential Virtual Machines}\label{sec:intro:bg-cvm}
 
-This section provides background on \glspl{tee} and the industry's shift toward \glspl{cvm}, establishing the context for \incognitos, an \gls{os}- design for \gls{cvm} side-channel mitigation, as presented in \cref{chap:incognitos}.
+This section provides background on \glspl{tee} and the industry's shift toward \glspl{cvm}, establishing the context for \incognitos, an \gls{os} design for \gls{cvm} side-channel mitigation, as presented in \cref{chap:incognitos}.
 
 \subsection{Motivation: re-establishing trust in the cloud}
 
@@ -270,10 +270,10 @@ Data breaches are also financially damaging, costing organizations up to \$4.4 b
 \begin{figure}[t]
     \centering
 \input{figures/bg-tee-trust-model-tikz}
-\caption{Trust model of Traditional computing vs. Intel SGX.}\label{trad-vs-tee}
+\caption{Trust model of traditional computing vs. Intel SGX.}\label{trad-vs-tee}
 \end{figure}
 
-\Glspl{tee} aims to re-establish trust in cloud environments by enabling remote users to securely deploy computation and isolating that computation from the rest of the platform, including cloud administrators.
+\Glspl{tee} aim to re-establish trust in cloud environments by enabling remote users to securely deploy computation and isolating that computation from the rest of the platform, including cloud administrators.
 \autoref{trad-vs-tee} illustrates the trust models of traditional systems and that of \glspl{tee}, such as Intel \gls{sgx}~\cite{costan_intel_2016}.
 In traditional systems (left), the application owner must trust the entire software stack—including the \gls{os}, hypervisor, and hardware.
 In contrast, \gls{tee} systems (right) reduce the \gls{tcb} to the TEE-capable hardware and the trusted portion of the application, referred to as the \emph{enclave} in \gls{sgx}.
@@ -281,7 +281,7 @@ In contrast, \gls{tee} systems (right) reduce the \gls{tcb} to the TEE-capable h
 
 The key properties of \glspl{tee} are (1) \gls{tcb} minimization, (2) root-of-trust establishment, and (3) runtime isolation. \begin{itemize}
 	\item \textbf{\gls{tcb} minimization} reduces the amount of code that must be trusted for the security of a protected application.
-	      By excluding the \ glspl {os}, hypervisor, and most system software from the \ glspl {tcb}, \glspl{tee} limits the attack surface and makes formal or informal assurance more tractable.
+	      By excluding the \glspl{os}, hypervisor, and most system software from the \gls{tcb}, \glspl{tee} limit the attack surface and makes formal or informal assurance more tractable.
 	      Only a small hardware-defined computing base and the trusted portion of the application remain within the \gls{tcb}.
 	\item \textbf{Root-of-trust establishment} provides a verifiable foundation upon which remote users can rely.
 	      TEEs use hardware-backed cryptographic keys and measurement mechanisms (e.g., hashing of code and initial state) to create attestable evidence of the platform's integrity.
@@ -327,8 +327,8 @@ These constraints significantly increase the effort required to develop enclave 
 \end{figure}
 
 Recognizing the need for compatibility, vendors introduced a new class of \gls{tee} called \gls{cvm}.
-\glspl{cvm}, as illustrated in \autoref{cvm}, extends the protection to entire \glspl{vm}.
-Instead of isolating only a small portion of an application, \glspl{cvm} allows an unmodified guest \gls{os} and its applications to run inside a protected execution environment.
+\glspl{cvm}, as illustrated in \autoref{cvm}, extend the protection to entire \glspl{vm}.
+Instead of isolating only a small portion of an application, \glspl{cvm} allow an unmodified guest \gls{os} and its applications to run inside a protected execution environment.
 This design preserves strong hardware isolation while retaining the familiar virtualization interface that cloud systems already rely on.
 
 Modern processor vendors provide dedicated hardware mechanisms to support \glspl{cvm}.
